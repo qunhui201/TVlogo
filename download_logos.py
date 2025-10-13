@@ -2,92 +2,80 @@ import os
 import re
 import requests
 from pathlib import Path
-from time import sleep
 
-# -------------------------
-# 配置部分
-# -------------------------
-# GitHub 原始链接 md 文件夹
-GITHUB_MD_RAW_URL = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/md/"
+# GitHub 原始内容 URL 模板
+MD_BASE_URL = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/md/{}.md"
 
-# 输出根目录
-output_root = Path("TVlogo_Images")
-output_root.mkdir(exist_ok=True)
+# 要下载的 md 文件列表
+md_files = [f"{i:02}.md" for i in range(1, 51)]
 
-# 请求头
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
-    "Accept": "image/webp,image/apng,image/*,*/*;q=0.8"
-}
+# 下载图片的根目录
+ROOT_DIR = Path("TVlogo_Images")
+ROOT_DIR.mkdir(exist_ok=True)
 
-# 最大重试次数
-MAX_RETRY = 3
+# 重试次数
+MAX_RETRIES = 3
 
-# -------------------------
-# 函数部分
-# -------------------------
-def safe_filename(name):
-    """生成安全的文件名"""
-    return "".join(c if c.isalnum() or c in "_-" else "_" for c in name)
+# 记录失败下载
+failed_downloads = []
 
 def download_image(url, save_path):
-    """下载图片，失败自动重试"""
-    for attempt in range(1, MAX_RETRY + 1):
+    """下载图片，失败重试"""
+    for attempt in range(1, MAX_RETRIES + 1):
         try:
-            resp = requests.get(url, headers=HEADERS, timeout=10, allow_redirects=True)
+            resp = requests.get(url, timeout=10)
             if resp.status_code == 200:
                 with open(save_path, "wb") as f:
                     f.write(resp.content)
                 print(f"下载成功: {save_path}")
                 return True
             else:
-                print(f"请求状态码 {resp.status_code}，重试 {attempt}/{MAX_RETRY}")
+                print(f"请求状态码 {resp.status_code}，重试 {attempt}/{MAX_RETRIES}")
         except Exception as e:
-            print(f"下载异常: {e}，重试 {attempt}/{MAX_RETRY}")
-        sleep(1)
+            print(f"请求异常 {e}，重试 {attempt}/{MAX_RETRIES}")
     print(f"下载失败: {save_path}")
+    failed_downloads.append(str(save_path))
     return False
 
-# -------------------------
-# 主程序
-# -------------------------
-# 1. 获取所有 md 文件名（这里直接列出，如果有新文件，需要更新）
-md_files = [
-    "01.md","02.md","03.md","04.md","05.md","06.md","07.md","08.md","09.md","10.md",
-    "11.md","12.md","13.md","14.md","15.md","16.md","17.md","18.md","19.md","20.md",
-    "21.md","22.md","23.md","24.md","25.md","26.md","27.md","28.md","29.md","30.md",
-    "31.md","32.md","33.md","34.md","35.md","36.md","37.md","38.md","39.md","40.md",
-    "41.md","42.md","43.md","44.md","45.md","46.md","47.md","48.md","49.md","50.md"
-]
-
-for md_file in md_files:
-    url = GITHUB_MD_RAW_URL + md_file
+def process_md(md_url):
+    """处理单个 md 文件"""
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=10)
-        resp.raise_for_status()
+        resp = requests.get(md_url)
+        if resp.status_code != 200:
+            print(f"下载 md 文件失败: {md_url}")
+            return
         content = resp.text
+
+        # 获取子文件夹标题 【台湾频道一】 -> 台湾频道一
+        folder_match = re.search(r"#\s*【(.+?)】", content)
+        folder_name = folder_match.group(1) if folder_match else "Unknown"
+        folder_path = ROOT_DIR / folder_name
+        folder_path.mkdir(parents=True, exist_ok=True)
+
+        # 匹配 img src 链接和对应频道名
+        matches = re.findall(r'\|([^|]+)\|<img\s+src="([^"]+)"', content)
+        for title, img_url in matches:
+            # 图片文件名用频道名 + 后缀
+            ext = os.path.splitext(img_url)[1]
+            file_name = f"{title}{ext}"
+            save_path = folder_path / file_name
+            if not save_path.exists():
+                download_image(img_url, save_path)
+
     except Exception as e:
-        print(f"获取 {md_file} 失败: {e}")
-        continue
+        print(f"处理 md 文件异常: {md_url} -> {e}")
 
-    # 匹配 Markdown 标题作为子文件夹
-    title_matches = re.findall(r"# 【(.+?)】", content)
-    if title_matches:
-        folder_title = title_matches[0]
-    else:
-        folder_title = md_file.replace(".md","")
+def main():
+    for md_file in md_files:
+        md_url = MD_BASE_URL.format(md_file)
+        print(f"开始处理: {md_url}")
+        process_md(md_url)
 
-    folder_path = output_root / safe_filename(folder_title)
-    folder_path.mkdir(exist_ok=True)
+    print("\n全部下载完成")
+    if failed_downloads:
+        print("以下文件下载失败：")
+        for f in failed_downloads:
+            print(f)
 
-    # 匹配所有图片链接和对应频道名
-    pattern = re.compile(r"\|(.+?)\|<img src=\"(https?://.+?)\">")
-    matches = pattern.findall(content)
-
-    for channel_name, img_url in matches:
-        img_name = safe_filename(channel_name) + Path(img_url).suffix
-        save_path = folder_path / img_name
-        if save_path.exists():
-            print(f"已存在: {save_path}")
-            continue
-        download_image(img_url, save_path)
+if __name__ == "__main__":
+    main()
