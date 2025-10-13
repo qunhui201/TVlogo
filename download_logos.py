@@ -3,8 +3,8 @@ import re
 import requests
 from pathlib import Path
 
-# GitHub 原始内容 URL 模板
-MD_BASE_URL = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/md/{}.md"
+# GitHub 原始内容 URL 模板（不要在这里再加 .md）
+MD_BASE_URL = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/md/{}"
 
 # 要下载的 md 文件列表
 md_files = [f"{i:02}.md" for i in range(1, 51)]
@@ -55,7 +55,8 @@ def process_md(md_url):
         # 匹配 img src 链接和对应频道名
         matches = re.findall(r'\|([^|]+)\|<img\s+src="([^"]+)"', content)
         for title, img_url in matches:
-            # 图片文件名用频道名 + 后缀
+            # 清理 img_url，去掉可能多余的属性
+            img_url = img_url.split('"')[0].split()[0]
             ext = os.path.splitext(img_url)[1]
             file_name = f"{title}{ext}"
             save_path = folder_path / file_name
