@@ -2,34 +2,31 @@ name: Download TV Logos
 
 on:
   workflow_dispatch:  # 手动触发
-  push:
-    branches:
-      - main
+
 
 jobs:
   download:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.x"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
 
-    - name: Install requests
-      run: pip install requests
+      - name: Install requests
+        run: pip install requests
 
-    - name: Download TV logos
-      run: |
-        python download_logos.py
+      - name: Download TV logos
+        run: |
+          python3 download_tvlogos.py  # 你的脚本文件名
 
-    - name: Commit downloaded logos
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git add img/
-        git commit -m "Add downloaded TV logos" || echo "No changes"
-        git push
+      - name: Commit & Push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add TVlogo_Images/
+          git commit -m "Add downloaded TV logos" || echo "No changes to commit"
+          git push
