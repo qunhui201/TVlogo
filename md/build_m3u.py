@@ -39,7 +39,7 @@ CATEGORY_ORDER = [
 # 地方频道关键词
 LOCAL_KEYWORDS = ["新闻", "生活", "影视", "文体", "少儿", "都市", "公共", "教育", "剧场"]
 
-# 下载网络 M3U 并保存到临时文件
+# 下载网络 M3U 并返回行列表
 def download_m3u(url):
     try:
         resp = requests.get(url, timeout=15)
@@ -71,7 +71,6 @@ def build_logo_map():
             if file.suffix.lower() == ".png":
                 name = file.stem
                 logo_map[name] = (category, file)
-
     return logo_map
 
 # 提取仓库中可能的地名文件夹（用于地方台判断）
@@ -100,36 +99,39 @@ def parse_m3u(lines):
         i += 1
     return channels
 
-# 根据 logo_map 和地名判断频道分类
+# 分类逻辑修正版
 def classify_channel(name, logo_map, regions):
-    # 优先 logo 匹配
+    # 1️⃣ 优先 logo 匹配
     if name in logo_map:
         return logo_map[name][0]
 
-    # CCTV/央视频道
+    # 2️⃣ 第三方系列匹配
+    for s in ["CIBN", "DOX", "NewTV", "iHOT", "数字频道",
+              "台湾频道一", "台湾频道二", "台湾频道三"]:
+        if s in name:
+            return s
+
+    # 3️⃣ CCTV/央视频道
     if "CCTV" in name or "CETV" in name or "CGTN" in name:
         return "央视频道"
 
-    # 卫视频道
+    # 4️⃣ 卫视频道（包含地名）
     if "卫视" in name:
         return "卫视频道"
 
-    # 判断是否包含地名（非卫视类）
+    # 5️⃣ 地方频道规则：地名 + LOCAL_KEYWORDS
     for region in regions:
         if region in name:
-            return "地方频道"
+            for keyword in LOCAL_KEYWORDS:
+                if keyword in name:
+                    return "地方频道"
 
-    # 地方频道关键词
+    # 6️⃣ LOCAL_KEYWORDS
     for keyword in LOCAL_KEYWORDS:
         if keyword in name:
             return "地方频道"
 
-    # 第三方系列匹配
-    for s in ["CIBN", "DOX", "NewTV", "iHOT", "数字频道", "台湾频道一", "台湾频道二", "台湾频道三"]:
-        if s in name:
-            return s
-
-    # 默认其他频道
+    # 7️⃣ 默认其他频道
     return "其他频道"
 
 # 生成 EXTINF 条目
