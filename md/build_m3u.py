@@ -1,4 +1,4 @@
-# build_m3u_logo.py
+# build_m3u_full.py
 import re
 import requests
 from pathlib import Path
@@ -12,6 +12,20 @@ REMOTE_FILES = [
 ALIAS_FILE = "md/mohupidao.txt"
 OUTPUT_FILE = "output.m3u"
 
+# 台标路径
+LOGO_PATHS = [
+    "TVlogo_Images/中央电视台",
+    "TVlogo_Images/全国卫视",
+    "TVlogo_Images/CGTN、中国教育电视台、新华社、中央新影",
+    "TVlogo_Images/CIBN系列",
+    "TVlogo_Images/DOX系列",
+    "TVlogo_Images/NewTV系列",
+    "TVlogo_Images/iHOT系列"
+]
+
+REMOTE_LOGO = "https://github.com/qunhui201/TVlogo/tree/main/img"
+
+# 地方频道关键字
 PROVINCES = [
     "北京", "上海", "天津", "重庆", "辽宁", "吉林", "黑龙江",
     "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南",
@@ -21,12 +35,6 @@ PROVINCES = [
 ]
 
 SERIES_LIST = ["CIBN", "DOX", "NewTV", "iHOT"]
-
-GITHUB_LOGO_BASE = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/img"
-
-LOCAL_LOGO_PATH = Path("TVlogo_Images")
-
-SPECIAL_GITHUB_NAMES = ["CGTN", "中国教育电视台", "新华社", "中央新影"]
 
 # --------- 函数 ---------
 def load_alias_map(alias_file):
@@ -84,62 +92,54 @@ def classify_channel(name, group):
     return "其他频道"
 
 def find_logo(name):
-    # 特殊 GitHub 台标
-    for special in SPECIAL_GITHUB_NAMES:
-        if special in name:
-            # 假设图片名和频道名相近
-            return f"{GITHUB_LOGO_BASE}/{name}.png"
+    # 先在本地文件夹匹配
+    for path in LOGO_PATHS:
+        candidate = Path(path) / f"{name}.png"
+        if candidate.exists():
+            return str(candidate)
+    # 如果包含 CGTN、中国教育电视台、新华社、中央新影，可用远程备用
+    if any(x in name for x in ["CGTN", "中国教育电视台", "新华社", "中央新影"]):
+        return REMOTE_LOGO
+    return ""
 
-    # 优先在本地分类文件夹找台标
-    for folder in LOCAL_LOGO_PATH.glob("**/*"):
-        if folder.is_file() and name in folder.stem:
-            return str(folder.resolve())
-    
-    # 本地找不到再去 GitHub
-    return f"{GITHUB_LOGO_BASE}/{name}.png"
+def cctv_sort_key(item):
+    m = re.search(r"CCTV[-+]?(\d+)", item[0])
+    return int(m.group(1)) if m else 100  # 未匹配的放后面
 
+# --------- 主逻辑 ---------
 def main():
     alias_map = load_alias_map(ALIAS_FILE)
     all_channels = []
 
+    # 下载远程 m3u
     for url in REMOTE_FILES:
         content = download_m3u(url)
         channels = parse_m3u(content)
         all_channels.extend(channels)
 
-    # 应用别名
+    # 应用别名、分类、台标
     processed = []
-    seen_urls = set()
     for name, url, grp, _ in all_channels:
-        if url in seen_urls:
-            continue  # 去重
-        seen_urls.add(url)
         name = apply_alias(name, alias_map)
         grp_final = classify_channel(name, grp)
         logo = find_logo(name)
         processed.append((name, url, grp_final, logo))
 
-    # 对央视频道按数字排序
+    # 央视按数字排序，其他频道保持原顺序
     cctv_channels = [x for x in processed if x[2] == "央视频道"]
     other_channels = [x for x in processed if x[2] != "央视频道"]
 
-    def cctv_sort_key(item):
-        m = re.search(r"CCTV[-]?(\d+)", item[0])
-        return int(m.group(1)) if m else 0
-
     cctv_channels.sort(key=cctv_sort_key)
-    final_list = cctv_channels + other_channels
 
-    # 输出 M3U
     output_lines = ["#EXTM3U"]
-    for name, url, grp, logo in final_list:
+    for name, url, grp, logo in cctv_channels + other_channels:
         output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{grp}",{name}')
         output_lines.append(url)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines))
 
-    print(f"已生成 {OUTPUT_FILE}，共 {len(final_list)} 个频道")
+    print(f"已生成 {OUTPUT_FILE}，共 {len(processed)} 个频道")
 
 if __name__ == "__main__":
     main()
