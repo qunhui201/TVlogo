@@ -1,5 +1,3 @@
 requests
 pandas
 beautifulsoup4
-pandas
-re
