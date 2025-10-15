@@ -1,87 +1,91 @@
-import requests
 import re
-from pathlib import Path
+import requests
+from collections import defaultdict
+from datetime import datetime
 
-# ---- 配置 ----
+# IPTV 源列表
 iptv_sources = [
     "http://httop.top/iptvs.m3u",
     "http://httop.top/iptvx.m3u"
 ]
-channels_txt = Path("channels.txt")
-output_file = Path("output.m3u")
 
-# GitHub 图标路径前缀
-LOGO_BASE = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images"
+# 输出文件名
+output_file = "output.m3u"
 
-# EPG 地址
-EPG_URL = "https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"
+# 台标主路径
+logo_base = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images"
 
-# ---- 读取频道分类 ----
-channel_groups = {}
-current_group = None
-with channels_txt.open(encoding="utf-8") as f:
-    for line in f:
-        line = line.strip()
-        if not line:
-            continue
-        if line.startswith("#"):
-            current_group = line.strip("#").strip()
-        else:
-            channel_groups[line] = current_group or "其他频道"
+# 匹配央视频道的正则
+cctv_pattern = re.compile(r'^(CCTV|CETV)[\-\d]+')
 
-# ---- 抓取 IPTV 内容 ----
-m3u_lines = []
-for url in iptv_sources:
+# 存储所有频道
+channels = defaultdict(list)
+
+def fetch_m3u(url):
+    """从远程URL获取m3u内容"""
     try:
-        print(f"Fetching {url} ...")
-        res = requests.get(url, timeout=10)
-        res.encoding = "utf-8"
-        m3u_lines.extend(res.text.splitlines())
+        print(f"📡 正在下载 {url} ...")
+        resp = requests.get(url, timeout=15)
+        resp.encoding = 'utf-8'
+        if resp.status_code == 200:
+            return resp.text
+        else:
+            print(f"⚠️ 下载失败: {url} ({resp.status_code})")
+            return ""
     except Exception as e:
-        print(f"⚠️ Failed to fetch {url}: {e}")
+        print(f"❌ 获取失败: {url} -> {e}")
+        return ""
 
-# ---- 解析频道 ----
-pattern = re.compile(r"^(?!#EXTM3U|#EXTINF)(https?://[^\s]+)$")
-channels = []  # [(name, url)]
+# 从多个源合并
+merged_content = ""
+for src in iptv_sources:
+    merged_content += fetch_m3u(src) + "\n"
 
+# 按行解析
+lines = merged_content.splitlines()
 current_name = None
-for line in m3u_lines:
-    line = line.strip()
+
+for line in lines:
     if line.startswith("#EXTINF"):
-        # 提取频道名
-        name_match = re.search(r",([^,]+)$", line)
-        if name_match:
-            current_name = name_match.group(1).strip()
-    elif pattern.match(line):
-        if current_name:
-            channels.append((current_name, line))
-            current_name = None
+        match = re.search(r',(.+)$', line)
+        if match:
+            current_name = match.group(1).strip()
+    elif line.startswith("http") and current_name:
+        channels[current_name].append(line.strip())
+        current_name = None
 
-# ---- 生成 output.m3u ----
-lines = [f'#EXTM3U x-tvg-url="{EPG_URL}"\n']
+print(f"✅ 共解析到 {len(channels)} 个频道。")
 
-for name, url in channels:
-    # 匹配分类
-    group = channel_groups.get(name.split()[0], "其他频道")
+# 生成输出内容
+output_lines = [
+    '#EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"\n'
+]
 
-    # 猜测 logo 路径（优先匹配对应文件夹）
-    # 央视频道示例路径：https://.../中央电视台/CCTV-1 综合.png
-    logo_folder = {
-        "央视频道": "中央电视台",
-        "央视付费频道": "中央新影",
-        "卫视频道": "全国卫视",
-        "广东频道": "广东",
-    }.get(group, "其他")
+for name, urls in sorted(channels.items()):
+    # 判断频道分类与台标路径
+    if cctv_pattern.match(name):
+        group = "央视频道"
+        logo_folder = "中央电视台"
+    else:
+        group = "其他频道"
+        logo_folder = "其他"
 
-    logo_name = f"{name}.png"
-    tvg_logo = f"{LOGO_BASE}/{logo_folder}/{logo_name}"
-    tvg_name = re.sub(r"\s+", "", name)  # 去掉空格防止TVBox识别错误
+    # 台标URL（例如：https://.../中央电视台/CCTV-1 综合.png）
+    logo_url = f"{logo_base}/{logo_folder}/{name}.png"
 
-    lines.append(
-        f'#EXTINF:-1 tvg-name="{tvg_name}" tvg-logo="{tvg_logo}" group-title="{group}",{name}'
-    )
-    lines.append(url)
+    # 为同频道输出多条链接
+    for url in urls:
+        output_lines.append(
+            f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo_url}" group-title="{group}",{name}\n{url}\n'
+        )
 
-# ---- 写入文件 ----
-output_file.write_text("\n".join(lines), encoding="utf-8")
-print(f"✅ 已生成 {output_file}")
+# 添加更新时间
+now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+output_lines.append(f'#EXTINF:-1 🕘️更新时间, {now}\n')
+output_lines.append("https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/stream05/streamPlaylist.m3u8\n")
+
+# 写入文件
+with open(output_file, "w", encoding="utf-8") as f:
+    f.writelines(output_lines)
+
+print(f"🎉 已生成 {output_file}，总计 {len(channels)} 个频道。")
