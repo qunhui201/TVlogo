@@ -1,81 +1,97 @@
-# httop.py
 import requests
-import re
 from pathlib import Path
 
-# 两个 m3u 链接
-urls = [
+# -----------------------------
+# 配置
+# -----------------------------
+M3U_URLS = [
     "http://httop.top/iptvs.m3u",
     "http://httop.top/iptvx.m3u"
 ]
 
-# GitHub 台标文件夹本地路径
-logo_base = Path(__file__).parent / "TVlogo_Images"
+# 台标文件夹（仓库根目录的 TVlogo_Images）
+repo_root = Path(__file__).parent.parent
+logo_base = repo_root / "TVlogo_Images"
 
 # 输出文件
-output_m3u = Path(__file__).parent / "merged_channels.m3u"
-output_list = Path(__file__).parent / "channel_list.txt"
+output_m3u = repo_root / "output.m3u"
+channel_list_file = repo_root / "channels.txt"
 
-# 节目单链接模板（可统一修改）
-epg_url_template = "https://github.com/qunhui201/TVlogo/tree/main/TVlogo_Images"
+# 节目单模板（可按需修改）
+EPG_URL_TEMPLATE = "https://github.com/qunhui201/TVlogo/tree/main/TVlogo_Images/{channel}.xml"
 
-# 用来存储所有频道
-channels = []
+# -----------------------------
+# 检查台标文件夹
+# -----------------------------
+if not logo_base.exists():
+    raise FileNotFoundError(f"台标文件夹不存在: {logo_base}")
 
-# 匹配 #EXTINF 信息
-extinf_pattern = re.compile(r'#EXTINF:-1.*?,(.*)\n(.*)')
+# 遍历台标文件夹，建立映射 {频道名: 台标路径}
+logos = {}
+for folder in logo_base.iterdir():
+    if folder.is_dir():
+        for logo_file in folder.iterdir():
+            if logo_file.suffix.lower() in [".png", ".jpg", ".jpeg"]:
+                logos[logo_file.stem] = logo_file.as_posix()
 
-for url in urls:
+print(f"共找到 {len(logos)} 个台标文件")
+
+# -----------------------------
+# 抓取 M3U
+# -----------------------------
+all_channels = []
+channel_names = set()
+
+for url in M3U_URLS:
     print(f"Fetching {url} ...")
-    r = requests.get(url, timeout=10)
+    r = requests.get(url, timeout=15)
     r.encoding = 'utf-8'
-    text = r.text
-    matches = extinf_pattern.findall(text)
-    for title, link in matches:
-        # 提取 group-title
-        group_match = re.search(r'group-title="(.*?)"', title)
-        group = group_match.group(1) if group_match else "未分类"
-        # 提取 tvg-name
-        name_match = re.search(r'tvg-name="(.*?)"', title)
-        tvg_name = name_match.group(1) if name_match else title.strip()
-        channels.append({
-            "title": tvg_name,
-            "group": group,
-            "link": link.strip()
-        })
+    lines = r.text.splitlines()
+    
+    for i, line in enumerate(lines):
+        if line.startswith("#EXTINF:"):
+            title_line = line
+            stream_line = lines[i+1] if i+1 < len(lines) else ""
+            # 提取 tvg-name 和 group-title
+            tvg_name = ""
+            group_title = ""
+            try:
+                tvg_name = title_line.split('tvg-name="')[1].split('"')[0]
+            except:
+                tvg_name = title_line.split(',')[-1].strip()
+            try:
+                group_title = title_line.split('group-title="')[1].split('"')[0]
+            except:
+                group_title = "其它频道"
 
-# 去重（按 title + link）
-seen = set()
-unique_channels = []
-for ch in channels:
-    key = (ch['title'], ch['link'])
-    if key not in seen:
-        seen.add(key)
-        unique_channels.append(ch)
+            if tvg_name in channel_names:
+                continue  # 去重
+            channel_names.add(tvg_name)
 
-# 写出频道列表备用
-with open(output_list, "w", encoding="utf-8") as f:
-    for ch in unique_channels:
-        f.write(f"{ch['title']} ({ch['group']})\n")
+            # 匹配台标
+            logo_path = logos.get(tvg_name, "")
 
-# 生成新的 m3u
+            # 节目单链接
+            epg_url = EPG_URL_TEMPLATE.format(channel=tvg_name)
+
+            # 构建新的 EXTINF 行
+            new_extinf = f'#EXTINF:-1 tvg-id="{tvg_name}" tvg-name="{tvg_name}" tvg-logo="{logo_path}" group-title="{group_title}",{tvg_name}'
+            
+            all_channels.append((new_extinf, stream_line))
+
+# -----------------------------
+# 写入 M3U 文件
+# -----------------------------
 with open(output_m3u, "w", encoding="utf-8") as f:
     f.write("#EXTM3U\n")
-    for ch in unique_channels:
-        # 尝试匹配台标
-        logo_path = ""
-        # 台标命名规则示例：文件夹名/频道名.png
-        for folder in logo_base.iterdir():
-            if folder.is_dir():
-                candidate = folder / f"{ch['title']}.png"
-                if candidate.exists():
-                    logo_path = f"{epg_url_template}/{folder.name}/{candidate.name}"
-                    break
-        # 写入 EXTINF
-        f.write(f'#EXTINF:-1 tvg-name="{ch["title"]}" tvg-logo="{logo_path}" group-title="{ch["group"]}",{ch["title"]}\n')
-        f.write(f'{ch["link"]}\n')
+    for extinf, url in all_channels:
+        f.write(f"{extinf}\n{url}\n")
 
-print(f"Done! {len(unique_channels)} channels merged.")
-print(f"M3U output: {output_m3u}")
-print(f"Channel list: {output_list}")
+# -----------------------------
+# 写入频道列表文件
+# -----------------------------
+with open(channel_list_file, "w", encoding="utf-8") as f:
+    for name in sorted(channel_names):
+        f.write(f"{name}\n")
 
+print(f"完成: {output_m3u} 和 {channel_list_file}")
