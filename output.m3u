@@ -1,5 +1,5 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"
-#EXTINF:-1,🕘 更新时间 2025-10-15 06:00:14
+#EXTINF:-1,🕘 更新时间 2025-10-15 06:14:25
 #EXTINF:-1 tvg-name="CCTV-1 综合" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/CCTV-1 综合.png" group-title="央视频道",CCTV-1 综合
 http://116.2.178.200:808/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="CCTV-1 综合" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/CCTV-1 综合.png" group-title="央视频道",CCTV-1 综合
@@ -164,8 +164,6 @@ http://116.2.178.200:808/hls/10/index.m3u8
 http://111.43.126.240:7777/hls/57/index.m3u8
 #EXTINF:-1 tvg-name="辽宁卫视" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/辽宁/辽宁卫视.png" group-title="地方频道",辽宁卫视
 http://124.88.238.50:82/hls/21/index.m3u8
-#EXTINF:-1 tvg-name="辽宁体育" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/辽宁体育.png" group-title="地方频道",辽宁体育
-http://116.2.178.200:808/hls/11/index.m3u8
 #EXTINF:-1 tvg-name="东方卫视" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/上海/东方卫视.png" group-title="地方频道",东方卫视
 http://116.2.178.200:808/hls/12/index.m3u8
 #EXTINF:-1 tvg-name="东方卫视" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/上海/东方卫视.png" group-title="地方频道",东方卫视
@@ -292,6 +290,8 @@ http://111.43.126.240:7777/hls/99/index.m3u8
 http://111.43.126.240:7777/hls/100/index.m3u8
 #EXTINF:-1 tvg-name="哒啵赛事" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/数字频道/哒啵赛事.png" group-title="数字频道",哒啵赛事
 http://111.43.126.240:7777/hls/101/index.m3u8
+#EXTINF:-1 tvg-name="辽宁体育" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/辽宁体育.png" group-title="其他频道",辽宁体育
+http://116.2.178.200:808/hls/11/index.m3u8
 #EXTINF:-1 tvg-name="纪实高清" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/纪实高清.png" group-title="其他频道",纪实高清
 http://116.2.178.200:808/hls/42/index.m3u8
 #EXTINF:-1 tvg-name="1" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/1.png" group-title="其他频道",1
