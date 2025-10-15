@@ -1,50 +1,45 @@
-name: Build and Update M3U
+name: Build M3U Playlist
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:    # 手动触发
   schedule:
-    - cron: "0 4 * * *" # 每天 04:00 UTC 自动触发
+    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发
 
 jobs:
-  build_m3u:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出仓库
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2. 设置 Python
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
-      # 3. 安装依赖
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f "md/requirements.txt" ]; then pip install -r md/requirements.txt; fi
+          pip install requests
 
-      # 4. 运行 M3U 构建脚本
-      - name: Build M3U
+      - name: Run build script
         run: python3 md/build_m3u.py
 
-      # 5. 上传 artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: output-m3u
           path: output.m3u
 
-      # 6. 安全自动提交更新
-      - name: Commit changes
+      - name: Configure git
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git fetch origin main
-          git reset --soft origin/main
+
+      - name: Commit and push changes
+        run: |
           git add output.m3u
-          git commit -m "Auto update M3U playlist $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git pull --rebase origin main || echo "No remote changes"
-          git push origin main
+          git commit -m "Auto update M3U playlist $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git pull --rebase
+          git push
