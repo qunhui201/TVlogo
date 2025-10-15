@@ -9,8 +9,8 @@ REMOTE_FILES = [
     "http://httop.top/iptvx.m3u"
 ]
 
-TVLOGO_DIR = Path("/path/to/TVlogo_Images")  # 你的台标根目录
-OUTPUT_FILE = "output_classified.m3u"
+TVLOGO_DIR = Path("TVlogo_Images")  # 你的台标根目录
+OUTPUT_FILE = "output.m3u"
 
 PROVINCES = [
     "北京","上海","天津","重庆","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西",
