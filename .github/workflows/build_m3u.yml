@@ -1,45 +1,41 @@
 name: Build M3U
 
+# 手动触发 & 定时触发
 on:
-  workflow_dispatch:    # 手动触发
+  workflow_dispatch:   # 手动触发
   schedule:
     - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ 拉取仓库
+      # 1. 拉取最新仓库
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 确保拉取完整历史和最新文件
 
-      # 2️⃣ 设置 Python
+      # 2. 设置 Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # 3️⃣ 安装依赖（如果有 requirements.txt）
+      # 3. 安装依赖
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f "md/requirements.txt" ]; then pip install -r md/requirements.txt; fi
+          pip install -r md/requirements.txt
 
-      # 4️⃣ 运行脚本生成 M3U
-      - name: Run build_m3u.py
-        run: python3 md/build_m3u.py
+      # 4. 执行生成脚本
+      - name: Run build_m3u_classify.py
+        run: python3 md/build_m3u_classify.py
 
-      # 5️⃣ 提交生成的文件
-      - name: Commit and push if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output_original.m3u
-          # 检查是否有改动
-          if ! git diff --cached --quiet; then
-            git commit -m "Update output_original.m3u"
-            git push
-          else
-            echo "No changes to commit"
-          fi
+      # 5. 可选：上传生成的文件作为 artifact
+      - name: Upload output.m3u
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-m3u
+          path: output.m3u
