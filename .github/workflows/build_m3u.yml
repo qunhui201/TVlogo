@@ -1,35 +1,45 @@
-name: Classify Channels by Region
+name: Build M3U Playlist
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:    # 手动触发
   schedule:
-    - cron: "0 1 * * *"  # 每天 UTC 01:00 自动运行（北京时间 09:00）
+    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发
 
 jobs:
-  classify:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
-          pip install requests pandas beautifulsoup4 || true
+          python -m pip install --upgrade pip
+          pip install requests
 
-      - name: Run classification script
+      - name: Run build script
+        run: python3 md/build_m3u.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-m3u
+          path: output.m3u
+
+      - name: Configure git
         run: |
-          python3 md/build_m3u.py
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
 
       - name: Commit and push changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Auto classify channels by region" || echo "No changes to commit"
+          git add output.m3u
+          git commit -m "Auto update M3U playlist $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git pull --rebase
           git push
