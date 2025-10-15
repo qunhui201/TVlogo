@@ -1,4 +1,4 @@
-# build_m3u_classify_full_v2.py
+# build_m3u_classify_full_v3.py
 import re
 import requests
 from pathlib import Path
@@ -10,18 +10,22 @@ REMOTE_FILES = [
 ]
 
 TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
+OUTPUT_FILE = "output.m3u"
+
+FIXED_EPG_URL = "https://gh.catmak.name/https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"
 
 PROVINCES = [
     "北京","上海","天津","重庆","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西",
     "山东","河南","湖北","湖南","广东","广西","海南","四川","贵州","云南","陕西","甘肃",
-    "青海","宁夏","新疆","内蒙","西藏","香港","澳门","台湾","延边","大湾区"
+    "青海","宁夏","新疆","内蒙","西藏","香港","澳门","台湾"
 ]
 
 SPECIAL_CHANNELS = {
     "CCTV17": "央视频道"  # 特例处理
 }
 
-OUTPUT_FILE = "output.m3u"
+LOCAL_SUFFIX = ["新闻","生活","影视","都市","文体","少儿"]
+THIRD_PARTY = ["CIBN","DOX","NewTV","iHOT","数字频道","台湾频道一","台湾频道二","台湾频道三"]
 
 # -------- 函数 ---------
 def download_m3u(url):
@@ -46,6 +50,26 @@ def parse_m3u(content):
             result.append((name, url, grp, logo))
     return result
 
+def match_logo(name, group, tvlogo_dir):
+    """根据分类和频道名反向匹配台标"""
+    # 特殊分类不匹配，直接返回空或已有 logo
+    if group in ["央视频道", "卫视频道", "地方频道"]:
+        search_dirs = [tvlogo_dir / group]
+    else:
+        # 其他分类
+        search_dirs = [tvlogo_dir / group]
+
+    for folder in search_dirs:
+        if not folder.exists() or not folder.is_dir():
+            continue
+        for file in folder.iterdir():
+            if file.is_file():
+                # 忽略英文前缀，匹配中文频道名
+                ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', file.stem)
+                if ch_name and ch_name in name:
+                    return str(file.resolve())
+    return ""  # 未匹配到返回空
+
 def classify_channel(name, original_group, tvlogo_dir):
     """分类逻辑"""
     # 特殊频道直接归类
@@ -65,27 +89,19 @@ def classify_channel(name, original_group, tvlogo_dir):
     for province in PROVINCES:
         if province in name and "卫视" not in name:
             return "地方频道"
+    for suffix in LOCAL_SUFFIX:
+        if name.endswith(suffix):
+            return "地方频道"
 
-    # 第三方系列匹配（忽略英文前缀）
-    for folder in tvlogo_dir.iterdir():
-        if not folder.is_dir():
-            continue
-        folder_name = folder.name
-        if folder_name in ["央视频道", "卫视频道", "地方频道"]:
-            continue
-        for logo_file in folder.iterdir():
-            if not logo_file.is_file():
-                continue
-            filename = logo_file.stem
-            ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)  # 忽略英文前缀
-            if ch_name and ch_name in name:
-                return folder_name
+    # 第三方系列匹配
+    for series in THIRD_PARTY:
+        if series in name:
+            return series
 
     # 数字或未知
     if name.isdigit() or not name:
         return "其他频道"
 
-    # 默认
     return "其他频道"
 
 # -------- 主逻辑 ---------
@@ -99,9 +115,12 @@ def main():
         all_channels.extend(channels)
 
     # 写入输出文件
-    output_lines = ["#EXTM3U"]
+    output_lines = [f'#EXTM3U x-tvg-url="{FIXED_EPG_URL}"']
+
     for name, url, grp, logo in all_channels:
         final_group = classify_channel(name, grp, TVLOGO_DIR)
+        if not logo:
+            logo = match_logo(name, final_group, TVLOGO_DIR)
         output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{final_group}",{name}')
         output_lines.append(url)
 
