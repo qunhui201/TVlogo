@@ -1,9 +1,9 @@
 name: Build M3U
 
 on:
-  workflow_dispatch:   # 手动触发
+  workflow_dispatch:  # 手动触发
   schedule:
-    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发
+    - cron: "0 2 * * *"  # 每天 02:00 UTC 自动运行
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
@@ -23,17 +23,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Run HTTOP script
-        run: |
-          python md/httop.py
+      - name: Run httop script
+        run: python md/httop.py
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add merged_channels.m3u channel_list.txt
-          git commit -m "Update merged m3u and channel list"
-          git push
-        env:
-          # 需要用到 GitHub Token
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload generated files
+        uses: actions/upload-artifact@v3
+        with:
+          name: m3u-output
+          path: |
+            output.m3u
+            channels.txt
