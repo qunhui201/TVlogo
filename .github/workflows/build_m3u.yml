@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f "md/requirements.txt" ]; then pip install -r py/requirements.txt; fi
+          if [ -f "md/requirements.txt" ]; then pip install -r md/requirements.txt; fi
 
       # 4️⃣ 运行脚本生成 M3U
       - name: Run build_m3u.py
