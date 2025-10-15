@@ -3,71 +3,69 @@ import re
 from pathlib import Path
 
 # -------- 配置 ---------
-INPUT_FILE = "output.m3u"          # 已生成的 M3U 文件
+INPUT_FILE = "output.m3u"         # 原 M3U 文件（分类完成）
 TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
 OUTPUT_FILE = "output_with_logo.m3u"
 
+# 保留原有三类
+RESERVED_GROUPS = ["央视频道", "卫视频道", "地方频道"]
+
 # -------- 函数 ---------
-def parse_m3u_lines(lines):
-    """解析 M3U 内容，返回 [(info_line, url_line)]"""
+def parse_m3u(file_path):
+    """解析 M3U 文件"""
+    lines = Path(file_path).read_text(encoding="utf-8").splitlines()
     result = []
-    i = 0
-    while i < len(lines):
+    for i in range(len(lines)):
         if lines[i].startswith("#EXTINF"):
             info = lines[i]
             url = lines[i+1] if i+1 < len(lines) else ""
-            result.append([info, url])
-            i += 2
-        else:
-            i += 1
+            tvg_name = re.search(r'tvg-name="([^"]+)"', info)
+            group_title = re.search(r'group-title="([^"]+)"', info)
+            tvg_logo = re.search(r'tvg-logo="([^"]*)"', info)
+            name = tvg_name.group(1) if tvg_name else ""
+            grp = group_title.group(1) if group_title else ""
+            logo = tvg_logo.group(1) if tvg_logo else ""
+            result.append({"name": name, "url": url, "group": grp, "logo": logo})
     return result
 
-def match_logo(name, group, tvlogo_dir):
-    """根据分类和频道名反向匹配台标"""
-    search_dir = tvlogo_dir / group
-    if not search_dir.exists() or not search_dir.is_dir():
-        return ""
-    for file in search_dir.iterdir():
-        if not file.is_file():
+def match_logo(channel_name):
+    """根据 TVlogo 文件夹匹配台标，只针对非央视/卫视/地方"""
+    for folder in TVLOGO_DIR.iterdir():
+        if not folder.is_dir():
             continue
-        filename = file.stem
-        ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)  # 忽略英文前缀
-        if ch_name and ch_name in name:
-            return str(file.resolve())
+        folder_name = folder.name
+        if folder_name in RESERVED_GROUPS:
+            continue
+        # 遍历文件夹内所有图片文件
+        for file in folder.iterdir():
+            if not file.is_file():
+                continue
+            stem = file.stem
+            # 忽略英文前缀、数字、下划线、加号等
+            clean_name = re.sub(r'^[A-Za-z0-9_\+\-]+', '', stem)
+            if clean_name and clean_name in channel_name:
+                # 构造台标 URL
+                return f"{TVLOGO_DIR}/{folder_name}/{file.name}"
     return ""
 
 # -------- 主逻辑 ---------
 def main():
-    with open(INPUT_FILE, "r", encoding="utf-8") as f:
-        lines = f.read().splitlines()
+    channels = parse_m3u(INPUT_FILE)
+    output_lines = ["#EXTM3U x-tvg-url=\"https://gh.catmak.name/https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz\""]
 
-    channel_entries = parse_m3u_lines(lines)
-    output_lines = []
-    
-    # 保留 #EXTM3U 行开头
-    if lines and lines[0].startswith("#EXTM3U"):
-        output_lines.append(lines[0])
+    for ch in channels:
+        final_logo = ch["logo"]
+        if ch["group"] not in RESERVED_GROUPS:
+            # 尝试匹配台标
+            logo_path = match_logo(ch["name"])
+            if logo_path:
+                final_logo = logo_path
+        # 写入
+        output_lines.append(f'#EXTINF:-1 tvg-name="{ch["name"]}" tvg-logo="{final_logo}" group-title="{ch["group"]}",{ch["name"]}')
+        output_lines.append(ch["url"])
 
-    for info, url in channel_entries:
-        tvg_name_match = re.search(r'tvg-name="([^"]+)"', info)
-        group_match = re.search(r'group-title="([^"]+)"', info)
-        name = tvg_name_match.group(1) if tvg_name_match else ""
-        group = group_match.group(1) if group_match else ""
-        
-        logo = match_logo(name, group, TVLOGO_DIR)
-        # 替换或添加 tvg-logo
-        if 'tvg-logo="' in info:
-            info = re.sub(r'tvg-logo="[^"]*"', f'tvg-logo="{logo}"', info)
-        else:
-            info = info.replace('group-title="', f'tvg-logo="{logo}" group-title="')
-        
-        output_lines.append(info)
-        output_lines.append(url)
-
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        f.write("\n".join(output_lines))
-
-    print(f"已生成 {OUTPUT_FILE}，共 {len(channel_entries)} 个频道")
+    Path(OUTPUT_FILE).write_text("\n".join(output_lines), encoding="utf-8")
+    print(f"已生成 {OUTPUT_FILE}，共 {len(channels)} 个频道")
 
 if __name__ == "__main__":
     main()
