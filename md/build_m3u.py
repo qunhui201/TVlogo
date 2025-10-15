@@ -1,4 +1,4 @@
-# build_m3u_classify_full.py
+# build_m3u_classify_ignore_prefix.py
 import re
 import requests
 from pathlib import Path
@@ -27,7 +27,6 @@ def download_m3u(url):
     return r.text
 
 def parse_m3u(content):
-    """解析 m3u 文件内容"""
     lines = content.splitlines()
     result = []
     for i in range(len(lines)):
@@ -45,16 +44,25 @@ def parse_m3u(content):
 
 def classify_channel(name, original_group, tvlogo_dir):
     """分类逻辑"""
-    # 1. 保留央视、卫视、地方频道原分组
+    # 保留央视、卫视、地方频道原分组
     if original_group in ["央视频道", "卫视频道", "地方频道"]:
         return original_group
 
-    # 2. 第三方系列匹配
+    # 第三方系列匹配，忽略英文前缀
     for folder in tvlogo_dir.iterdir():
-        if folder.is_dir() and folder.name in name:
-            return folder.name
+        if not folder.is_dir():
+            continue
+        for logo_file in folder.iterdir():
+            if not logo_file.is_file():
+                continue
+            # 去掉英文前缀匹配中文名字
+            filename = logo_file.stem  # 不带扩展名
+            # 移除英文前缀，比如 NewTV东北热剧 -> 东北热剧
+            ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)
+            if ch_name in name:
+                return folder.name
 
-    # 3. 数字或未知
+    # 数字或未知
     if name.isdigit() or not name:
         return "其他频道"
 
@@ -70,7 +78,6 @@ def main():
         channels = parse_m3u(content)
         all_channels.extend(channels)
 
-    # 写入输出
     output_lines = ["#EXTM3U"]
     for name, url, grp, logo in all_channels:
         final_group = classify_channel(name, grp, TVLOGO_DIR)
