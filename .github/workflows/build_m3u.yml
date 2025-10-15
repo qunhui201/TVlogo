@@ -1,35 +1,31 @@
-name: Auto Build IPTV M3U
+name: Build IPTV M3U
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"  # 每天北京时间10:00 (UTC 02:00)
+    - cron: "0 2 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.11"
 
-      - name: Install Dependencies
-        run: |
-          pip install requests
+      - name: Install dependencies
+        run: pip install requests
 
-      - name: Run Build Script
-        run: |
-          python3 md/build_m3u.py
+      - name: Build M3U
+        run: python3 md/build_m3u.py
 
-      - name: Commit and Push Results
-        run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          git add output.m3u
-          git commit -m "Auto update M3U playlist $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git push
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-m3u
+          path: output.m3u
