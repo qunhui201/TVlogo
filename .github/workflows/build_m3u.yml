@@ -3,44 +3,52 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:    # 手动触发
   schedule:
-    - cron: "0 2 * * *" # 每天 UTC 02:00 自动触发
+    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发，可删除此行关闭定时
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. 检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      # 2. 设置 Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.x"
 
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r md/requirements.txt
 
-      - name: Install requirements
-        run: pip install -r md/requirements.txt
-
-      - name: Run classification script
+      # 4. 运行主脚本生成 output.m3u
+      - name: Run build_m3u.py
         run: python3 md/build_m3u.py
 
-      - name: Run add logo script
+      # 5. 运行台标脚本生成 output_with_logo.m3u
+      - name: Run build_m3u_add_logo.py
         run: python3 md/build_m3u_add_logo.py
 
-      - name: Upload output files
+      # 6. 上传生成的文件作为 artifact
+      - name: Upload M3U files as artifact
         uses: actions/upload-artifact@v4
         with:
           name: m3u-playlist
           path: |
             output.m3u
             output_with_logo.m3u
-- name: Commit output_with_logo.m3u
-  run: |
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-    git add output_with_logo.m3u
-    git commit -m "Update output_with_logo.m3u"
-    git push
+
+      # 7. 可选：提交生成的 output_with_logo.m3u 到仓库
+      - name: Commit output_with_logo.m3u to repo
+        if: github.ref == 'refs/heads/main'  # 仅主分支自动提交
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output_with_logo.m3u
+          git commit -m "Update output_with_logo.m3u [skip ci]" || echo "No changes to commit"
+          git push
