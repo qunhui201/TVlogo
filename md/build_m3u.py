@@ -1,123 +1,148 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import requests
-from datetime import datetime
+import os
+import sys
+import glob
+import time
 from pathlib import Path
-import re
+from collections import defaultdict, OrderedDict
 
-iptv_sources = [
-    "http://httop.top/iptvs.m3u",
-    "http://httop.top/iptvx.m3u"
+# IPTV m3u 文件列表
+INPUT_FILES = [
+    "iptv1.m3u",
+    "iptv2.m3u"
 ]
 
-logo_base = "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img"
+# TVlogo 图片目录
+LOGO_DIR = Path("TVlogo_Images")
+OUTPUT_FILE = Path("output.m3u")
 
-# 合并频道字典
-channels = {}
-numeric_channels = []
+# 固定开头内容
+FIXED_HEADER = '#EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"'
 
-# 识别频道分组
-def classify_channel(name):
-    name_lower = name.lower()
-    # 央视频道
-    if "cctv" in name_lower or "cetv" in name_lower or "cgtn" in name_lower or "中央电视台" in name:
-        group = "央视频道"
-        folder = "中央电视台"
-    # 卫视频道
-    elif "卫视" in name:
-        group = "卫视频道"
-        # 取地名或全国卫视作为台标文件夹
-        m = re.match(r"(全国|北京|上海|广东|广州|深圳|湖南|湖北|重庆|四川|浙江|江苏|福建|山东|海南|青海)?", name)
-        folder = m.group(0) if m and m.group(0) else "全国卫视"
-    # 地方频道
-    elif re.search(r"(北京|上海|广东|广州|深圳|湖南|湖北|重庆|四川|浙江|江苏|福建|山东|海南|青海)", name):
-        group = "地方频道"
-        folder = re.search(r"(北京|上海|广东|广州|深圳|湖南|湖北|重庆|四川|浙江|江苏|福建|山东|海南|青海)", name).group(0)
-    else:
-        group = "其他频道"
-        folder = "其他"
-    logo_name = name.replace(" ", "%20") + ".png"
-    logo_url = f"{logo_base}/{folder}/{logo_name}"
-    return group, logo_url
+# 分类顺序
+CATEGORY_ORDER = [
+    "央视频道",
+    "卫视频道",
+    "地方频道",
+    "CIBN系列",
+    "DOX系列",
+    "NewTV系列",
+    "iHOT系列",
+    "数字频道",
+    "台湾频道一",
+    "台湾频道二",
+    "台湾频道三",
+    "其他频道"
+]
 
-def parse_m3u(url):
-    try:
-        r = requests.get(url, timeout=10)
-        r.raise_for_status()
-    except:
-        print(f"无法获取 {url}")
-        return
-
-    lines = r.text.splitlines()
-    name = None
-    for line in lines:
-        line = line.strip()
-        if not line or line.startswith("#EXTM3U"):
+# 扫描 TVlogo_Images 文件夹生成 folder -> 分类映射
+def build_folder_map():
+    folder_map = {}
+    for folder in LOGO_DIR.iterdir():
+        if not folder.is_dir():
             continue
-        if line.startswith("#EXTINF"):
-            m = re.search(r",(.+)$", line)
-            name = m.group(1).strip() if m else None
-        elif line.startswith("http"):
-            if not name:
-                name = line.split("/")[-2] if line.split("/")[-2] else line.split("/")[-1]
-            if name.isdigit():
-                numeric_channels.append((name, line))
-            else:
-                group, logo = classify_channel(name)
-                if name not in channels:
-                    channels[name] = {"group": group, "logo": logo, "urls": []}
-                channels[name]["urls"].append(line)
-            name = None
+        name = folder.name
+        # 分类规则
+        if name == "中央电视台":
+            folder_map[name] = "央视频道"
+        elif name == "全国卫视" or "卫视" in name:
+            folder_map[name] = "卫视频道"
+        elif name in ["CIBN", "DOX", "NewTV", "iHOT", "数字频道",
+                      "台湾频道一", "台湾频道二", "台湾频道三"]:
+            folder_map[name] = name  # 第三方系列直接使用文件夹名
+        else:
+            folder_map[name] = "地方频道"
+    return folder_map
 
-# 解析所有源
-for url in iptv_sources:
-    parse_m3u(url)
+# 从 m3u 文件中解析频道
+def parse_m3u(files):
+    channels = []
+    for file in files:
+        with open(file, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+            i = 0
+            while i < len(lines):
+                line = lines[i].strip()
+                if line.startswith("#EXTINF"):
+                    name = line.split(",")[-1].strip()
+                    i += 1
+                    if i < len(lines):
+                        url = lines[i].strip()
+                        channels.append((name, url))
+                i += 1
+    return channels
 
-# 输出
-output_file = Path("output.m3u")
-with output_file.open("w", encoding="utf-8") as f:
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    f.write('#EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"\n')
-    f.write(f"#EXTINF:-1 🕘️更新时间, {now}\n")
-    f.write("https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/stream05/streamPlaylist.m3u8\n")
+# 根据 logo 文件夹判断分类
+def classify_channel(name, folder_map):
+    for folder_name, category in folder_map.items():
+        logo_path = LOGO_DIR / folder_name
+        possible_logo = logo_path / f"{name}.png"
+        if possible_logo.exists():
+            return category
+        # 如果名字里有地名+卫视的组合，也归卫视频道
+        if "卫视" in name:
+            for f in folder_map:
+                if f in name:
+                    return "卫视频道"
+        # 特殊处理 CCTV
+        if "CCTV" in name or "CETV" in name or "CGTN" in name:
+            return "央视频道"
+    # 默认其他频道
+    return "其他频道"
 
-    # 央视频道排序
-    for name in sorted([n for n in channels if channels[n]["group"]=="央视频道"],
-                       key=lambda x: [int(s) if s.isdigit() else s for s in re.findall(r'\d+|\D+', x)]):
-        data = channels[name]
-        for url in data["urls"]:
-            f.write(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{data["logo"]}" group-title="央视频道",{name}\n')
-            f.write(f"{url}\n")
+# 生成 group-title 和 logo URL
+def build_entry(name, url, category):
+    # 尝试找到 logo
+    logo_file = None
+    for folder_name, cat in folder_map.items():
+        if cat == category:
+            candidate = LOGO_DIR / folder_name / f"{name}.png"
+            if candidate.exists():
+                logo_file = candidate
+                break
+    if logo_file:
+        logo_url = f"https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/{logo_file.relative_to(LOGO_DIR)}".replace("\\", "/")
+    else:
+        logo_url = f"https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/{name}.png"
+    return f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo_url}" group-title="{category}",{name}\n{url}'
 
-    # 卫视频道
-    for name in channels:
-        if channels[name]["group"]=="卫视频道":
-            data = channels[name]
-            for url in data["urls"]:
-                f.write(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{data["logo"]}" group-title="卫视频道",{name}\n')
-                f.write(f"{url}\n")
+# 按央视频道数字排序
+def sort_channels(channels):
+    def cctv_key(item):
+        name, urls = item
+        if "CCTV" in name:
+            digits = "".join(filter(str.isdigit, name))
+            return int(digits) if digits else 0
+        return 9999
+    channels_sorted = sorted(channels.items(), key=lambda x: (CATEGORY_ORDER.index(x[1][0][2]) if x[1] else 99, cctv_key(x[1][0])))
+    return channels_sorted
 
-    # 地方频道
-    for name in channels:
-        if channels[name]["group"]=="地方频道":
-            data = channels[name]
-            for url in data["urls"]:
-                f.write(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{data["logo"]}" group-title="地方频道",{name}\n')
-                f.write(f"{url}\n")
+# ---------- 主程序 ----------
+folder_map = build_folder_map()
+channels = parse_m3u(INPUT_FILES)
 
-    # 其他频道
-    for name in channels:
-        if channels[name]["group"]=="其他频道":
-            data = channels[name]
-            for url in data["urls"]:
-                f.write(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{data["logo"]}" group-title="其他频道",{name}\n')
-                f.write(f"{url}\n")
+# 合并重复频道 URL
+channel_dict = defaultdict(list)  # name -> list of (name, url, category)
+for name, url in channels:
+    category = classify_channel(name, folder_map)
+    channel_dict[name].append((name, url, category))
 
-    # 纯数字频道
-    for name, url in numeric_channels:
-        logo = f"{logo_base}/其他/{name}.png"
-        f.write(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="其他频道",{name}\n')
-        f.write(f"{url}\n")
+# 按分类顺序整理输出
+output_entries = []
+for cat in CATEGORY_ORDER:
+    for name, entries in channel_dict.items():
+        if entries[0][2] == cat:
+            # 合并 URL
+            for _, url, category in entries:
+                output_entries.append(build_entry(name, url, category))
 
-print("✅ 已生成 output.m3u")
+# 输出到文件
+with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    f.write(FIXED_HEADER + "\n")
+    f.write(f'#EXTINF:-1 🕘️更新时间, {time.strftime("%Y-%m-%d %H:%M:%S")}\n')
+    for line in output_entries:
+        f.write(line + "\n")
+
+print(f"✅ 已生成 {OUTPUT_FILE}")
