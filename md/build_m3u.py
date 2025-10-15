@@ -8,10 +8,10 @@ REMOTE_FILES = [
     "http://httop.top/iptvx.m3u"
 ]
 
-ALIAS_FILE = "md/mohupidao.txt"
-OUTPUT_FILE = "output.m3u"
+ALIAS_FILE = "md/mohupidao.txt"  # 别名映射文件
+OUTPUT_FILE = "output.m3u"       # 输出文件
 
-# 地方频道关键字（可以根据需要扩展）
+# 地方频道关键字
 PROVINCES = [
     "北京", "上海", "天津", "重庆", "辽宁", "吉林", "黑龙江",
     "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南",
@@ -20,23 +20,27 @@ PROVINCES = [
     "西藏", "香港", "澳门", "台湾"
 ]
 
+# 系列频道
 SERIES_LIST = ["CIBN", "DOX", "NewTV", "iHOT"]
 
 # --------- 函数 ---------
 def load_alias_map(alias_file):
     alias_map = {}
-    with open(alias_file, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            parts = line.split(",")
-            main_name = parts[0]
-            for alias in parts[1:]:
-                if alias.startswith("re:"):
-                    alias_map[alias[3:]] = main_name
-                else:
-                    alias_map[re.escape(alias)] = main_name
+    try:
+        with open(alias_file, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split(",")
+                main_name = parts[0]
+                for alias in parts[1:]:
+                    if alias.startswith("re:"):
+                        alias_map[alias[3:]] = main_name
+                    else:
+                        alias_map[re.escape(alias)] = main_name
+    except FileNotFoundError:
+        print(f"别名文件 {alias_file} 不存在，跳过别名映射")
     return alias_map
 
 def apply_alias(name, alias_map):
@@ -61,24 +65,27 @@ def parse_m3u(content):
             group_title = re.search(r'group-title="([^"]+)"', info)
             tvg_logo = re.search(r'tvg-logo="([^"]+)"', info)
             name = tvg_name.group(1) if tvg_name else ""
-            grp = group_title.group(1) if group_title else ""
+            group = group_title.group(1) if group_title else ""
             logo = tvg_logo.group(1) if tvg_logo else ""
-            result.append((name, url, grp, logo))
+            result.append((name, url, group, logo))
     return result
 
 def classify_channel(name, group):
-    # 如果原文件就是央视或卫视，就直接返回原分组
-    if group in ["央视", "卫视", "CCTV", "央视卫视", "卫视频道"]:
+    # 央视和卫视沿用原分组
+    if group in ["央视频道", "卫视频道"]:
         return group
+
     # 判断地方频道
     for p in PROVINCES:
         if p in name and "卫视" not in name:
             return "地方频道"
+
     # 判断系列频道
     for s in SERIES_LIST:
         if s in name:
             return s
-    # 其他
+
+    # 其他频道
     return "其他频道"
 
 # --------- 主逻辑 ---------
@@ -88,15 +95,18 @@ def main():
 
     # 下载远程 m3u
     for url in REMOTE_FILES:
-        content = download_m3u(url)
-        channels = parse_m3u(content)
-        all_channels.extend(channels)
+        try:
+            content = download_m3u(url)
+            channels = parse_m3u(content)
+            all_channels.extend(channels)
+        except Exception as e:
+            print(f"下载 {url} 失败：{e}")
 
     # 应用别名并分类
     output_lines = ["#EXTM3U"]
-    for name, url, grp, logo in all_channels:
+    for name, url, group, logo in all_channels:
         name = apply_alias(name, alias_map)
-        grp_final = classify_channel(name, grp)
+        grp_final = classify_channel(name, group)
         output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{grp_final}",{name}')
         output_lines.append(url)
 
