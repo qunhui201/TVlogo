@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Build Script
         run: |
-          python3 build_m3u.py
+          python3 md/httop.py
 
       - name: Commit and Push Results
         run: |
