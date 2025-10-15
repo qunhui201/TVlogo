@@ -1,4 +1,4 @@
-# build_m3u_classify_full.py
+# build_m3u_classify_full_v2.py
 import re
 import requests
 from pathlib import Path
@@ -10,6 +10,17 @@ REMOTE_FILES = [
 ]
 
 TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
+
+PROVINCES = [
+    "北京","上海","天津","重庆","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西",
+    "山东","河南","湖北","湖南","广东","广西","海南","四川","贵州","云南","陕西","甘肃",
+    "青海","宁夏","新疆","内蒙","西藏","香港","澳门","台湾","延边","大湾区"
+]
+
+SPECIAL_CHANNELS = {
+    "CCTV17": "央视频道"  # 特例处理
+}
+
 OUTPUT_FILE = "output.m3u"
 
 # -------- 函数 ---------
@@ -37,11 +48,25 @@ def parse_m3u(content):
 
 def classify_channel(name, original_group, tvlogo_dir):
     """分类逻辑"""
+    # 特殊频道直接归类
+    for key, val in SPECIAL_CHANNELS.items():
+        if key in name:
+            return val
+
     # 保留原分组
     if original_group in ["央视频道", "卫视频道", "地方频道"]:
         return original_group
 
-    # 第三方系列匹配，忽略英文前缀
+    # 卫视频道：只要包含“卫视”
+    if "卫视" in name:
+        return "卫视频道"
+
+    # 地方频道：包含地名且不是卫视
+    for province in PROVINCES:
+        if province in name and "卫视" not in name:
+            return "地方频道"
+
+    # 第三方系列匹配（忽略英文前缀）
     for folder in tvlogo_dir.iterdir():
         if not folder.is_dir():
             continue
@@ -52,8 +77,7 @@ def classify_channel(name, original_group, tvlogo_dir):
             if not logo_file.is_file():
                 continue
             filename = logo_file.stem
-            # 去掉英文前缀和特殊符号
-            ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)
+            ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)  # 忽略英文前缀
             if ch_name and ch_name in name:
                 return folder_name
 
