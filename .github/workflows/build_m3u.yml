@@ -9,9 +9,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  # 允许提交文件到仓库
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true  # 允许推送回仓库
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -19,21 +25,25 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: |
-          pip install requests
+        run: pip install requests
 
       - name: Run script
         run: python md/httop.py
 
-      - name: Upload output
+      - name: Commit & Push updated file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add output.m3u
+            git commit -m "🤖 Auto update M3U list $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Upload artifact (backup)
         uses: actions/upload-artifact@v4
         with:
           name: output-m3u
           path: output.m3u
-      - name: Commit output files
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add output.m3u channels_tvbox.txt
-          git commit -m "Update channels files"
-          git push
