@@ -1,27 +1,24 @@
-name: Build M3U Playlist
+name: Build M3U
 
-# 手动触发 & 定时触发
 on:
   workflow_dispatch:   # 手动触发
   schedule:
-    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发
+    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发，可修改
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 拉取最新仓库
+      # 1. 检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 确保拉取完整历史和最新文件
 
       # 2. 设置 Python
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       # 3. 安装依赖
       - name: Install dependencies
@@ -29,13 +26,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
 
-      # 4. 执行生成脚本
-      - name: Run build_m3u_classify.py
+      # 4. 运行脚本生成 output.m3u
+      - name: Run build script
         run: python3 md/build_m3u_classify.py
 
-      # 5. 可选：上传生成的文件作为 artifact
-      - name: Upload output.m3u
-        uses: actions/upload-artifact@v3
-        with:
-          name: output-m3u
-          path: output.m3u
+      # 5. 检查是否有变化
+      - name: Check for changes
+        id: git-check
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output.m3u
+          echo "CHANGES=$(git diff --cached --name-only)" >> $GITHUB_ENV
+
+      # 6. 提交并推送变化
+      - name: Commit and Push if changed
+        if: env.CHANGES != ''
+        run: |
+          git commit -m "Update output.m3u [skip ci]"
+          git push origin HEAD:main
