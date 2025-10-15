@@ -1,7 +1,7 @@
-# build_m3u.py
+# build_m3u_logo.py
 import re
 import requests
-from collections import defaultdict
+from pathlib import Path
 
 # --------- 配置 ---------
 REMOTE_FILES = [
@@ -22,24 +22,27 @@ PROVINCES = [
 
 SERIES_LIST = ["CIBN", "DOX", "NewTV", "iHOT"]
 
+GITHUB_LOGO_BASE = "https://raw.githubusercontent.com/qunhui201/TVlogo/main/img"
+
+LOCAL_LOGO_PATH = Path("TVlogo_Images")
+
+SPECIAL_GITHUB_NAMES = ["CGTN", "中国教育电视台", "新华社", "中央新影"]
+
 # --------- 函数 ---------
 def load_alias_map(alias_file):
     alias_map = {}
-    try:
-        with open(alias_file, encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                parts = line.split(",")
-                main_name = parts[0]
-                for alias in parts[1:]:
-                    if alias.startswith("re:"):
-                        alias_map[alias[3:]] = main_name
-                    else:
-                        alias_map[re.escape(alias)] = main_name
-    except FileNotFoundError:
-        print(f"别名文件 {alias_file} 不存在，跳过别名映射")
+    with open(alias_file, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split(",")
+            main_name = parts[0]
+            for alias in parts[1:]:
+                if alias.startswith("re:"):
+                    alias_map[alias[3:]] = main_name
+                else:
+                    alias_map[re.escape(alias)] = main_name
     return alias_map
 
 def apply_alias(name, alias_map):
@@ -64,13 +67,13 @@ def parse_m3u(content):
             group_title = re.search(r'group-title="([^"]+)"', info)
             tvg_logo = re.search(r'tvg-logo="([^"]+)"', info)
             name = tvg_name.group(1) if tvg_name else ""
-            group = group_title.group(1) if group_title else ""
+            grp = group_title.group(1) if group_title else ""
             logo = tvg_logo.group(1) if tvg_logo else ""
-            result.append((name, url, group, logo))
+            result.append((name, url, grp, logo))
     return result
 
 def classify_channel(name, group):
-    if group in ["央视频道", "卫视频道"]:
+    if group in ["央视", "卫视", "CCTV", "央视频道", "央视卫视", "卫视频道"]:
         return group
     for p in PROVINCES:
         if p in name and "卫视" not in name:
@@ -80,62 +83,63 @@ def classify_channel(name, group):
             return s
     return "其他频道"
 
-# 提取 CCTV 数字用于排序
-def cctv_sort_key(name):
-    match = re.match(r"CCTV[- ]?(\d+)", name)
-    return int(match.group(1)) if match else 1000  # 非 CCTV 放后面
+def find_logo(name):
+    # 特殊 GitHub 台标
+    for special in SPECIAL_GITHUB_NAMES:
+        if special in name:
+            # 假设图片名和频道名相近
+            return f"{GITHUB_LOGO_BASE}/{name}.png"
 
-# --------- 主逻辑 ---------
+    # 优先在本地分类文件夹找台标
+    for folder in LOCAL_LOGO_PATH.glob("**/*"):
+        if folder.is_file() and name in folder.stem:
+            return str(folder.resolve())
+    
+    # 本地找不到再去 GitHub
+    return f"{GITHUB_LOGO_BASE}/{name}.png"
+
 def main():
     alias_map = load_alias_map(ALIAS_FILE)
     all_channels = []
 
     for url in REMOTE_FILES:
-        try:
-            content = download_m3u(url)
-            channels = parse_m3u(content)
-            all_channels.extend(channels)
-        except Exception as e:
-            print(f"下载 {url} 失败：{e}")
+        content = download_m3u(url)
+        channels = parse_m3u(content)
+        all_channels.extend(channels)
 
-    # 应用别名并分类
-    grouped = defaultdict(list)  # key: name, value: [(url, group, logo)]
-    channel_info = {}            # name -> final group-title
-
-    for name, url, group, logo in all_channels:
+    # 应用别名
+    processed = []
+    seen_urls = set()
+    for name, url, grp, _ in all_channels:
+        if url in seen_urls:
+            continue  # 去重
+        seen_urls.add(url)
         name = apply_alias(name, alias_map)
-        grp_final = classify_channel(name, group)
-        grouped[name].append((url, logo))
-        channel_info[name] = grp_final
+        grp_final = classify_channel(name, grp)
+        logo = find_logo(name)
+        processed.append((name, url, grp_final, logo))
 
-    # 生成输出 M3U
+    # 对央视频道按数字排序
+    cctv_channels = [x for x in processed if x[2] == "央视频道"]
+    other_channels = [x for x in processed if x[2] != "央视频道"]
+
+    def cctv_sort_key(item):
+        m = re.search(r"CCTV[-]?(\d+)", item[0])
+        return int(m.group(1)) if m else 0
+
+    cctv_channels.sort(key=cctv_sort_key)
+    final_list = cctv_channels + other_channels
+
+    # 输出 M3U
     output_lines = ["#EXTM3U"]
-
-    # 先输出央视频道，按数字排序
-    cctv_names = [name for name in grouped if channel_info[name] == "央视频道"]
-    for name in sorted(cctv_names, key=cctv_sort_key):
-        for url, logo in grouped[name]:
-            output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="央视频道",{name}')
-            output_lines.append(url)
-
-    # 再输出卫视频道
-    for name in grouped:
-        if channel_info[name] == "卫视频道":
-            for url, logo in grouped[name]:
-                output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="卫视频道",{name}')
-                output_lines.append(url)
-
-    # 再输出其他频道（地方、系列、其他）
-    for name in grouped:
-        if channel_info[name] not in ["央视频道", "卫视频道"]:
-            for url, logo in grouped[name]:
-                output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{channel_info[name]}",{name}')
-                output_lines.append(url)
+    for name, url, grp, logo in final_list:
+        output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{grp}",{name}')
+        output_lines.append(url)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines))
 
-    print(f"已生成 {OUTPUT_FILE}，共 {len(all_channels)} 个频道")
+    print(f"已生成 {OUTPUT_FILE}，共 {len(final_list)} 个频道")
 
 if __name__ == "__main__":
     main()
