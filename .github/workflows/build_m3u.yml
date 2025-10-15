@@ -31,3 +31,10 @@ jobs:
           path: |
             output.m3u
             channels_tvbox.txt
+      - name: Commit output files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add output.m3u channels_tvbox.txt
+          git commit -m "Update channels files"
+          git push
