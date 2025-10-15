@@ -1,48 +1,35 @@
-name: Build M3U List
+name: Auto Build IPTV M3U
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 手动触发
   schedule:
-    - cron: "0 2 * * *"  # 每天 02:00 (UTC) 自动执行
+    - cron: "0 2 * * *"  # 每天北京时间10:00 (UTC 02:00)
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: pip install requests
-
-      - name: Run script
-        run: python md/httop.py
-
-      - name: Commit & Push updated file
+      - name: Install Dependencies
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain)" ]; then
-            git add output.m3u
-            git commit -m "🤖 Auto update M3U list $(date '+%Y-%m-%d %H:%M:%S')"
-            git push
-          else
-            echo "No changes to commit"
-          fi
+          pip install requests
 
-      - name: Upload artifact (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: output-m3u
-          path: output.m3u
+      - name: Run Build Script
+        run: |
+          python3 build_m3u.py
+
+      - name: Commit and Push Results
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add output.m3u
+          git commit -m "Auto update M3U playlist $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push
