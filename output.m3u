@@ -1,5 +1,5 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"
-#EXTINF:-1 🕘️更新时间, 2025-10-15 03:54:58
+#EXTINF:-1 🕘️更新时间, 2025-10-15 03:57:56
 https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/stream05/streamPlaylist.m3u8
 #EXTINF:-1 tvg-name="http://116.2.178.200:808/hls/1/index.m3u8" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/其他频道/http://116.2.178.200:808/hls/1/index.m3u8.png" group-title="其他频道",http://116.2.178.200:808/hls/1/index.m3u8
 http://116.2.178.200:808/hls/1/index.m3u8
