@@ -1,7 +1,6 @@
 # build_m3u.py
 import re
 import requests
-from collections import defaultdict
 
 # --------- 配置 ---------
 REMOTE_FILES = [
@@ -9,9 +8,10 @@ REMOTE_FILES = [
     "http://httop.top/iptvx.m3u"
 ]
 
-ALIAS_FILE = "md/mohupidao.txt"
-OUTPUT_FILE = "output.m3u"
+ALIAS_FILE = "md/mohupidao.txt"  # 别名映射文件
+OUTPUT_FILE = "output.m3u"       # 输出文件
 
+# 地方频道关键字
 PROVINCES = [
     "北京", "上海", "天津", "重庆", "辽宁", "吉林", "黑龙江",
     "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南",
@@ -20,6 +20,7 @@ PROVINCES = [
     "西藏", "香港", "澳门", "台湾"
 ]
 
+# 系列频道
 SERIES_LIST = ["CIBN", "DOX", "NewTV", "iHOT"]
 
 # --------- 函数 ---------
@@ -70,26 +71,29 @@ def parse_m3u(content):
     return result
 
 def classify_channel(name, group):
+    # 央视和卫视沿用原分组
     if group in ["央视频道", "卫视频道"]:
         return group
+
+    # 判断地方频道
     for p in PROVINCES:
         if p in name and "卫视" not in name:
             return "地方频道"
+
+    # 判断系列频道
     for s in SERIES_LIST:
         if s in name:
             return s
-    return "其他频道"
 
-# 提取 CCTV 数字用于排序
-def cctv_sort_key(name):
-    match = re.match(r"CCTV[- ]?(\d+)", name)
-    return int(match.group(1)) if match else 1000  # 非 CCTV 放后面
+    # 其他频道
+    return "其他频道"
 
 # --------- 主逻辑 ---------
 def main():
     alias_map = load_alias_map(ALIAS_FILE)
     all_channels = []
 
+    # 下载远程 m3u
     for url in REMOTE_FILES:
         try:
             content = download_m3u(url)
@@ -99,39 +103,14 @@ def main():
             print(f"下载 {url} 失败：{e}")
 
     # 应用别名并分类
-    grouped = defaultdict(list)  # key: name, value: [(url, group, logo)]
-    channel_info = {}            # name -> final group-title
-
+    output_lines = ["#EXTM3U"]
     for name, url, group, logo in all_channels:
         name = apply_alias(name, alias_map)
         grp_final = classify_channel(name, group)
-        grouped[name].append((url, logo))
-        channel_info[name] = grp_final
+        output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{grp_final}",{name}')
+        output_lines.append(url)
 
-    # 生成输出 M3U
-    output_lines = ["#EXTM3U"]
-
-    # 先输出央视频道，按数字排序
-    cctv_names = [name for name in grouped if channel_info[name] == "央视频道"]
-    for name in sorted(cctv_names, key=cctv_sort_key):
-        for url, logo in grouped[name]:
-            output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="央视频道",{name}')
-            output_lines.append(url)
-
-    # 再输出卫视频道
-    for name in grouped:
-        if channel_info[name] == "卫视频道":
-            for url, logo in grouped[name]:
-                output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="卫视频道",{name}')
-                output_lines.append(url)
-
-    # 再输出其他频道（地方、系列、其他）
-    for name in grouped:
-        if channel_info[name] not in ["央视频道", "卫视频道"]:
-            for url, logo in grouped[name]:
-                output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{channel_info[name]}",{name}')
-                output_lines.append(url)
-
+    # 写入输出文件
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines))
 
