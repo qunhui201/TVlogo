@@ -10,8 +10,8 @@ from collections import defaultdict, OrderedDict
 
 # IPTV m3u 文件列表
 INPUT_FILES = [
-    "iptv1.m3u",
-    "iptv2.m3u"
+    "http://httop.top/iptvs.m3u",
+    "http://httop.top/iptvx.m3u"
 ]
 
 # TVlogo 图片目录
