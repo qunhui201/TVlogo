@@ -1,37 +1,44 @@
-import requests
-from pathlib import Path
+# md/httop.py
+import os
 
-# -----------------------------
-# 配置
-# -----------------------------
-M3U_URLS = [
-    "http://httop.top/iptvs.m3u",
-    "http://httop.top/iptvx.m3u"
-]
-
-# 台标文件夹（仓库根目录的 TVlogo_Images）
-repo_root = Path(__file__).parent.parent
-logo_base = repo_root / "TVlogo_Images"
+# 输入文件
+channels_file = "channels.txt"
 
 # 输出文件
-output_m3u = repo_root / "output.m3u"
-channel_list_file = repo_root / "channels.txt"
+m3u_file = "output.m3u"
+tvbox_file = "channels_tvbox.txt"
 
-# -----------------------------
-# 检查台标文件夹
-# -----------------------------
-if not logo_base.exists():
-    raise FileNotFoundError(f"台标文件夹不存在: {logo_base}")
+# 读取频道列表
+with open(channels_file, "r", encoding="utf-8") as f:
+    lines = [line.strip() for line in f if line.strip()]
 
-# 遍历台标文件夹，建立映射 {频道名: 台标路径}
-logos = {}
-for folder in logo_base.iterdir():
-    if folder.is_dir():
-        for logo_file in folder.iterdir():
-            if logo_file.suffix.lower() in [".png", ".jpg", ".jpeg"]:
-                logos[logo_file.stem] = logo_file.as_posix()
+# 初始化
+m3u_lines = ["#EXTM3U"]
+tvbox_lines = []
 
-print(f"共找到 {len(logos)} 个台标文件")
+current_group = None
+
+for line in lines:
+    if line.startswith("#"):
+        current_group = line[1:].strip()
+        tvbox_lines.append(line)  # 直接写入txt
+        continue
+    # 构建 M3U，每个频道用示例URL占位，可替换
+    url = f"http://example.com/stream/{line.replace(' ', '_')}.m3u8"
+    m3u_lines.append(f'#EXTINF:-1,group-title="{current_group}",{line}')
+    m3u_lines.append(url)
+    tvbox_lines.append(line)
+
+# 写入 M3U
+with open(m3u_file, "w", encoding="utf-8") as f:
+    f.write("\n".join(m3u_lines))
+
+# 写入 TVBox TXT
+with open(tvbox_file, "w", encoding="utf-8") as f:
+    f.write("\n".join(tvbox_lines))
+
+print(f"完成: {m3u_file} 和 {tvbox_file}")
+
 
 # -----------------------------
 # 抓取 M3U
