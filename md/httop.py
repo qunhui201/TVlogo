@@ -17,9 +17,6 @@ logo_base = repo_root / "TVlogo_Images"
 output_m3u = repo_root / "output.m3u"
 channel_list_file = repo_root / "channels.txt"
 
-# 节目单模板（可按需修改）
-EPG_URL_TEMPLATE = "https://github.com/qunhui201/TVlogo/tree/main/TVlogo_Images/{channel}.xml"
-
 # -----------------------------
 # 检查台标文件夹
 # -----------------------------
@@ -70,9 +67,6 @@ for url in M3U_URLS:
 
             # 匹配台标
             logo_path = logos.get(tvg_name, "")
-
-            # 节目单链接
-            epg_url = EPG_URL_TEMPLATE.format(channel=tvg_name)
 
             # 构建新的 EXTINF 行
             new_extinf = f'#EXTINF:-1 tvg-id="{tvg_name}" tvg-name="{tvg_name}" tvg-logo="{logo_path}" group-title="{group_title}",{tvg_name}'
