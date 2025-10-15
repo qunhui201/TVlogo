@@ -5,6 +5,7 @@ import re
 import time
 from pathlib import Path
 from collections import defaultdict
+import requests
 
 # ---------- 配置 ----------
 INPUT_URLS = [
@@ -17,19 +18,6 @@ OUTPUT_FILE = Path("output.m3u")
 ALIAS_FILE = Path("md/mohupidao.txt")
 
 FIXED_HEADER = '#EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"'
-
-CATEGORY_ORDER = [
-    "央视频道",
-    "卫视频道",
-    "地方频道",
-    "CIBN系列",
-    "DOX系列",
-    "NewTV系列",
-    "iHOT系列",
-    "其他频道"
-]
-
-LOCAL_KEYWORDS = ["新闻", "生活", "影视", "文体", "少儿", "都市", "公共", "教育", "剧场"]
 
 SERIES_CATEGORIES = ["CIBN", "DOX", "NewTV", "iHOT"]
 
@@ -52,7 +40,6 @@ def load_aliases(alias_file):
     return alias_map
 
 # ---------- M3U 下载 ----------
-import requests
 def download_m3u(url):
     try:
         resp = requests.get(url, timeout=15)
@@ -65,15 +52,19 @@ def download_m3u(url):
 # ---------- 解析 M3U ----------
 def parse_m3u(lines):
     channels = []
+    current_group = None
     i = 0
     while i < len(lines):
         line = lines[i].strip()
         if line.startswith("#EXTINF"):
+            # 尝试获取 group-title 分类
+            m = re.search(r'group-title="([^"]*)"', line)
+            group = m.group(1) if m else None
             name = line.split(",")[-1].strip()
             i += 1
             if i < len(lines):
                 url = lines[i].strip()
-                channels.append((name, url))
+                channels.append((name, url, group))
         i += 1
     return channels
 
@@ -99,25 +90,6 @@ def build_logo_map():
                 logo_map[file.stem] = file
     return logo_map
 
-# ---------- 判断分类 ----------
-def classify_channel(name, regions):
-    # CCTV/CETV/CGTN/中央新影等直接归央视频道
-    if any(x in name for x in ["CCTV", "CETV", "CGTN", "中央新影"]):
-        return "央视频道"
-    # 卫视频道
-    if "卫视" in name:
-        return "卫视频道"
-    # 地方频道：包含地名且不是卫视
-    for region in regions:
-        if region in name:
-            return "地方频道"
-    # 系列频道
-    for s in SERIES_CATEGORIES:
-        if s in name:
-            return f"{s}系列"
-    # 默认其他
-    return "其他频道"
-
 # ---------- 获取地方地名 ----------
 def get_regions():
     regions = []
@@ -125,6 +97,22 @@ def get_regions():
         if folder.is_dir() and folder.name not in ["中央电视台", "全国卫视"] + SERIES_CATEGORIES:
             regions.append(folder.name)
     return regions
+
+# ---------- 判断分类 ----------
+def classify_channel(name, original_group, regions):
+    # 如果原 M3U 里有分组且是央视/卫视，直接用
+    if original_group and ("CCTV" in original_group or "卫视" in original_group):
+        return original_group
+    # 地方频道
+    for region in regions:
+        if region in name and "卫视" not in name:
+            return "地方频道"
+    # 系列频道
+    for s in SERIES_CATEGORIES:
+        if s in name:
+            return f"{s}系列"
+    # 其他频道
+    return "其他频道"
 
 # ---------- 生成 EXTINF 条目 ----------
 def build_entry(name, url, category, logo_map, regions):
@@ -153,23 +141,22 @@ def main():
         all_channels.extend(parse_m3u(lines))
 
     # 应用别名
-    all_channels = [(apply_alias(name, alias_map), url) for name, url in all_channels]
+    all_channels = [(apply_alias(name, alias_map), url, grp) for name, url, grp in all_channels]
 
     # 分类
     channel_dict = defaultdict(list)
-    for name, url in all_channels:
-        category = classify_channel(name, regions)
-        channel_dict[name].append((name, url, category))
+    for name, url, grp in all_channels:
+        category = classify_channel(name, grp, regions)
+        channel_dict[category].append((name, url))
 
-    # 按分类顺序整理输出
+    # 按顺序输出
     output_entries = []
+    CATEGORY_ORDER = ["央视频道", "卫视频道", "地方频道"] + [f"{s}系列" for s in SERIES_CATEGORIES] + ["其他频道"]
     for cat in CATEGORY_ORDER:
-        for name, entries in channel_dict.items():
-            if entries[0][2] == cat:
-                for _, url, category in entries:
-                    output_entries.append(build_entry(name, url, category, logo_map, regions))
+        for name, url in channel_dict.get(cat, []):
+            output_entries.append(build_entry(name, url, cat, logo_map, regions))
 
-    # 输出到文件
+    # 写入文件
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(FIXED_HEADER + "\n")
         f.write(f'#EXTINF:-1,🕘 更新时间 {time.strftime("%Y-%m-%d %H:%M:%S")}\n')
