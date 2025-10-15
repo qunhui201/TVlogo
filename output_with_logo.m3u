@@ -1,4 +1,4 @@
-#EXTM3U
+#EXTM3U x-tvg-url="https://gh.catmak.name/https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV1
 http://116.2.178.200:808/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
@@ -33,7 +33,7 @@ http://116.2.178.200:808/hls/18/index.m3u8
 http://116.2.178.200:808/hls/20/index.m3u8
 #EXTINF:-1 tvg-name="辽宁卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/辽宁卫视.png" group-title="卫视频道",辽宁卫视
 http://116.2.178.200:808/hls/10/index.m3u8
-#EXTINF:-1 tvg-name="辽宁体育" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/海外频道/FOX体育.png" group-title="地方频道",辽宁体育
+#EXTINF:-1 tvg-name="辽宁体育" tvg-logo="" group-title="地方频道",辽宁体育
 http://116.2.178.200:808/hls/11/index.m3u8
 #EXTINF:-1 tvg-name="北京卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/北京卫视.png" group-title="卫视频道",北京卫视
 http://116.2.178.200:808/hls/13/index.m3u8
