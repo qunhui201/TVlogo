@@ -1,40 +1,43 @@
-# md/httop.py
-import os
+import requests
 
-# 输入文件
-channels_file = "channels.txt"
+# 远程 M3U 链接
+urls = [
+    "http://httop.top/iptvs.m3u",
+    "http://httop.top/iptvx.m3u"
+]
 
 # 输出文件
-m3u_file = "output.m3u"
-tvbox_file = "channels_tvbox.txt"
+output_m3u = "output.m3u"
+output_tvbox = "channels_tvbox.txt"
 
-# 读取频道列表
-with open(channels_file, "r", encoding="utf-8") as f:
-    lines = [line.strip() for line in f if line.strip()]
+all_lines = []
 
-# 初始化
-m3u_lines = ["#EXTM3U"]
-tvbox_lines = []
+for url in urls:
+    resp = requests.get(url, timeout=10)
+    resp.encoding = 'utf-8'  # 保证中文正常
+    lines = resp.text.splitlines()
+    all_lines.extend(lines)
 
-current_group = None
+# 写 output.m3u
+with open(output_m3u, "w", encoding="utf-8") as f:
+    f.write("\n".join(all_lines))
 
-for line in lines:
-    if line.startswith("#"):
-        current_group = line[1:].strip()
-        tvbox_lines.append(line)  # 写入 TVBox TXT
-        continue
-    # 构建 M3U，每个频道用示例URL占位，可替换为真实链接
-    url = f"http://example.com/stream/{line.replace(' ', '_')}.m3u8"
-    m3u_lines.append(f'#EXTINF:-1,group-title="{current_group}",{line}')
-    m3u_lines.append(url)
-    tvbox_lines.append(line)
+# 写 channels_tvbox.txt （只保留频道名称和 URL，2行一个集合）
+tvbox_list = []
+i = 0
+while i < len(all_lines):
+    line = all_lines[i]
+    if line.startswith("#EXTINF:"):
+        # 获取频道名
+        name = line.split(",")[-1].strip()
+        url = all_lines[i + 1].strip() if i + 1 < len(all_lines) else ""
+        tvbox_list.append(name)
+        tvbox_list.append(url)
+        i += 2
+    else:
+        i += 1
 
-# 写入 M3U
-with open(m3u_file, "w", encoding="utf-8") as f:
-    f.write("\n".join(m3u_lines))
+with open(output_tvbox, "w", encoding="utf-8") as f:
+    f.write("\n".join(tvbox_list))
 
-# 写入 TVBox TXT
-with open(tvbox_file, "w", encoding="utf-8") as f:
-    f.write("\n".join(tvbox_lines))
-
-print(f"完成: {m3u_file} 和 {tvbox_file}")
+print(f"完成: {output_m3u} 和 {output_tvbox}")
