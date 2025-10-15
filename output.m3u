@@ -1,5 +1,5 @@
 #EXTM3U x-tvg-url="https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"
-#EXTINF:-1 🕘️更新时间, 2025-10-15 05:45:50
+#EXTINF:-1 🕘️更新时间, 2025-10-15 05:55:51
 #EXTINF:-1 tvg-name="CETV-1" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/其他/CETV-1.png" group-title="央视频道",CETV-1
 http://111.43.126.240:7777/hls/34/index.m3u8
 #EXTINF:-1 tvg-name="CGTN-1" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/CGTN、中国教育电视台、新华社、中央新影/CGTN.png" group-title="央视频道",CGTN-1
