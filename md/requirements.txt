@@ -1,4 +1,6 @@
 requests
 pandas
+beautifulsoup4
+pandas
 os
 re
