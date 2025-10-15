@@ -3,7 +3,7 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:    # 手动触发
   schedule:
-    - cron: "0 2 * * *" # 每天 02:00 UTC 自动触发，可删除此行关闭定时
+    - cron: "30 */4 * * *"
 
 jobs:
   build:
