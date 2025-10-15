@@ -1,4 +1,4 @@
-# build_m3u_classify.py
+# build_m3u_classify_full.py
 import re
 import requests
 from pathlib import Path
@@ -9,7 +9,7 @@ REMOTE_FILES = [
     "http://httop.top/iptvx.m3u"
 ]
 
-TVLOGO_DIR = Path("TVlogo_Images")  # 你的台标根目录
+TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
 OUTPUT_FILE = "output.m3u"
 
 PROVINCES = [
@@ -18,8 +18,7 @@ PROVINCES = [
     "青海","宁夏","新疆","内蒙","西藏","香港","澳门","台湾"
 ]
 
-LOCAL_SUFFIX = ["新闻","生活","影视","都市","文体","少儿"]  # 地方频道关键词后缀
-THIRD_PARTY = ["CIBN","DOX","NewTV","iHOT","数字频道","台湾频道一","台湾频道二","台湾频道三"]
+LOCAL_SUFFIX = ["新闻","生活","影视","都市","文体","少儿"]
 
 # -------- 函数 ---------
 def download_m3u(url):
@@ -44,58 +43,37 @@ def parse_m3u(content):
             result.append((name, url, grp, logo))
     return result
 
-def classify_channel(name, original_group):
+def classify_channel(name, original_group, tvlogo_dir):
     """分类逻辑"""
-    # 保留央视和卫视原分组
-    if original_group in ["央视频道","卫视频道"]:
+    # 1. 保留央视、卫视、地方频道原分组
+    if original_group in ["央视频道", "卫视频道", "地方频道"]:
         return original_group
 
-    # 央视频道
-    for keyword in ["CCTV","CETV","CGTN"]:
-        if keyword in name:
-            return "央视频道"
-    # 卫视频道
-    if "卫视" in name:
-        return "卫视频道"
-    for province in PROVINCES:
-        if province in name and "卫视" in name:
-            return "卫视频道"
-
-    # 地方频道
-    for province in PROVINCES:
-        if province in name:
-            return "地方频道"
-    for suffix in LOCAL_SUFFIX:
-        if name.endswith(suffix):
-            return "地方频道"
-    for folder in TVLOGO_DIR.iterdir():
+    # 2. 第三方系列匹配
+    for folder in tvlogo_dir.iterdir():
         if folder.is_dir() and folder.name in name:
-            return "地方频道"
+            return folder.name
 
-    # 第三方系列
-    for s in THIRD_PARTY:
-        if s in name:
-            return s
-
-    # 数字或未知
+    # 3. 数字或未知
     if name.isdigit() or not name:
         return "其他频道"
 
-    # 默认
     return "其他频道"
 
 # -------- 主逻辑 ---------
 def main():
     all_channels = []
 
+    # 下载远程 m3u
     for url in REMOTE_FILES:
         content = download_m3u(url)
         channels = parse_m3u(content)
         all_channels.extend(channels)
 
+    # 写入输出
     output_lines = ["#EXTM3U"]
     for name, url, grp, logo in all_channels:
-        final_group = classify_channel(name, grp)
+        final_group = classify_channel(name, grp, TVLOGO_DIR)
         output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{final_group}",{name}')
         output_lines.append(url)
 
