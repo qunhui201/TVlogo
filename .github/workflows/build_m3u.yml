@@ -1,4 +1,4 @@
-name: Build M3U
+name: Build M3U Playlist
 
 # 手动触发 & 定时触发
 on:
