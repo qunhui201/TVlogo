@@ -24,7 +24,7 @@ jobs:
 
       - name: Run classification script
         run: |
-          python3 py/classify_channels.py
+          python3 md/build_m3u.py
 
       - name: Commit and push changes
         run: |
