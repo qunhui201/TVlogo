@@ -1,4 +1,4 @@
-name: Build M3U Playlist 
+name: Build M3U Playlist
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. 设置 Python
+      # 2. 设置 Python 环境
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -30,7 +30,6 @@ jobs:
       - name: Run build scripts
         run: |
           python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt (根目录)
-          python3 md/build_m3u_add_logo.py # 生成 output_with_logo.m3u
 
       # 5. 检查 output_with_logo.m3u 是否更新
       - name: Check for updates
@@ -56,14 +55,10 @@ jobs:
           TIMESTAMP=$(date +"%m%d%H%M")
           mkdir -p history
           cp output.m3u history/${TIMESTAMP}.m3u
-          cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          
-          # 更新根目录文件，如果文件不存在
-          if [ ! -f ./tvbox_output.txt ]; then
-            cp tvbox_output.txt ./tvbox_output.txt
-          fi
-          echo "✅ 已保存到 history/ 目录并更新根目录文件"
+          echo "✅ 已保存到 history/ 目录："
+          echo " - ${TIMESTAMP}.m3u"
+          echo " - tvbox_${TIMESTAMP}.txt"
 
       # 7. 提交更新到仓库（仅主分支）
       - name: Commit updated files to repo
@@ -71,7 +66,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output.m3u output_with_logo.m3u tvbox_output.txt
+          git add output.m3u tvbox_output.txt
           git commit -m "Add updated M3U and TVBox build $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
 
@@ -83,5 +78,4 @@ jobs:
           name: m3u-playlist-${{ github.run_id }}
           path: |
             output.m3u
-            output_with_logo.m3u
             tvbox_output.txt
