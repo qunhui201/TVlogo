@@ -26,32 +26,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
 
-      # 4. 运行 Python 脚本生成文件
+      # 4. 删除旧文件（根目录）
+      - name: Clean old generated files
+        run: |
+          echo "🧹 删除旧的输出文件..."
+          rm -f output.m3u output_with_logo.m3u tvbox_output.txt
+          ls -l || true
+
+      # 5. 运行 Python 脚本生成文件
       - name: Run build scripts
         run: |
-          python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt (根目录)
+          python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt
           python3 md/build_m3u_add_logo.py # 生成 output_with_logo.m3u
+          ls -l output*.m3u tvbox_output.txt || true
 
-      # 5. 检查 output_with_logo.m3u 是否更新
-      - name: Check for updates
-        id: check_update
-        run: |
-          if [ -f output_with_logo.m3u ]; then
-            if git diff --quiet --exit-code -- output_with_logo.m3u; then
-              echo "no_change=true" >> $GITHUB_ENV
-              echo "✅ 文件内容未变化，本次运行跳过保存。"
-            else
-              echo "no_change=false" >> $GITHUB_ENV
-              echo "🆕 检测到文件内容更新，将保存新版本。"
-            fi
-          else
-            echo "no_change=false" >> $GITHUB_ENV
-            echo "⚠️ 文件不存在，视为新生成文件。"
-          fi
-
-      # 6. 若有更新则保存历史文件
-      - name: Save updated M3U and TVBox files
-        if: env.no_change == 'false'
+      # 6. 保存文件到 history（每次运行都保存）
+      - name: Save new copies to history
         run: |
           TIMESTAMP=$(date +"%m%d%H%M")
           mkdir -p history
@@ -63,19 +53,18 @@ jobs:
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
 
-      # 7. 提交更新到仓库（仅主分支）
+      # 7. 提交所有更新（始终提交最新）
       - name: Commit updated files to repo
-        if: env.no_change == 'false' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output.m3u output_with_logo.m3u tvbox_output.txt
-          git commit -m "Add updated M3U and TVBox build $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
+          git add output.m3u output_with_logo.m3u tvbox_output.txt history/
+          git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
 
-      # 8. 上传 artifact（仅当有更新）
+      # 8. 上传 artifact（可选）
       - name: Upload M3U and TVBox files as artifact
-        if: env.no_change == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: m3u-playlist-${{ github.run_id }}
@@ -83,3 +72,5 @@ jobs:
             output.m3u
             output_with_logo.m3u
             tvbox_output.txt
+            history/*.m3u
+            history/*.txt
