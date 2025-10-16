@@ -88,34 +88,55 @@ def get_fixed_4k_channels():
     ]
 
 def append_4k_to_m3u(file_path, k4_channels):
-    """追加到 M3U 文件（幂等：检查是否已有 '4K频道'）"""
+    """追加到 M3U 文件（修复粘连：确保换行，幂等）"""
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
+    
     if 'group-title="4K频道"' in content:
         print(f"⚠️ {file_path} 已包含 4K频道，跳过追加。")
         return False
     
-    with open(file_path, "a", encoding="utf-8") as f:
-        for tvg_id, name, url, logo in k4_channels:
-            logo_attr = f' tvg-logo="{logo}"' if logo else ""
-            f.write(f'#EXTINF:-1 tvg-id="{tvg_id}" tvg-name="{name}"{logo_attr} group-title="4K频道",{name}\n')
-            f.write(f"{url}\n")
-    print(f"✅ 已追加 4K频道 到 {file_path}")
+    # 确保内容以换行结束
+    if content and not content.endswith('\n'):
+        content += '\n'
+    
+    # 构建 4K 追加内容（确保每行后换行）
+    append_content = ""
+    for tvg_id, name, url, logo in k4_channels:
+        logo_attr = f' tvg-logo="{logo}"' if logo else ""
+        append_content += f'#EXTINF:-1 tvg-id="{tvg_id}" tvg-name="{name}"{logo_attr} group-title="4K频道",{name}\n'
+        append_content += f"{url}\n"
+    
+    # 重新写入整个文件
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(content + append_content)
+    
+    print(f"✅ 已追加 4K频道 到 {file_path}（确保换行）")
     return True
 
 def append_4k_to_tvbox(file_path, k4_channels):
-    """追加到 tvbox_output.txt（幂等）"""
+    """追加到 tvbox_output.txt（修复粘连：确保顶格换行，幂等）"""
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
+    
     if '📺4K频道' in content:
         print(f"⚠️ {file_path} 已包含 4K频道，跳过追加。")
         return False
     
-    with open(file_path, "a", encoding="utf-8") as f:
-        f.write(f"📺4K频道,#genre#\n")
-        for _, name, url, _ in k4_channels:
-            f.write(f"{name},{url}\n")
-    print(f"✅ 已追加 4K频道 到 {file_path}")
+    # 确保内容以换行结束（防止粘连）
+    if content and not content.endswith('\n'):
+        content += '\n'
+    
+    # 构建 4K 追加内容（组头独占一行，每频道一行）
+    append_content = f"📺4K频道,#genre#\n"
+    for _, name, url, _ in k4_channels:
+        append_content += f"{name},{url}\n"
+    
+    # 重新写入整个文件（确保格式正确）
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(content + append_content)
+    
+    print(f"✅ 已追加 4K频道 到 {file_path}（确保顶格换行）")
     return True
 
 def main():
