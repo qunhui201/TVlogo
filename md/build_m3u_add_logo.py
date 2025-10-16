@@ -69,7 +69,7 @@ def match_logo(channel_name, group_title):
 def main():
     output_lines = []
     missing_logos = []
-    output_lines.append('#EXTM3U x-tvg-url="https://gh.catmak.name/https://raw.githubusercontent.com/Guovin/iptv-api/refs/heads/master/output/epg/epg.gz"')
+    output_lines.append('#EXTM3U x-tvg-url="https://epg.v1.mk/fy.xml"')
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
         lines = f.read().splitlines()
     i = 0
