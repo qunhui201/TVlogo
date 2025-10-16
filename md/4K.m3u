@@ -1,0 +1,20 @@
+#EXTM3U x-tvg-url="https://epg.v1.mk/fy.xml"
+#EXTINF:-1 tvg-id="30" tvg-name="北京卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/beijing.png" group-title="4k",北京卫视4K
+http://192.168.0.109/zgst.php?id=btv4k
+#EXTINF:-1 tvg-id="26"  tvg-name="东方卫视4K" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E4%B8%9C%E6%96%B9%E5%8D%AB%E8%A7%864K.png" group-title="4k",东方卫视4K
+http://192.168.0.109/zgst.php?id=sh4k
+#EXTINF:-1 tvg-id="29" tvg-name="江苏卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/jiangsu.png" group-title="4k",江苏卫视4K
+http://192.168.0.109/zgst.php?id=js4k
+#EXTINF:-1 tvg-id="28" tvg-name="浙江卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/zhejiang.png" group-title="4k",浙江卫视4K
+http://192.168.0.109/zgst.php?id=zj4k
+#EXTINF:-1 tvg-id="27" tvg-name="湖南卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/hunan.png" group-title="4k",湖南卫视4K
+http://192.168.0.109/zgst.php?id=hn4k
+#EXTINF:-1 tvg-id="38" tvg-name="山东卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/shandong.png" group-title="4k",山东卫视4K
+http://192.168.0.109/zgst.php?id=sd4k
+#EXTINF:-1 tvg-id="33" tvg-name="广东卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/guangdong.png" group-title="4k",广东卫视4K
+http://192.168.0.109/zgst.php?id=gd4k
+#EXTINF:-1 tvg-id="56" tvg-name="四川卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/sichuan.png" group-title="4k",四川卫视4K
+http://192.168.0.109/zgst.php?id=sc4k
+#EXTINF:-1 tvg-id="34" tvg-name="深圳卫视4k" tvg-logo="http://epg.51zmt.top:8000/tb1/ws/shenzhen.png" group-title="4k",深圳卫视4K
+http://192.168.0.109/zgst.php?id=sz4k
+
