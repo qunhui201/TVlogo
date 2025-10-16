@@ -3,36 +3,31 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 */4 * * *"  # 每4小时30分运行
+    - cron: "30 */4 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. 设置 Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
 
-      # 3. 安装依赖
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
 
-      # 4. 运行 Python 脚本生成文件
       - name: Run build scripts
         run: |
-          python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt (根目录)
-          python3 md/build_m3u_add_logo.py # 生成 output_with_logo.m3u
+          python3 md/build_m3u.py
+          python3 md/build_m3u_add_logo.py
 
-      # 5. 检查 output_with_logo.m3u 是否更新
       - name: Check for updates
         id: check_update
         run: |
@@ -49,7 +44,6 @@ jobs:
             echo "⚠️ 文件不存在，视为新生成文件。"
           fi
 
-      # 6. 若有更新则保存历史文件
       - name: Save updated M3U and TVBox files
         if: env.no_change == 'false'
         run: |
@@ -58,12 +52,9 @@ jobs:
           cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          echo "✅ 已保存到 history/ 目录："
-          echo " - ${TIMESTAMP}.m3u"
-          echo " - logo${TIMESTAMP}.m3u"
-          echo " - tvbox_${TIMESTAMP}.txt"
+          cp tvbox_output.txt ./tvbox_output.txt   # 同步根目录
+          echo "✅ 已保存到 history/ 目录并更新根目录文件"
 
-      # 7. 提交更新到仓库（仅主分支）
       - name: Commit updated files to repo
         if: env.no_change == 'false' && github.ref == 'refs/heads/main'
         run: |
@@ -73,7 +64,6 @@ jobs:
           git commit -m "Add updated M3U and TVBox build $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
 
-      # 8. 上传 artifact（仅当有更新）
       - name: Upload M3U and TVBox files as artifact
         if: env.no_change == 'false'
         uses: actions/upload-artifact@v4
