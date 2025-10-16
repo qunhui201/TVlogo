@@ -88,3 +88,4 @@ jobs:
             output.m3u
             output_with_logo.m3u
             tvbox_output.txt
+            missing_logos.txt
