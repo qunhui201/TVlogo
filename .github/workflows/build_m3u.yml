@@ -28,9 +28,9 @@ jobs:
       # 4.1 调试：列出文件确认生成
       - name: List files for debug
         run: |
-          ls -la  # 列出根目录文件
+          ls -la # 列出根目录文件
           if [ -f output_with_logo.m3u ]; then
-            cat output_with_logo.m3u | head -n 5  # 打印前5行验证内容
+            cat output_with_logo.m3u | head -n 5 # 打印前5行验证内容
           else
             echo "⚠️ output_with_logo.m3u 不存在！"
           fi
@@ -47,13 +47,22 @@ jobs:
             echo "no_change=false" >> $GITHUB_ENV
             echo "⚠️ 文件不存在，视为新生成。"
           else
-            git add output_with_logo.m3u  # 先 add 到暂存区以检测新文件
-            if git diff --quiet --exit-code --cached -- output_with_logo.m3u; then
+            # 计算新文件的 hash
+            NEW_HASH=$(md5sum output_with_logo.m3u | awk '{print $1}')
+            # 获取 repo 中当前版本的 hash（如果存在）
+            if git show HEAD:output_with_logo.m3u > old_file.m3u 2>/dev/null; then
+              OLD_HASH=$(md5sum old_file.m3u | awk '{print $1}')
+              rm old_file.m3u
+            else
+              OLD_HASH="none"  # 文件新加
+            fi
+            if [ "$NEW_HASH" = "$OLD_HASH" ]; then
               echo "no_change=true" >> $GITHUB_ENV
-              echo "✅ 文件内容未变化，本次运行跳过保存。"
+              echo "✅ 文件内容未变化（hash 匹配），本次运行跳过保存。"
             else
               echo "no_change=false" >> $GITHUB_ENV
-              echo "🆕 检测到文件内容更新，将保存新版本。"
+              echo "🆕 检测到文件内容更新（hash 不同），将保存新版本。"
+              echo "New hash: $NEW_HASH, Old hash: $OLD_HASH"
             fi
           fi
       # 6. 若有更新则保存历史文件
@@ -80,7 +89,7 @@ jobs:
           git push
       # 8. 上传 artifact（仅当有更新）
       - name: Upload M3U and TVBox files as artifact
-        if: always()  # 改为 always() 以便调试，即使 no_change 也上传
+        if: always() # 改为 always() 以便调试，即使 no_change 也上传
         uses: actions/upload-artifact@v4
         with:
           name: m3u-playlist-${{ github.run_id }}
