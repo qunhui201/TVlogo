@@ -26,14 +26,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
 
-      # 4. 运行主脚本生成 output.m3u 和 output_with_logo.m3u 以及 tvbox_output.txt
+      # 4. 运行主脚本生成文件
       - name: Run build scripts
         run: |
           python3 md/build_m3u.py
           python3 md/build_m3u_add_logo.py
-          python3 md/build_m3u_classify_full_v2.py
 
-      # 5. 检查是否有更新
+      # 5. 检查 output_with_logo.m3u 是否有更新
       - name: Check for updates
         id: check_update
         run: |
@@ -49,23 +48,21 @@ jobs:
             echo "no_change=false" >> $GITHUB_ENV
             echo "⚠️ 文件不存在，视为新生成文件。"
 
-      # 6. 若有更新则保存到 history 目录并加简化命名
-      - name: Save updated M3U and TVBox files with timestamp
+      # 6. 若有更新则保存到 history 目录并加时间戳
+      - name: Save updated M3U and TVBox files
         if: env.no_change == 'false'
         run: |
           TIMESTAMP=$(date +"%m%d%H%M")
           mkdir -p history
-          # 保存原来的 m3u 文件
           cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
-          # 保存 TVBox 输出文件
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          echo "✅ 已保存到："
-          echo " - history/${TIMESTAMP}.m3u"
-          echo " - history/logo${TIMESTAMP}.m3u"
-          echo " - history/tvbox_${TIMESTAMP}.txt"
+          echo "✅ 已保存到 history/ 目录："
+          echo " - ${TIMESTAMP}.m3u"
+          echo " - logo${TIMESTAMP}.m3u"
+          echo " - tvbox_${TIMESTAMP}.txt"
 
-      # 7. 提交到仓库（仅当有更新）
+      # 7. 提交到仓库（仅当有更新且是主分支）
       - name: Commit updated files to repo
         if: env.no_change == 'false' && github.ref == 'refs/heads/main'
         run: |
