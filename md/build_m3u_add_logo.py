@@ -66,66 +66,6 @@ def match_logo(channel_name, group_title):
                     return logo_path
     return logo_path
 
-def get_fixed_4k_channels():
-    return [
-        ("30", "北京卫视4k", "http://192.168.0.109/zgst.php?id=btv4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%8C%97%E4%BA%AC%E5%8D%AB%E8%A7%864K.png"),
-        ("26", "东方卫视4K", "http://192.168.0.109/zgst.php?id=sh4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E4%B8%9C%E6%96%B9%E5%8D%AB%E8%A7%864K.png"),
-        ("29", "江苏卫视4k", "http://192.168.0.109/zgst.php?id=js4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B1%9F%E8%8B%8F%E5%8D%AB%E8%A7%864K.png"),
-        ("28", "浙江卫视4k", "http://192.168.0.109/zgst.php?id=zj4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B5%99%E6%B1%9F%E5%8D%AB%E8%A7%864K.png"),
-        ("27", "湖南卫视4k", "http://192.168.0.109/zgst.php?id=hn4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B9%96%E5%8D%97%E5%8D%AB%E8%A7%864K.png"),
-        ("38", "山东卫视4k", "http://192.168.0.109/zgst.php?id=sd4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%B1%B1%E4%B8%9C%E5%8D%AB%E8%A7%864K.png"),
-        ("33", "广东卫视4k", "http://192.168.0.109/zgst.php?id=gd4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%B9%BF%E4%B8%9C%E5%8D%AB%E8%A7%864K.png"),
-        ("56", "四川卫视4k", "http://192.168.0.109/zgst.php?id=sc4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%9B%9B%E5%B7%9D%E5%8D%AB%E8%A7%864K.png"),
-        ("34", "深圳卫视4k", "http://192.168.0.109/zgst.php?id=sz4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B7%B1%E5%9C%B3%E5%8D%AB%E8%A7%864K.png"),
-    ]
-
-def append_4k_to_m3u(file_path, k4_channels):
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    
-    if 'group-title="4K频道"' in content:
-        print(f"⚠️ {file_path} 已包含 4K频道，跳过追加。")
-        return False
-    
-    if content and not content.endswith('\n\n'):
-        if content.endswith('\n'):
-            content += '\n'
-        else:
-            content += '\n\n'
-    
-    append_content = ""
-    for tvg_id, name, url, logo in k4_channels:
-        logo_attr = f' tvg-logo="{logo}"' if logo else ""
-        append_content += f'#EXTINF:-1 tvg-id="{tvg_id}" tvg-name="{name}"{logo_attr} group-title="4K频道",{name}\n'
-        append_content += f"{url}\n"
-    
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(content + append_content)
-    
-    print(f"✅ 已追加 4K频道 到 {file_path}（强制顶格分离）")
-    return True
-
-def append_4k_to_tvbox(file_path, k4_channels):
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    
-    if '📺4K频道' in content:
-        print(f"⚠️ {file_path} 已包含 4K频道，跳过追加。")
-        return False
-    
-    if content and not content.endswith('\n'):
-        content += '\n'
-    
-    append_content = f"📺4K频道,#genre#\n"
-    for _, name, url, _ in k4_channels:
-        append_content += f"{name},{url}\n"
-    
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(content + append_content)
-    
-    print(f"✅ 已追加 4K频道 到 {file_path}（确保顶格换行）")
-    return True
-
 def main():
     output_lines = []
     missing_logos = []
@@ -157,21 +97,6 @@ def main():
     print(f"✅ 已生成 {OUTPUT_FILE}")
     print(f"📺 共 {sum(1 for l in output_lines if l.startswith('#EXTINF'))} 个频道")
     print(f"⚠️ 未匹配台标的频道已保存至 {MISSING_LOGO_FILE}（共 {len(missing_logos)} 个）")
-
-    k4_channels = get_fixed_4k_channels()
-    
-    changed1 = append_4k_to_m3u(OUTPUT_FILE, k4_channels)
-    changed2 = append_4k_to_m3u(INPUT_FILE, k4_channels)
-    
-    tvbox_file = "tvbox_output.txt"
-    if os.path.exists(tvbox_file):
-        changed3 = append_4k_to_tvbox(tvbox_file, k4_channels)
-    else:
-        changed3 = False
-        print(f"⚠️ {tvbox_file} 不存在，跳过 4K 追加。")
-    
-    if changed1 or changed2 or changed3:
-        print("✅ 4K频道 追加导致内容变化，将触发 history 保存。")
 
 if __name__ == "__main__":
     main()
