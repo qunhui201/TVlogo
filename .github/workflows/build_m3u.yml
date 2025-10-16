@@ -26,12 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
 
-      # 4. 删除旧的输出文件（保持根目录永远最新）
+      # 4. 删除旧的输出文件（根目录保持最新）
       - name: Remove old output files
         run: |
           echo "🧹 删除旧的输出文件..."
           rm -f output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt
-          ls -lh output* tvbox_output.txt missing_logos.txt || echo "✅ 文件已清理"
+          echo "✅ 文件已清理"
 
       # 5. 运行 Python 脚本生成文件
       - name: Run build scripts
@@ -39,20 +39,16 @@ jobs:
           python3 md/build_m3u.py
           python3 md/build_m3u_add_logo.py
 
-      # 6. 保存历史文件到 history/
+      # 6. 保存历史文件到 history/（只备份 output_with_logo.m3u 和 tvbox_output.txt）
       - name: Save to history
         run: |
           TIMESTAMP=$(date +"%m%d%H%M")
           mkdir -p history
-          cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          cp missing_logos.txt history/missing_${TIMESTAMP}.txt
           echo "✅ 已保存到 history/ 目录："
-          echo " - ${TIMESTAMP}.m3u"
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
-          echo " - missing_${TIMESTAMP}.txt"
 
       # 7. 提交更新到仓库（仅主分支）
       - name: Commit updated files to repo
@@ -64,7 +60,7 @@ jobs:
           git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
 
-      # 8. 上传 artifact
+      # 8. 上传 artifact（包括根目录最新文件）
       - name: Upload M3U and TVBox files as artifact
         uses: actions/upload-artifact@v4
         with:
