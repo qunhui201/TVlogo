@@ -1,7 +1,7 @@
 name: Build M3U Playlist
 
 on:
-  workflow_dispatch:    # 手动触发
+  workflow_dispatch:
   schedule:
     - cron: "30 */4 * * *"  # 每4小时30分运行
 
@@ -26,10 +26,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
 
-      # 4. 运行 Python 脚本
+      # 4. 运行 Python 脚本生成文件
       - name: Run build scripts
         run: |
-          python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt
+          python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt (根目录)
           python3 md/build_m3u_add_logo.py # 生成 output_with_logo.m3u
 
       # 5. 检查 output_with_logo.m3u 是否更新
@@ -58,7 +58,6 @@ jobs:
           cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          cp tvbox_output.txt ./tvbox_output.txt  # 确保更新到根目录
           echo "✅ 已保存到 history/ 目录："
           echo " - ${TIMESTAMP}.m3u"
           echo " - logo${TIMESTAMP}.m3u"
@@ -70,7 +69,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .  # 确保添加根目录的文件
+          git add output.m3u output_with_logo.m3u tvbox_output.txt
           git commit -m "Add updated M3U and TVBox build $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
 
