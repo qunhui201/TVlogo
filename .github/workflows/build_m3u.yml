@@ -1,127 +1,56 @@
 name: Build M3U Playlist
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 */4 * * *" # 每4小时30分运行
+    - cron: "30 */4 * * *"  # 每4小时30分运行
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       # 1. 检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 完整克隆历史，避免浅克隆问题
+
       # 2. 设置 Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
+
       # 3. 安装依赖
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r md/requirements.txt
-      # 4. 备份旧文件（如果存在，用于比较）
-      - name: Backup old files
-        run: |
-          mkdir -p backup
-          if [ -f output.m3u ]; then cp output.m3u backup/output.m3u; fi
-          if [ -f output_with_logo.m3u ]; then cp output_with_logo.m3u backup/output_with_logo.m3u; fi
-          if [ -f tvbox_output.txt ]; then cp tvbox_output.txt backup/tvbox_output.txt; fi
-          if [ -f missing_logos.txt ]; then cp missing_logos.txt backup/missing_logos.txt; fi
-      # 5. 移除旧的主文件（强制脚本生成覆盖）
-      - name: Remove old generated files
-        run: |
-          rm -f output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt
-          echo "✅ 已移除旧生成文件，强制脚本重新生成。"
-      # 6. 运行 Python 脚本生成文件
+
+      # 4. 运行 Python 脚本生成文件
       - name: Run build scripts
         run: |
-          python3 md/build_m3u.py # 生成 output.m3u + tvbox_output.txt (根目录)
+          python3 md/build_m3u.py           # 生成 output.m3u + tvbox_output.txt (根目录)
           python3 md/build_m3u_add_logo.py # 生成 output_with_logo.m3u
-      # 6.1 调试：列出文件确认生成
-      - name: List files for debug
-        run: |
-          ls -la # 列出根目录文件
-          if [ -f output_with_logo.m3u ]; then
-            cat output_with_logo.m3u | head -n 5 # 打印前5行验证内容
-            md5sum output_with_logo.m3u
-          else
-            echo "⚠️ output_with_logo.m3u 不存在！"
-          fi
-          md5sum output.m3u tvbox_output.txt missing_logos.txt || echo "某些文件不存在"
-      # 7. 检查所有文件是否更新（使用 hash 比较备份 vs 新文件）
+
+      # 5. 检查 output_with_logo.m3u 是否更新
       - name: Check for updates
         id: check_update
         run: |
-          UPDATED=false
-          # 检查 output.m3u
-          if [ -f output.m3u ] && [ -f backup/output.m3u ]; then
-            NEW_HASH_M3U=$(md5sum output.m3u | awk '{print $1}')
-            OLD_HASH_M3U=$(md5sum backup/output.m3u | awk '{print $1}')
-            if [ "$NEW_HASH_M3U" != "$OLD_HASH_M3U" ]; then
-              UPDATED=true
-              echo "🆕 output.m3u 已更新 (New: $NEW_HASH_M3U, Old: $OLD_HASH_M3U)"
+          if [ -f output_with_logo.m3u ]; then
+            if git diff --quiet --exit-code -- output_with_logo.m3u; then
+              echo "no_change=true" >> $GITHUB_ENV
+              echo "✅ 文件内容未变化，本次运行跳过保存。"
             else
-              echo "✅ output.m3u 未变化"
+              echo "no_change=false" >> $GITHUB_ENV
+              echo "🆕 检测到文件内容更新，将保存新版本。"
             fi
-          elif [ -f output.m3u ]; then
-            UPDATED=true
-            echo "🆕 output.m3u 是新文件"
-          fi
-          # 检查 output_with_logo.m3u
-          if [ -f output_with_logo.m3u ] && [ -f backup/output_with_logo.m3u ]; then
-            NEW_HASH_LOGO=$(md5sum output_with_logo.m3u | awk '{print $1}')
-            OLD_HASH_LOGO=$(md5sum backup/output_with_logo.m3u | awk '{print $1}')
-            if [ "$NEW_HASH_LOGO" != "$OLD_HASH_LOGO" ]; then
-              UPDATED=true
-              echo "🆕 output_with_logo.m3u 已更新 (New: $NEW_HASH_LOGO, Old: $OLD_HASH_LOGO)"
-            else
-              echo "✅ output_with_logo.m3u 未变化"
-            fi
-          elif [ -f output_with_logo.m3u ]; then
-            UPDATED=true
-            echo "🆕 output_with_logo.m3u 是新文件"
-          fi
-          # 检查 tvbox_output.txt
-          if [ -f tvbox_output.txt ] && [ -f backup/tvbox_output.txt ]; then
-            NEW_HASH_TVBOX=$(md5sum tvbox_output.txt | awk '{print $1}')
-            OLD_HASH_TVBOX=$(md5sum backup/tvbox_output.txt | awk '{print $1}')
-            if [ "$NEW_HASH_TVBOX" != "$OLD_HASH_TVBOX" ]; then
-              UPDATED=true
-              echo "🆕 tvbox_output.txt 已更新 (New: $NEW_HASH_TVBOX, Old: $OLD_HASH_TVBOX)"
-            else
-              echo "✅ tvbox_output.txt 未变化"
-            fi
-          elif [ -f tvbox_output.txt ]; then
-            UPDATED=true
-            echo "🆕 tvbox_output.txt 是新文件"
-          fi
-          # 检查 missing_logos.txt (变化表示源更新)
-          if [ -f missing_logos.txt ] && [ -f backup/missing_logos.txt ]; then
-            NEW_HASH_MISS=$(md5sum missing_logos.txt | awk '{print $1}')
-            OLD_HASH_MISS=$(md5sum backup/missing_logos.txt | awk '{print $1}')
-            if [ "$NEW_HASH_MISS" != "$OLD_HASH_MISS" ]; then
-              UPDATED=true
-              echo "🆕 missing_logos.txt 已更新 (New: $NEW_HASH_MISS, Old: $OLD_HASH_MISS)"
-            else
-              echo "✅ missing_logos.txt 未变化"
-            fi
-          elif [ -f missing_logos.txt ]; then
-            UPDATED=true
-            echo "🆕 missing_logos.txt 是新文件"
-          fi
-          # 设置环境变量
-          if [ "$UPDATED" = true ]; then
-            echo "no_change=false" >> $GITHUB_ENV
-            echo "🆕 检测到至少一个文件更新，将备份历史、覆盖根目录并提交。"
           else
-            echo "no_change=true" >> $GITHUB_ENV
-            echo "✅ 所有文件内容未变化，本次运行跳过备份历史和提交（但仍生成文件）。"
+            echo "no_change=false" >> $GITHUB_ENV
+            echo "⚠️ 文件不存在，视为新生成文件。"
           fi
-      # 8. 备份到 history/（仅当根目录文件更新时；用时间戳命名，不覆盖旧历史）
-      - name: Backup to history if updated
+
+      # 6. 若有更新则保存历史文件
+      - name: Save updated M3U and TVBox files
         if: env.no_change == 'false'
         run: |
           TIMESTAMP=$(date +"%m%d%H%M")
@@ -129,33 +58,24 @@ jobs:
           cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          cp missing_logos.txt history/missing_${TIMESTAMP}.txt || echo "missing_logos.txt 不存在，跳过"
-          echo "✅ 已备份更新文件到 history/ 目录（新时间戳：${TIMESTAMP}）："
+          echo "✅ 已保存到 history/ 目录："
           echo " - ${TIMESTAMP}.m3u"
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
-          echo " - missing_${TIMESTAMP}.txt"
-      # 9. 更新根目录主文件（仅当更新时，用新生成覆盖旧；无更新时保持旧根目录）
-      - name: Update root files if changed
-        if: env.no_change == 'false'
-        run: |
-          cp output.m3u . || echo "output.m3u 未生成，使用备份或跳过"
-          cp output_with_logo.m3u . 
-          cp tvbox_output.txt .
-          cp missing_logos.txt . || echo "missing_logos.txt 不存在，跳过"
-          echo "✅ 已用新文件覆盖根目录（用于下次比较和仓库跟踪）。"
-      # 10. 提交更新到仓库（仅当更新时，仅主分支）
+
+      # 7. 提交更新到仓库（仅主分支）
       - name: Commit updated files to repo
         if: env.no_change == 'false' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt
-          git commit -m "Add updated M3U and TVBox build $(date +"%m%d%H%M") [skip ci]" || echo "无变化，跳过 commit"
+          git add output.m3u output_with_logo.m3u tvbox_output.txt
+          git commit -m "Add updated M3U and TVBox build $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
-      # 11. 上传 artifact（始终上传，便于调试）
+
+      # 8. 上传 artifact（仅当有更新）
       - name: Upload M3U and TVBox files as artifact
-        if: always()
+        if: env.no_change == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: m3u-playlist-${{ github.run_id }}
@@ -163,4 +83,3 @@ jobs:
             output.m3u
             output_with_logo.m3u
             tvbox_output.txt
-            missing_logos.txt
