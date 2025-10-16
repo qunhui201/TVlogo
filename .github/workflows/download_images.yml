@@ -21,7 +21,7 @@ jobs:
 
       - name: Download TV logos
         run: |
-          python3 download_tvlogos.py  # 你的脚本文件名
+          python3 md/download_tvlogos.py  # 你的脚本文件名
 
       - name: Commit & Push changes
         run: |
