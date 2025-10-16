@@ -3,51 +3,45 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 */4 * * *"  # 每4小时30分运行
+    - cron: "30 */4 * * *"   # 每4小时运行一次
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-
-      - name: Install dependencies
+      - name: 🧹 删除旧的输出文件
         run: |
-          cd ${{ github.workspace }}
-          python -m pip install --upgrade pip
-          pip install -r md/requirements.txt
-
-      # ✅ 确保在仓库根目录删除旧文件
-      - name: Clean old generated files
-        run: |
-          cd ${{ github.workspace }}
+          cd /home/runner/work/TVlogo/TVlogo
           echo "🧹 删除旧的输出文件..."
           rm -f output.m3u output_with_logo.m3u tvbox_output.txt
-          echo "🧹 删除完成，当前文件列表："
-          ls -l || true
+          ls -l --time-style=long-iso
 
-      # ✅ 确保在根目录生成文件
-      - name: Run build scripts
+      - name: 🧩 运行 Python 生成文件
         run: |
-          cd ${{ github.workspace }}
+          cd /home/runner/work/TVlogo/TVlogo
           python3 md/build_m3u.py
-          python3 md/build_m3u_add_logo.py
-          echo "📄 当前生成的文件："
-          ls -l output*.m3u tvbox_output.txt || true
 
-      # ✅ 每次运行都保存副本
-      - name: Save new copies to history
+      # ✅ 新增：强制刷新时间戳（即使内容没变）
+      - name: ⏰ 强制刷新根目录输出文件时间戳
         run: |
-          cd ${{ github.workspace }}
+          cd /home/runner/work/TVlogo/TVlogo
+          for f in output.m3u output_with_logo.m3u tvbox_output.txt; do
+            if [ -f "$f" ]; then
+              echo "" >> "$f"
+              sed -i '$d' "$f"
+            fi
+          done
+          echo "📄 文件时间戳已刷新："
+          ls -l --time-style=long-iso output.m3u output_with_logo.m3u tvbox_output.txt || true
+
+      - name: 🗃️ 保存到 history/
+        run: |
+          cd /home/runner/work/TVlogo/TVlogo
           TIMESTAMP=$(date +"%m%d%H%M")
-          mkdir -p history
           cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
@@ -56,19 +50,16 @@ jobs:
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
 
-      # ✅ 自动提交
-      - name: Commit updated files to repo
-        if: github.ref == 'refs/heads/main'
+      - name: Commit and Push
         run: |
-          cd ${{ github.workspace }}
+          cd /home/runner/work/TVlogo/TVlogo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output.m3u output_with_logo.m3u tvbox_output.txt history/
-          git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
+          git add history/
+          git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "no changes"
           git push
 
-      # ✅ 上传结果
-      - name: Upload M3U and TVBox files as artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: m3u-playlist-${{ github.run_id }}
@@ -76,5 +67,4 @@ jobs:
             output.m3u
             output_with_logo.m3u
             tvbox_output.txt
-            history/*.m3u
-            history/*.txt
+            history/
