@@ -51,17 +51,17 @@ jobs:
             echo "⚠️ 文件不存在，视为新生成文件。"
           fi
 
-      # 7. 若有更新则保存到 history 目录并加上时间戳文件名
-      - name: Save updated M3U files with timestamp
+      # 7. 若有更新则保存到 history 目录并加简化命名
+      - name: Save updated M3U files with simplified names
         if: env.no_change == 'false'
         run: |
           TIMESTAMP=$(date +"%m%d%H%M")
           mkdir -p history
-          cp output.m3u history/output_${TIMESTAMP}.m3u
-          cp output_with_logo.m3u history/output_with_logo_${TIMESTAMP}.m3u
+          cp output.m3u history/${TIMESTAMP}.m3u
+          cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           echo "✅ 已保存到："
-          echo " - history/output_${TIMESTAMP}.m3u"
-          echo " - history/output_with_logo_${TIMESTAMP}.m3u"
+          echo " - history/${TIMESTAMP}.m3u"
+          echo " - history/logo-${TIMESTAMP}.m3u"
 
       # 8. 提交到仓库（仅当有更新）
       - name: Commit updated M3U files
