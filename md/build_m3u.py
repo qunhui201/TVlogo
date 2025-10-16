@@ -6,7 +6,7 @@ from collections import defaultdict
 
 # -------- 配置 ---------
 REMOTE_FILES = [
-    "https://live.catvod.com/tv.m3u",
+    "https://iptv.catvod.com/tv.m3u",
     "http://httop.top/iptvs.m3u",
     "http://httop.top/iptvx.m3u"
 ]
