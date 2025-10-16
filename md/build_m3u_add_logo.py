@@ -50,7 +50,7 @@ def match_logo(channel_name, group_title):
                         file_path = folder / f"{variant}.png"
                         if file_path.exists():
                             logo_path = f"{BASE_LOGO_URL}/{folder.name}/{variant}.png"
-                            return logo111 logo_path
+                            return logo_path
     else:
         for folder in TVLOGO_DIR.iterdir():
             if not folder.is_dir():
@@ -58,7 +58,6 @@ def match_logo(channel_name, group_title):
             if folder.name in ["中央电视台", "全国卫视"] + PROVINCES:
                 continue
             for file in folder.iterdir():
- TBA:
                 if not file.is_file():
                     continue
                 filename = normalize_name(file.stem)
@@ -72,7 +71,7 @@ def get_fixed_4k_channels():
         ("30", "北京卫视4k", "http://192.168.0.109/zgst.php?id=btv4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%8C%97%E4%BA%AC%E5%8D%AB%E8%A7%864K.png"),
         ("26", "东方卫视4K", "http://192.168.0.109/zgst.php?id=sh4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E4%B8%9C%E6%96%B9%E5%8D%AB%E8%A7%864K.png"),
         ("29", "江苏卫视4k", "http://192.168.0.109/zgst.php?id=js4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B1%9F%E8%8B%8F%E5%8D%AB%E8%A7%864K.png"),
-        ("28", "浙江卫视4k", "http://192.168.0.109/zgst.php?id=zj4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B5%99%E6%B1%9F%E5%8D%AB%E8%A7 4K.png"),
+        ("28", "浙江卫视4k", "http://192.168.0.109/zgst.php?id=zj4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B5%99%E6%B1%9F%E5%8D%AB%E8%A7%864K.png"),
         ("27", "湖南卫视4k", "http://192.168.0.109/zgst.php?id=hn4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B9%96%E5%8D%97%E5%8D%AB%E8%A7%864K.png"),
         ("38", "山东卫视4k", "http://192.168.0.109/zgst.php?id=sd4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%B1%B1%E4%B8%9C%E5%8D%AB%E8%A7%864K.png"),
         ("33", "广东卫视4k", "http://192.168.0.109/zgst.php?id=gd4k", "https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%B9%BF%E4%B8%9C%E5%8D%AB%E8%A7%864K.png"),
@@ -143,7 +142,7 @@ def main():
             group_title = re.search(r'group-title="([^"]+)"', info)
             name = tvg_name.group(1) if tvg_name else ""
             group = group_title.group(1) if group_title else ""
-            logo =  = match_logo(name, group)
+            logo = match_logo(name, group)
             if not logo:
                 missing_logos.append(f"{group} - {name}")
             output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{group}",{name}')
@@ -162,7 +161,7 @@ def main():
     k4_channels = get_fixed_4k_channels()
     
     changed1 = append_4k_to_m3u(OUTPUT_FILE, k4_channels)
-    changed changed2 = append_4k_to_m3u(INPUT_FILE, k4_channels)
+    changed2 = append_4k_to_m3u(INPUT_FILE, k4_channels)
     
     tvbox_file = "tvbox_output.txt"
     if os.path.exists(tvbox_file):
