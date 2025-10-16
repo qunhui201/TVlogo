@@ -1,7 +1,7 @@
 import re
 import requests
 from pathlib import Path
-from datetime import datetime
+from collections import defaultdict
 
 # -------- 配置 ---------
 REMOTE_FILES = [
@@ -46,16 +46,21 @@ def parse_m3u(content):
     return result
 
 def classify_channel(name, original_group, tvlogo_dir):
+    # 特殊频道
     for key, val in SPECIAL_CHANNELS.items():
         if key in name:
             return val
+    # 已知大类
     if original_group in ["央视频道", "卫视频道", "地方频道"]:
         return original_group
+    # 卫视频道
     if "卫视" in name:
         return "卫视频道"
+    # 地方频道
     for province in PROVINCES:
         if province in name and "卫视" not in name:
             return "地方频道"
+    # 第三方系列匹配台标
     for folder in tvlogo_dir.iterdir():
         if not folder.is_dir(): continue
         folder_name = folder.name
@@ -66,19 +71,26 @@ def classify_channel(name, original_group, tvlogo_dir):
             ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)
             if ch_name and ch_name in name:
                 return folder_name
+    # 数字或未知
     if name.isdigit() or not name:
         return "其他频道"
     return "其他频道"
 
 def generate_tvbox_txt(channels):
-    now_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    lines = []
+    grouped = defaultdict(list)
     for name, url, grp, logo in channels:
         final_group = classify_channel(name, grp, TVLOGO_DIR)
-        lines.append(f"{now_time},{url}")
-        lines.append(f"📺{final_group},#genre#")
+        grouped[final_group].append((name, url))
+
+    lines = []
+    for group in grouped:
+        lines.append(f"📺{group},#genre#")
+        for name, url in grouped[group]:
+            lines.append(f"{name},{url}")
+
     with open(TVBOX_TXT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
+
     print(f"✅ 已生成 {TVBOX_TXT_FILE}, 共 {len(channels)} 个频道")
 
 # -------- 主逻辑 ---------
@@ -95,8 +107,10 @@ def main():
         final_group = classify_channel(name, grp, TVLOGO_DIR)
         out_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{final_group}",{name}')
         out_lines.append(url)
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(out_lines))
+
     print(f"✅ 已生成 {OUTPUT_FILE}, 共 {len(all_channels)} 个频道")
 
     # 写 tvbox_output.txt
