@@ -663,22 +663,3 @@ http://124.88.238.50:82/hls/19/index.m3u8
 http://124.88.238.50:82/hls/20/index.m3u8
 #EXTINF:-1 tvg-name="辽宁卫视" tvg-logo="" group-title="卫视频道",辽宁卫视
 http://124.88.238.50:82/hls/21/index.m3u8
-
-#EXTINF:-1 tvg-id="30" tvg-name="北京卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%8C%97%E4%BA%AC%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",北京卫视4k
-http://192.168.0.109/zgst.php?id=btv4k
-#EXTINF:-1 tvg-id="26" tvg-name="东方卫视4K" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E4%B8%9C%E6%96%B9%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",东方卫视4K
-http://192.168.0.109/zgst.php?id=sh4k
-#EXTINF:-1 tvg-id="29" tvg-name="江苏卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B1%9F%E8%8B%8F%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",江苏卫视4k
-http://192.168.0.109/zgst.php?id=js4k
-#EXTINF:-1 tvg-id="28" tvg-name="浙江卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B5%99%E6%B1%9F%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",浙江卫视4k
-http://192.168.0.109/zgst.php?id=zj4k
-#EXTINF:-1 tvg-id="27" tvg-name="湖南卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B9%96%E5%8D%97%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",湖南卫视4k
-http://192.168.0.109/zgst.php?id=hn4k
-#EXTINF:-1 tvg-id="38" tvg-name="山东卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%B1%B1%E4%B8%9C%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",山东卫视4k
-http://192.168.0.109/zgst.php?id=sd4k
-#EXTINF:-1 tvg-id="33" tvg-name="广东卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%B9%BF%E4%B8%9C%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",广东卫视4k
-http://192.168.0.109/zgst.php?id=gd4k
-#EXTINF:-1 tvg-id="56" tvg-name="四川卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E5%9B%9B%E5%B7%9D%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",四川卫视4k
-http://192.168.0.109/zgst.php?id=sc4k
-#EXTINF:-1 tvg-id="34" tvg-name="深圳卫视4k" tvg-logo="https://cdn.jsdelivr.net/gh/qunhui201/TVlogo/img/%E6%B7%B1%E5%9C%B3%E5%8D%AB%E8%A7%864K.png" group-title="4K频道",深圳卫视4k
-http://192.168.0.109/zgst.php?id=sz4k
