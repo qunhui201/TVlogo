@@ -3,7 +3,7 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:    # 手动触发
   schedule:
-    - cron: "30 */4 * * *"
+    - cron: "30 */4 * * *"  # 每4小时的30分运行
 
 jobs:
   build:
@@ -34,21 +34,51 @@ jobs:
       - name: Run build_m3u_add_logo.py
         run: python3 md/build_m3u_add_logo.py
 
-      # 6. 上传生成的文件作为 artifact
-      - name: Upload M3U files as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: m3u-playlist
-          path: |
-            output.m3u
-            output_with_logo.m3u
+      # 6. 检查是否有更新
+      - name: Check for updates
+        id: check_update
+        run: |
+          if [ -f output_with_logo.m3u ]; then
+            if git diff --quiet --exit-code -- output_with_logo.m3u; then
+              echo "no_change=true" >> $GITHUB_ENV
+              echo "✅ 文件内容未变化，本次运行跳过保存。"
+            else
+              echo "no_change=false" >> $GITHUB_ENV
+              echo "🆕 检测到文件内容更新，将保存新版本。"
+            fi
+          else
+            echo "no_change=false" >> $GITHUB_ENV
+            echo "⚠️ 文件不存在，视为新生成文件。"
+          fi
 
-      # 7. 可选：提交生成的 output_with_logo.m3u 到仓库
-      - name: Commit output_with_logo.m3u to repo
-        if: github.ref == 'refs/heads/main'  # 仅主分支自动提交
+      # 7. 若有更新则保存到 history 目录并加上时间戳文件名
+      - name: Save updated M3U files with timestamp
+        if: env.no_change == 'false'
+        run: |
+          TIMESTAMP=$(date +"%m%d%H%M")
+          mkdir -p history
+          cp output.m3u history/output_${TIMESTAMP}.m3u
+          cp output_with_logo.m3u history/output_with_logo_${TIMESTAMP}.m3u
+          echo "✅ 已保存到："
+          echo " - history/output_${TIMESTAMP}.m3u"
+          echo " - history/output_with_logo_${TIMESTAMP}.m3u"
+
+      # 8. 提交到仓库（仅当有更新）
+      - name: Commit updated M3U files
+        if: env.no_change == 'false' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output_with_logo.m3u
-          git commit -m "Update output_with_logo.m3u [skip ci]" || echo "No changes to commit"
+          git add history/
+          git commit -m "Add updated M3U build $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
+
+      # 9. 上传 artifact（仅当有更新）
+      - name: Upload M3U files as artifact
+        if: env.no_change == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: m3u-playlist-${{ github.run_id }}
+          path: |
+            output.m3u
+            output_with_logo.m3u
