@@ -3,63 +3,78 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 */4 * * *"   # 每4小时运行一次
+    - cron: "30 */4 * * *"  # 每4小时30分运行
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 1. 检出仓库
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🧹 删除旧的输出文件
+      # 2. 设置 Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      # 3. 安装依赖
+      - name: Install dependencies
         run: |
-          cd /home/runner/work/TVlogo/TVlogo
+          python -m pip install --upgrade pip
+          pip install -r md/requirements.txt
+
+      # 4. 删除旧的输出文件
+      - name: Clean old files
+        run: |
           echo "🧹 删除旧的输出文件..."
-          rm -f output.m3u output_with_logo.m3u tvbox_output.txt
-          ls -l --time-style=long-iso
+          rm -f output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt
+          echo "🧹 删除完成，当前文件列表："
+          ls -lh
 
-      - name: 🧩 运行 Python 生成文件
+      # 5. 运行 Python 脚本生成文件（在 md/ 目录）
+      - name: Run build scripts
         run: |
-          cd /home/runner/work/TVlogo/TVlogo
           python3 md/build_m3u.py
+          python3 md/build_m3u_add_logo.py
 
-      # ✅ 新增：强制刷新时间戳（即使内容没变）
-      - name: ⏰ 强制刷新根目录输出文件时间戳
+      # 6. 复制 md/ 生成的文件到根目录
+      - name: Copy files to root directory
         run: |
-          cd /home/runner/work/TVlogo/TVlogo
-          for f in output.m3u output_with_logo.m3u tvbox_output.txt; do
-            if [ -f "$f" ]; then
-              echo "" >> "$f"
-              sed -i '$d' "$f"
-            fi
-          done
-          echo "📄 文件时间戳已刷新："
-          ls -l --time-style=long-iso output.m3u output_with_logo.m3u tvbox_output.txt || true
+          echo "📄 复制生成文件到根目录..."
+          cp md/output.m3u output.m3u
+          cp md/output_with_logo.m3u output_with_logo.m3u
+          cp md/tvbox_output.txt tvbox_output.txt
+          cp md/missing_logos.txt missing_logos.txt
+          ls -lh output* tvbox_output.txt missing_logos.txt
 
-      - name: 🗃️ 保存到 history/
+      # 7. 保存到 history/ 按时间戳
+      - name: Save history
         run: |
-          cd /home/runner/work/TVlogo/TVlogo
           TIMESTAMP=$(date +"%m%d%H%M")
+          mkdir -p history
           cp output.m3u history/${TIMESTAMP}.m3u
           cp output_with_logo.m3u history/logo${TIMESTAMP}.m3u
           cp tvbox_output.txt history/tvbox_${TIMESTAMP}.txt
-          echo "✅ 已保存到 history/："
+          echo "✅ 已保存到 history/ 目录："
           echo " - ${TIMESTAMP}.m3u"
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
 
-      - name: Commit and Push
+      # 8. 提交更新到仓库（仅主分支）
+      - name: Commit updated files to repo
+        if: github.ref == 'refs/heads/main'
         run: |
-          cd /home/runner/work/TVlogo/TVlogo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add history/
-          git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "no changes"
+          git add output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt
+          git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
           git push
 
-      - name: Upload artifacts
+      # 9. 上传 artifact
+      - name: Upload M3U and TVBox files as artifact
         uses: actions/upload-artifact@v4
         with:
           name: m3u-playlist-${{ github.run_id }}
@@ -67,4 +82,4 @@ jobs:
             output.m3u
             output_with_logo.m3u
             tvbox_output.txt
-            history/
+            missing_logos.txt
