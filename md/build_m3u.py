@@ -1,7 +1,6 @@
 import re
-from pathlib import Path
-from datetime import datetime
 import requests
+from pathlib import Path
 
 # -------- 配置 ---------
 REMOTE_FILES = [
@@ -9,27 +8,24 @@ REMOTE_FILES = [
     "http://httop.top/iptvx.m3u"
 ]
 
-TVLOGO_DIR = Path("TVlogo_Images")
+TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
+
 PROVINCES = [
-    "北京", "上海", "天津", "重庆", "辽宁", "吉林", "黑龙江", "江苏", "浙江", "安徽", "福建", "江西",
-    "山东", "河南", "湖北", "湖南", "广东", "广西", "海南", "四川", "贵州", "云南", "陕西", "甘肃",
-    "青海", "宁夏", "新疆", "内蒙", "西藏", "香港", "澳门", "台湾", "延边", "大湾区"
+    "北京","上海","天津","重庆","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西",
+    "山东","河南","湖北","湖南","广东","广西","海南","四川","贵州","云南","陕西","甘肃",
+    "青海","宁夏","新疆","内蒙","西藏","香港","澳门","台湾","延边","大湾区"
 ]
 
 SPECIAL_CHANNELS = {
-    "CCTV17": "央视频道"
+    "CCTV17": "央视频道",  # 特例处理
+    "4K": "4K频道"  # 明确指定4K频道
 }
 
 OUTPUT_FILE = "output.m3u"
-TVBOX_FILE = "tvbox_output.txt"
-
-# 固定 4K 频道文件（已有的文件）
-FIXED_4K_URL = "https://raw.githubusercontent.com/qunhui201/TVlogo/refs/heads/main/md/4K.m3u"
-FIXED_4K_GROUP = "4K频道"
+TVBOX_OUTPUT_FILE = "tvbox_output.txt"
 
 # -------- 函数 ---------
 def download_m3u(url):
-    """下载 m3u 文件"""
     r = requests.get(url, timeout=10)
     r.raise_for_status()
     return r.text
@@ -41,7 +37,7 @@ def parse_m3u(content):
     for i in range(len(lines)):
         if lines[i].startswith("#EXTINF"):
             info = lines[i]
-            url = lines[i + 1] if i + 1 < len(lines) else ""
+            url = lines[i+1] if i+1 < len(lines) else ""
             tvg_name = re.search(r'tvg-name="([^"]+)"', info)
             group_title = re.search(r'group-title="([^"]+)"', info)
             tvg_logo = re.search(r'tvg-logo="([^"]+)"', info)
@@ -52,17 +48,30 @@ def parse_m3u(content):
     return result
 
 def classify_channel(name, original_group, tvlogo_dir):
-    """分类频道"""
+    """分类逻辑"""
+    # 4K频道专门分类
+    if "4K" in name:
+        return "4K频道"
+
+    # 特殊频道直接归类
     for key, val in SPECIAL_CHANNELS.items():
         if key in name:
             return val
+
+    # 保留原分组
     if original_group in ["央视频道", "卫视频道", "地方频道"]:
         return original_group
+
+    # 卫视频道：只要包含“卫视”
     if "卫视" in name:
         return "卫视频道"
+
+    # 地方频道：包含地名且不是卫视
     for province in PROVINCES:
         if province in name and "卫视" not in name:
             return "地方频道"
+
+    # 第三方系列匹配（忽略英文前缀）
     for folder in tvlogo_dir.iterdir():
         if not folder.is_dir():
             continue
@@ -73,55 +82,66 @@ def classify_channel(name, original_group, tvlogo_dir):
             if not logo_file.is_file():
                 continue
             filename = logo_file.stem
-            ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)
+            ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)  # 忽略英文前缀
             if ch_name and ch_name in name:
                 return folder_name
+
+    # 数字或未知
     if name.isdigit() or not name:
         return "其他频道"
+
+    # 默认
     return "其他频道"
 
 # -------- 主逻辑 ---------
 def main():
     all_channels = []
+    tvbox_channels = []  # 用于存储 TVBox 格式的频道
 
     # 下载远程 M3U 文件
     for url in REMOTE_FILES:
-        try:
-            content = download_m3u(url)
-            all_channels.extend(parse_m3u(content))
-        except Exception as e:
-            print(f"⚠️ 下载 {url} 失败: {e}")
+        content = download_m3u(url)
+        channels = parse_m3u(content)
+        all_channels.extend(channels)
 
-    # 获取并合并固定 4K 频道（从 GitHub 上）
-    try:
-        content = download_m3u(FIXED_4K_URL)
-        all_channels.extend([(name, url, FIXED_4K_GROUP, logo) 
-                             for name, url, _, logo in parse_m3u(content)])
-    except Exception as e:
-        print(f"⚠️ 下载固定 4K 频道失败: {e}")
+    # 处理固定的 4K 频道
+    content_4k = download_m3u("https://raw.githubusercontent.com/qunhui201/TVlogo/refs/heads/main/md/4K.m3u")
+    channels_4k = parse_m3u(content_4k)
+    all_channels.extend(channels_4k)
 
-    # 写 output.m3u
+    # 写入输出文件
     output_lines = ["#EXTM3U"]
+    tvbox_lines = []
+
+    # 处理每个频道
+    grouped_channels = {}
+
     for name, url, grp, logo in all_channels:
         final_group = classify_channel(name, grp, TVLOGO_DIR)
-        output_lines.append(f'#EXTINF:-1 tvg-name="{name}" tvg-logo="{logo}" group-title="{final_group}",{name}')
-        output_lines.append(url)
+        
+        # 将频道按分类分组
+        if final_group not in grouped_channels:
+            grouped_channels[final_group] = []
+        
+        grouped_channels[final_group].append((name, url))
+
+    # 遍历分类
+    for group, channels in grouped_channels.items():
+        output_lines.append(f"#EXTINF:-1 group-title=\"{group}\", {group}")
+        for name, url in channels:
+            output_lines.append(url)
+            tvbox_lines.append(f"📺{group},#genre#\n{name},{url}")
+
+    # 生成 M3U 文件
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines))
-    print(f"✅ 已生成 {OUTPUT_FILE}, 共 {len(all_channels)} 个频道")
 
-    # 写 tvbox_output.txt
-    tvbox_lines = []
-    current_group = None
-    for name, url, grp, logo in all_channels:
-        final_group = classify_channel(name, grp, TVLOGO_DIR)
-        if current_group != final_group:
-            current_group = final_group
-            tvbox_lines.append(f"📺{current_group},#genre#")
-        tvbox_lines.append(f"{name},{url}")
-    with open(TVBOX_FILE, "w", encoding="utf-8") as f:
+    # 生成 TVBox 格式的文件
+    with open(TVBOX_OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(tvbox_lines))
-    print(f"✅ 已生成 {TVBOX_FILE}, 共 {len(all_channels)} 个频道")
+
+    print(f"已生成 {OUTPUT_FILE}，共 {len(all_channels)} 个频道")
+    print(f"已生成 {TVBOX_OUTPUT_FILE}，共 {len(tvbox_lines)} 个频道")
 
 if __name__ == "__main__":
     main()
