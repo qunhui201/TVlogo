@@ -20,7 +20,7 @@ jobs:
 
       - name: Run merge script
         run: |
-          python merge_files.py
+          python md/merge_files.py
 
       - name: Commit and push merged files
         run: |
