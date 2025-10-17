@@ -13,6 +13,8 @@ jobs:
       # 1. 检出仓库
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 拉取完整历史，方便 PR
 
       # 2. 设置 Python
       - name: Setup Python
@@ -50,16 +52,21 @@ jobs:
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
 
-      # 7. 提交更新到仓库（推送到 auto-build 分支，避免 main 冲突）
-      - name: Commit updated files to auto-build branch
+      # 7. 合并 history/ 下最近 15 个文件（调用 merge_tvlist.py）
+      - name: Merge history files
+        run: |
+          python3 md/merge_tvlist.py
+
+      # 8. 提交更新到 auto-build 分支
+      - name: Commit and push to auto-build branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt history/
-          git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
+          git commit -m "Auto build & merge files $(date +'%m%d%H%M') [skip ci]" || echo "No changes to commit"
           git push origin HEAD:auto-build --force
 
-      # 8. 上传 artifact（包括根目录最新文件）
+      # 9. 上传 artifact（包括根目录最新文件）
       - name: Upload M3U and TVBox files as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -69,17 +76,17 @@ jobs:
             output_with_logo.m3u
             tvbox_output.txt
             missing_logos.txt
+            history/
 
-      # 9. ✅ 合并 history/ 下最近 15 个文件（调用 merge_tvlist.py）
-      - name: Merge history files
-        run: |
-          python3 md/merge_tvlist.py
-     # 10. 提交 merged 文件到仓库
-      - name: Commit merged files to auto-build branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add history/merged.m3u history/merged.txt
-          git commit -m "Auto merge history files $(date +'%m%d%H%M') [skip ci]" || echo "No changes to commit"
-          git push origin HEAD:auto-build --force
-
+      # 10. 自动创建 PR 从 auto-build 合并到 main
+      - name: Create Pull Request to main
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Auto merge history files $(date +'%m%d%H%M') [skip ci]"
+          branch: auto-build
+          base: main
+          title: "Auto Merge history files $(date +'%m%d%H%M')"
+          body: "自动将 auto-build 分支的最新生成文件合并到 main 分支"
+          draft: false
+          delete-branch: false
