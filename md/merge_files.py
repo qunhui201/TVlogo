@@ -1,90 +1,79 @@
 #!/usr/bin/env python3
-# merge_files.py
-# 合并 history/ 下的 .m3u 和 .txt 文件
-# 去重规则：
-#  - .m3u: 保留相同标题下不同的链接；只在 (标题, 链接) 完全相同的情况下去重
-#  - .txt: 完全相同行去重
+# -*- coding: utf-8 -*-
+# 功能：合并 history/ 下的 .m3u 和 .txt 文件
+# 去重逻辑：
+#   - .m3u 文件：只根据链接(URL)去重，保留每个链接第一次出现对应的 #EXTINF + URL 对
+#   - .txt 文件：整行内容去重
 
 import os
-from collections import OrderedDict
 
 FOLDER = "history"
-OUTPUT_M3U = "merged.m3u"
-OUTPUT_TXT = "merged.txt"
 ENCODING = "utf-8"
 
-def merge_m3u(folder, output_filename):
-    # 用 OrderedDict 保持标题插入顺序，值为按顺序出现的链接列表
-    title_to_urls = OrderedDict()
-    seen_pairs = set()  # (title, url) 去重标记
 
+def merge_m3u(folder, output_file):
+    seen_urls = set()
+    merged_pairs = []
+
+    # 遍历所有 .m3u 文件
     for fname in sorted(os.listdir(folder)):
         if not fname.lower().endswith(".m3u"):
             continue
         path = os.path.join(folder, fname)
         try:
             with open(path, "r", encoding=ENCODING, errors="ignore") as f:
-                current_title = None
-                for raw in f:
-                    line = raw.rstrip("\n")
-                    if not line:
-                        continue
+                lines = [line.strip() for line in f if line.strip()]
+                i = 0
+                while i < len(lines):
+                    line = lines[i]
+                    # 如果是标题行
                     if line.startswith("#EXTINF"):
-                        current_title = line
-                        # 确保 dict 有此标题（但不立刻写入文件）
-                        if current_title not in title_to_urls:
-                            title_to_urls[current_title] = []
+                        if i + 1 < len(lines):
+                            url = lines[i + 1]
+                            # 如果链接未出现过，则保留这一对
+                            if url not in seen_urls:
+                                seen_urls.add(url)
+                                merged_pairs.append((line, url))
+                        i += 2
                     else:
-                        # 非 #EXTINF 行当作 URL（或者其他信息），以第一个非空非注释行视为链接
-                        if current_title is None:
-                            # 没有标题就跳过（防止文件格式异常）
-                            continue
-                        url = line.strip()
-                        pair = (current_title, url)
-                        if pair not in seen_pairs:
-                            seen_pairs.add(pair)
-                            title_to_urls[current_title].append(url)
+                        # 如果不是 #EXTINF 就直接跳过（防止某些异常行）
+                        i += 1
         except Exception as e:
-            print(f"⚠️ 读取文件出错: {path} -> {e}")
+            print(f"⚠️ 读取 {fname} 出错: {e}")
 
-    # 写入合并文件：每个标题写一次，紧接着写其所有 URL（每行一条）
-    out_path = os.path.join(folder, output_filename)
-    total_pairs = 0
+    # 写出结果
+    out_path = os.path.join(folder, output_file)
     with open(out_path, "w", encoding=ENCODING) as out:
-        for title, urls in title_to_urls.items():
-            if not urls:
-                continue
-            out.write(f"{title}\n")
-            for u in urls:
-                out.write(f"{u}\n")
-                total_pairs += 1
+        for title, url in merged_pairs:
+            out.write(f"{title}\n{url}\n")
 
-    print(f"✅ 合并 .m3u 完成 -> {out_path} （标题数: {len(title_to_urls)}, 链接对数: {total_pairs}）")
+    print(f"✅ 合并完成: {out_path}，共 {len(merged_pairs)} 条频道链接")
 
 
-def merge_txt(folder, output_filename):
+def merge_txt(folder, output_file):
     seen = set()
     merged_lines = []
+
     for fname in sorted(os.listdir(folder)):
         if not fname.lower().endswith(".txt"):
             continue
         path = os.path.join(folder, fname)
         try:
             with open(path, "r", encoding=ENCODING, errors="ignore") as f:
-                for raw in f:
-                    line = raw.strip()
+                for line in f:
+                    line = line.strip()
                     if not line:
                         continue
                     if line not in seen:
                         seen.add(line)
                         merged_lines.append(line)
         except Exception as e:
-            print(f"⚠️ 读取文件出错: {path} -> {e}")
+            print(f"⚠️ 读取 {fname} 出错: {e}")
 
-    out_path = os.path.join(folder, output_filename)
+    out_path = os.path.join(folder, output_file)
     with open(out_path, "w", encoding=ENCODING) as out:
         out.write("\n".join(merged_lines))
-    print(f"✅ 合并 .txt 完成 -> {out_path} （去重后行数: {len(merged_lines)}）")
+    print(f"✅ 合并完成: {out_path}，共 {len(merged_lines)} 行")
 
 
 if __name__ == "__main__":
@@ -92,5 +81,5 @@ if __name__ == "__main__":
         print(f"❌ 未找到目录: {FOLDER}")
         raise SystemExit(1)
 
-    merge_m3u(FOLDER, OUTPUT_M3U)
-    merge_txt(FOLDER, OUTPUT_TXT)
+    merge_m3u(FOLDER, "merged.m3u")
+    merge_txt(FOLDER, "merged.txt")
