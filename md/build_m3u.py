@@ -6,8 +6,8 @@ from collections import defaultdict
 
 # -------- 配置 ---------
 REMOTE_FILES = [
-    "http://httop.top/iptvs.m3u",
-    "http://httop.top/iptvx.m3u"
+    "http://httop.top/iptv.m3u",
+    "http://httop.top/iptvs.m3u"
 ]
 
 TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
