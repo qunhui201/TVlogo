@@ -70,3 +70,8 @@ jobs:
             output_with_logo.m3u
             tvbox_output.txt
             missing_logos.txt
+
+      # 9. ✅ 合并 history/ 下最新 15 个文件（调用 merge_tvlist.py）
+      - name: Merge history files
+        run: |
+          python3 history/merge_tvlist.py
