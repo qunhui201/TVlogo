@@ -50,15 +50,14 @@ jobs:
           echo " - logo${TIMESTAMP}.m3u"
           echo " - tvbox_${TIMESTAMP}.txt"
 
-      # 7. 提交更新到仓库（仅主分支）
-      - name: Commit updated files to repo
-        if: github.ref == 'refs/heads/main'
+      # 7. 提交更新到仓库（推送到 auto-build 分支，避免 main 冲突）
+      - name: Commit updated files to auto-build branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt history/
           git commit -m "Auto build M3U & TVBox files $(date +"%m%d%H%M") [skip ci]" || echo "No changes to commit"
-          git push
+          git push origin HEAD:auto-build --force
 
       # 8. 上传 artifact（包括根目录最新文件）
       - name: Upload M3U and TVBox files as artifact
@@ -71,7 +70,7 @@ jobs:
             tvbox_output.txt
             missing_logos.txt
 
-      # 9. ✅ 合并 history/ 下最新 15 个文件（调用 merge_tvlist.py）
+      # 9. ✅ 合并 history/ 下最近 15 个文件（调用 merge_tvlist.py）
       - name: Merge history files
         run: |
-          python3 md/merge_files.py
+          python3 md/merge_tvlist.py
