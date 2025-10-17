@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出仓库
+      # 1. 检出仓库（完整历史，用于直接 push）
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 拉取完整历史，方便 PR
+          fetch-depth: 0
 
       # 2. 设置 Python
       - name: Setup Python
@@ -57,14 +57,14 @@ jobs:
         run: |
           python3 md/merge_tvlist.py
 
-      # 8. 提交更新到 auto-build 分支
-      - name: Commit and push to auto-build branch
+      # 8. 提交更新到 main 分支
+      - name: Commit and push to main branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt history/
           git commit -m "Auto build & merge files $(date +'%m%d%H%M') [skip ci]" || echo "No changes to commit"
-          git push origin HEAD:auto-build --force
+          git push origin HEAD:main --force
 
       # 9. 上传 artifact（包括根目录最新文件）
       - name: Upload M3U and TVBox files as artifact
@@ -77,16 +77,3 @@ jobs:
             tvbox_output.txt
             missing_logos.txt
             history/
-
-      # 10. 自动创建 PR 从 auto-build 合并到 main
-      - name: Create Pull Request to main
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Auto merge history files $(date +'%m%d%H%M') [skip ci]"
-          branch: auto-build
-          base: main
-          title: "Auto Merge history files $(date +'%m%d%H%M')"
-          body: "自动将 auto-build 分支的最新生成文件合并到 main 分支"
-          draft: false
-          delete-branch: false
