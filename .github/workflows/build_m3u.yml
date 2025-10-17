@@ -74,3 +74,12 @@ jobs:
       - name: Merge history files
         run: |
           python3 md/merge_tvlist.py
+     # 10. 提交 merged 文件到仓库
+      - name: Commit merged files to auto-build branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add history/merged.m3u history/merged.txt
+          git commit -m "Auto merge history files $(date +'%m%d%H%M') [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:auto-build --force
+
