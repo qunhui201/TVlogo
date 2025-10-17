@@ -3,7 +3,7 @@ name: Build M3U Playlist
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 */4 * * *"  # 每4小时30分运行
+    - cron: "30 */8 * * *"  # 每4小时30分运行
 
 jobs:
   build:
