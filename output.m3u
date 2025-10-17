@@ -105,13 +105,13 @@ http://61.163.179.201:808/hls/14/index.m3u8
 http://61.163.179.201:808/hls/16/index.m3u8
 #EXTINF:-1 tvg-name="河南卫视" tvg-logo="" group-title="卫视频道",河南卫视
 http://61.163.179.201:808/hls/17/index.m3u8
-#EXTINF:-1 tvg-name="都市频道" tvg-logo="" group-title="台湾频道三",都市频道
+#EXTINF:-1 tvg-name="都市频道" tvg-logo="" group-title="台湾频道二",都市频道
 http://61.163.179.201:808/hls/18/index.m3u8
-#EXTINF:-1 tvg-name="民生频道" tvg-logo="" group-title="台湾频道三",民生频道
+#EXTINF:-1 tvg-name="民生频道" tvg-logo="" group-title="台湾频道二",民生频道
 http://61.163.179.201:808/hls/19/index.m3u8
-#EXTINF:-1 tvg-name="法治频道" tvg-logo="" group-title="台湾频道三",法治频道
+#EXTINF:-1 tvg-name="法治频道" tvg-logo="" group-title="台湾频道二",法治频道
 http://61.163.179.201:808/hls/20/index.m3u8
-#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="" group-title="台湾频道三",电视剧频道
+#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="" group-title="台湾频道二",电视剧频道
 http://61.163.179.201:808/hls/21/index.m3u8
 #EXTINF:-1 tvg-name="湖南卫视" tvg-logo="" group-title="卫视频道",湖南卫视
 http://61.163.179.201:808/hls/22/index.m3u8
@@ -151,13 +151,13 @@ http://61.163.179.201:808/hls/14/index.m3u8
 http://61.163.179.201:808/hls/16/index.m3u8
 #EXTINF:-1 tvg-name="河南卫视" tvg-logo="" group-title="卫视频道",河南卫视
 http://61.163.179.201:808/hls/17/index.m3u8
-#EXTINF:-1 tvg-name="都市频道" tvg-logo="" group-title="台湾频道三",都市频道
+#EXTINF:-1 tvg-name="都市频道" tvg-logo="" group-title="台湾频道二",都市频道
 http://61.163.179.201:808/hls/18/index.m3u8
-#EXTINF:-1 tvg-name="民生频道" tvg-logo="" group-title="台湾频道三",民生频道
+#EXTINF:-1 tvg-name="民生频道" tvg-logo="" group-title="台湾频道二",民生频道
 http://61.163.179.201:808/hls/19/index.m3u8
-#EXTINF:-1 tvg-name="法治频道" tvg-logo="" group-title="台湾频道三",法治频道
+#EXTINF:-1 tvg-name="法治频道" tvg-logo="" group-title="台湾频道二",法治频道
 http://61.163.179.201:808/hls/20/index.m3u8
-#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="" group-title="台湾频道三",电视剧频道
+#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="" group-title="台湾频道二",电视剧频道
 http://61.163.179.201:808/hls/21/index.m3u8
 #EXTINF:-1 tvg-name="湖南卫视" tvg-logo="" group-title="卫视频道",湖南卫视
 http://61.163.179.201:808/hls/22/index.m3u8
@@ -309,7 +309,7 @@ http://171.217.136.165:10001/hls/46/index.m3u8
 http://171.217.136.165:10001/hls/47/index.m3u8
 #EXTINF:-1 tvg-name="海南卫视" tvg-logo="" group-title="卫视频道",海南卫视
 http://171.217.136.165:10001/hls/50/index.m3u8
-#EXTINF:-1 tvg-name="峨眉电影" tvg-logo="" group-title="台湾频道三",峨眉电影
+#EXTINF:-1 tvg-name="峨眉电影" tvg-logo="" group-title="海外频道",峨眉电影
 http://171.217.136.165:10001/hls/52/index.m3u8
 #EXTINF:-1 tvg-name="星空购物" tvg-logo="" group-title="其他频道",星空购物
 http://171.217.136.165:10001/hls/54/index.m3u8
@@ -495,7 +495,7 @@ http://171.14.84.67:808/hls/49/index.m3u8
 http://171.14.84.67:808/hls/50/index.m3u8
 #EXTINF:-1 tvg-name="金鹰卡通" tvg-logo="" group-title="数字频道",金鹰卡通
 http://171.14.84.67:808/hls/51/index.m3u8
-#EXTINF:-1 tvg-name="嘉佳卡通" tvg-logo="" group-title="广东",嘉佳卡通
+#EXTINF:-1 tvg-name="嘉佳卡通" tvg-logo="" group-title="数字频道",嘉佳卡通
 http://171.14.84.67:808/hls/52/index.m3u8
 #EXTINF:-1 tvg-name="新疆卫视" tvg-logo="" group-title="卫视频道",新疆卫视
 http://171.14.84.67:808/hls/53/index.m3u8
@@ -503,7 +503,7 @@ http://171.14.84.67:808/hls/53/index.m3u8
 http://171.14.84.67:808/hls/54/index.m3u8
 #EXTINF:-1 tvg-name="新闻综合" tvg-logo="" group-title="CIBN系列",新闻综合
 http://171.14.84.67:808/hls/55/index.m3u8
-#EXTINF:-1 tvg-name="公共频道" tvg-logo="" group-title="台湾频道三",公共频道
+#EXTINF:-1 tvg-name="公共频道" tvg-logo="" group-title="台湾频道二",公共频道
 http://171.14.84.67:808/hls/56/index.m3u8
 #EXTINF:-1 tvg-name="移动戏曲" tvg-logo="" group-title="其他频道",移动戏曲
 http://171.14.84.67:808/hls/57/index.m3u8
@@ -717,7 +717,7 @@ http://111.43.126.240:7777/hls/72/index.m3u8
 http://111.43.126.240:7777/hls/73/index.m3u8
 #EXTINF:-1 tvg-name="优漫卡通" tvg-logo="" group-title="数字频道",优漫卡通
 http://111.43.126.240:7777/hls/74/index.m3u8
-#EXTINF:-1 tvg-name="CHC动作电影" tvg-logo="" group-title="数字频道",CHC动作电影
+#EXTINF:-1 tvg-name="CHC动作电影" tvg-logo="" group-title="海外频道",CHC动作电影
 http://111.43.126.240:7777/hls/75/index.m3u8
 #EXTINF:-1 tvg-name="爱情喜剧" tvg-logo="" group-title="NewTV系列",爱情喜剧
 http://111.43.126.240:7777/hls/76/index.m3u8
@@ -729,23 +729,23 @@ http://111.43.126.240:7777/hls/78/index.m3u8
 http://111.43.126.240:7777/hls/79/index.m3u8
 #EXTINF:-1 tvg-name="精品大剧" tvg-logo="" group-title="NewTV系列",精品大剧
 http://111.43.126.240:7777/hls/80/index.m3u8
-#EXTINF:-1 tvg-name="古装剧场" tvg-logo="" group-title="DOX系列",古装剧场
+#EXTINF:-1 tvg-name="古装剧场" tvg-logo="" group-title="NewTV系列",古装剧场
 http://111.43.126.240:7777/hls/81/index.m3u8
-#EXTINF:-1 tvg-name="军旅剧场" tvg-logo="" group-title="DOX系列",军旅剧场
+#EXTINF:-1 tvg-name="军旅剧场" tvg-logo="" group-title="NewTV系列",军旅剧场
 http://111.43.126.240:7777/hls/82/index.m3u8
-#EXTINF:-1 tvg-name="家庭剧场" tvg-logo="" group-title="DOX系列",家庭剧场
+#EXTINF:-1 tvg-name="家庭剧场" tvg-logo="" group-title="NewTV系列",家庭剧场
 http://111.43.126.240:7777/hls/83/index.m3u8
 #EXTINF:-1 tvg-name="超级电视剧" tvg-logo="" group-title="NewTV系列",超级电视剧
 http://111.43.126.240:7777/hls/84/index.m3u8
-#EXTINF:-1 tvg-name="超级电影" tvg-logo="" group-title="台湾频道三",超级电影
+#EXTINF:-1 tvg-name="超级电影" tvg-logo="" group-title="海外频道",超级电影
 http://111.43.126.240:7777/hls/85/index.m3u8
-#EXTINF:-1 tvg-name="超级体育" tvg-logo="" group-title="台湾频道三",超级体育
+#EXTINF:-1 tvg-name="超级体育" tvg-logo="" group-title="海外频道",超级体育
 http://111.43.126.240:7777/hls/86/index.m3u8
 #EXTINF:-1 tvg-name="超级综艺" tvg-logo="" group-title="NewTV系列",超级综艺
 http://111.43.126.240:7777/hls/87/index.m3u8
 #EXTINF:-1 tvg-name="精品记录" tvg-logo="" group-title="其他频道",精品记录
 http://111.43.126.240:7777/hls/88/index.m3u8
-#EXTINF:-1 tvg-name="精品体育" tvg-logo="" group-title="台湾频道三",精品体育
+#EXTINF:-1 tvg-name="精品体育" tvg-logo="" group-title="海外频道",精品体育
 http://111.43.126.240:7777/hls/89/index.m3u8
 #EXTINF:-1 tvg-name="金牌综艺" tvg-logo="" group-title="NewTV系列",金牌综艺
 http://111.43.126.240:7777/hls/90/index.m3u8
@@ -765,7 +765,7 @@ http://111.43.126.240:7777/hls/96/index.m3u8
 http://111.43.126.240:7777/hls/97/index.m3u8
 #EXTINF:-1 tvg-name="热播精选" tvg-logo="" group-title="其他频道",热播精选
 http://111.43.126.240:7777/hls/98/index.m3u8
-#EXTINF:-1 tvg-name="黑莓电影" tvg-logo="" group-title="数字频道",黑莓电影
+#EXTINF:-1 tvg-name="黑莓电影" tvg-logo="" group-title="海外频道",黑莓电影
 http://111.43.126.240:7777/hls/99/index.m3u8
 #EXTINF:-1 tvg-name="黑莓动画" tvg-logo="" group-title="数字频道",黑莓动画
 http://111.43.126.240:7777/hls/100/index.m3u8
@@ -775,7 +775,7 @@ http://111.43.126.240:7777/hls/101/index.m3u8
 http://111.43.126.240:7777/hls/102/index.m3u8
 #EXTINF:-1 tvg-name="咪咕精彩足球" tvg-logo="" group-title="其他频道",咪咕精彩足球
 http://111.43.126.240:7777/hls/103/index.m3u8
-#EXTINF:-1 tvg-name="咪咕精彩体育" tvg-logo="" group-title="台湾频道三",咪咕精彩体育
+#EXTINF:-1 tvg-name="咪咕精彩体育" tvg-logo="" group-title="海外频道",咪咕精彩体育
 http://111.43.126.240:7777/hls/104/index.m3u8
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="" group-title="央视频道",CCTV1
 http://124.88.238.50:82/hls/1/index.m3u8
