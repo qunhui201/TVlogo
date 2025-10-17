@@ -74,4 +74,4 @@ jobs:
       # 9. ✅ 合并 history/ 下最新 15 个文件（调用 merge_tvlist.py）
       - name: Merge history files
         run: |
-          python3 md/merge_tvlist.py
+          python3 md/merge_files.py
