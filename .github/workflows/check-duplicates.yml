@@ -29,6 +29,7 @@ jobs:
           python md/history.py
 
       - name: Upload Duplicate Log
+        if: always()  # 即使脚本失败也上传日志
         uses: actions/upload-artifact@v4
         with:
           name: duplicate-files-log
