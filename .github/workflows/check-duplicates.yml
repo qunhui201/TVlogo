@@ -2,12 +2,13 @@ name: Check History Directory
 
 on:
   schedule:
-    - cron: "40 */6 * * *"  # 每天 UTC 00:00（北京时间 08:00）
+    - cron: "40 */6 * * *"  # 每6小时检查一次
   workflow_dispatch:  # 支持手动触发
 
 jobs:
   check-duplicates:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,26 +27,25 @@ jobs:
 
       - name: Run Duplicate Check Script
         env:
-          TVlogo_TOKEN: ${{ secrets.TVlogo_TOKEN }}  # 使用 TVlogo_TOKEN 用于 API 删除
+          TVlogo_TOKEN: ${{ secrets.TVlogo_TOKEN }}  # 用于 API 删除重复文件
         run: |
           python md/history.py
 
       - name: Commit and Push Log File
-        if: always()  # 即使脚本失败也尝试提交日志
+        if: always()
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           if [ -f duplicate_history_files.txt ]; then
-            git pull --rebase origin main  # 拉取远程最新更改
             git add duplicate_history_files.txt
-            git commit -m "Update duplicate files log - $(date -u '+%Y-%m-%d %H:%M:%S')"
-            git push
+            git commit -m "Update duplicate files log - $(date -u '+%Y-%m-%d %H:%M:%S')" || echo "Nothing to commit"
+            git push || echo "Nothing to push"
           else
             echo "No duplicate log file to commit"
           fi
 
       - name: Upload Duplicate Log
-        if: always()  # 即使提交失败也上传 artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: duplicate-files-log
