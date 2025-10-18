@@ -3,6 +3,7 @@ import requests
 import hashlib
 import json
 import os
+import re
 from datetime import datetime
 
 # ========== 配置 ==========
@@ -64,6 +65,10 @@ def check_duplicates():
     files = get_github_contents(REPO_OWNER, REPO_NAME, DIRECTORY, BRANCH, recursive=True)
     if not files:
         print("❌ 未找到匹配模式的文件或目录不存在")
+        with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+            f.write(f"重复文件检查报告 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"仓库: {REPO_OWNER}/{REPO_NAME}/{DIRECTORY}\n")
+            f.write("未找到匹配模式的文件或目录不存在\n")
         return
     
     print(f"📋 发现 {len(files)} 个目标文件")
