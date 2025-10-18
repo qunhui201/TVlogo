@@ -13,7 +13,7 @@ BRANCH = "main"
 DIRECTORY = "history"
 FILE_PATTERN = r'^(logo|tvbox_)\d{8}\.(m3u|txt)$'  # 匹配 logoMMDDHHMM.m3u 或 tvbox_MMDDHHMM.txt
 OUTPUT_FILE = "duplicate_history_files.txt"
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # 必须：用于 API 删除文件，需 repo 权限
+GITHUB_TOKEN = os.getenv('TVLOGO_TOKEN')  # 必须：用于 API 删除文件，需 repo 权限
 
 HEADERS = {
     'Accept': 'application/vnd.github.v3+json',
