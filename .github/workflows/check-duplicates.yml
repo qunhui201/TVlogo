@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}  # 使用自定义 PAT，需 repo 权限
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,12 +26,25 @@ jobs:
 
       - name: Run Duplicate Check Script
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用默认 token 或自定义 PAT
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # 使用自定义 PAT 用于删除
         run: |
           python md/history.py
 
+      - name: Commit and Push Log File
+        if: always()  # 即使脚本失败也尝试提交日志
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          if [ -f duplicate_history_files.txt ]; then
+            git add duplicate_history_files.txt
+            git commit -m "Update duplicate files log"
+            git push
+          else
+            echo "No duplicate log file to commit"
+          fi
+
       - name: Upload Duplicate Log
-        if: always()  # 即使脚本失败也上传日志
+        if: always()  # 即使提交失败也上传 artifact
         uses: actions/upload-artifact@v4
         with:
           name: duplicate-files-log
