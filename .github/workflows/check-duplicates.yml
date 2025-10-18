@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}  # 使用自定义 PAT，需 repo 权限
+          token: ${{ secrets.TVlogo_TOKEN }}  # 使用 TVlogo_TOKEN 确保写权限
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,7 +26,7 @@ jobs:
 
       - name: Run Duplicate Check Script
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # 使用自定义 PAT 用于删除
+          TVlogo_TOKEN: ${{ secrets.TVlogo_TOKEN }}  # 使用 TVlogo_TOKEN 用于 API 删除
         run: |
           python md/history.py
 
@@ -37,7 +37,7 @@ jobs:
           git config --global user.email 'action@github.com'
           if [ -f duplicate_history_files.txt ]; then
             git add duplicate_history_files.txt
-            git commit -m "Update duplicate files log"
+            git commit -m "Update duplicate files log - $(date -u '+%Y-%m-%d %H:%M:%S')"
             git push
           else
             echo "No duplicate log file to commit"
