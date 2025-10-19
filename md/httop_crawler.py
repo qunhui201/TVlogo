@@ -19,21 +19,19 @@ try:
     # 解析 HTML
     soup = BeautifulSoup(response.text, "html.parser")
 
-    # 查找所有节目源链接（iptv*.m3u, e.xml, apk 等）
+    # 查找所有节目源链接（仅 m3u 类型）
     results = []
     link_rows = soup.find_all("div", class_="link-row")
     for row in link_rows:
-        # 优先 data-copy，否则 data-download
-        link = row.get("data-copy") or row.get("data-download")
-        if link:
+        link = row.get("data-copy")
+        if link and link.endswith(".m3u"):
             results.append(link)
 
-    # 保存到 txt 文件
+    # 保存为 Python 列表格式
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
-        for link in results:
-            f.write(link + "\n")
+        f.write(str(results))
 
-    print(f"提取成功，共 {len(results)} 条链接。已保存至 {OUTPUT_PATH}")
+    print(f"提取成功，共 {len(results)} 条 m3u 链接。已保存至 {OUTPUT_PATH}")
 
 except Exception as e:
     print(f"抓取失败: {e}")
