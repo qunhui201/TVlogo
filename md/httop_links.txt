@@ -1,1 +1,3 @@
-['http://httop.top/iptv.m3u', 'http://httop.top/iptv1.m3u', 'http://httop.top/iptv2.m3u']
+http://httop.top/iptv.m3u
+http://httop.top/iptv1.m3u
+http://httop.top/iptv2.m3u
