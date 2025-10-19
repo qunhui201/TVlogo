@@ -23,7 +23,7 @@ jobs:
 
       - name: Run crawler
         run: |
-          python httop_crawler.py
+          python md/httop_crawler.py
 
       - name: Commit and push changes
         run: |
