@@ -5,13 +5,12 @@ from pathlib import Path
 from collections import defaultdict
 
 # -------- 配置 ---------
-REMOTE_FILES = [
-    "http://httop.top/iptv.m3u",
-    "http://httop.top/iptv1.m3u",
-    "http://httop.top/iptv2.m3u"
-]
-
 TVLOGO_DIR = Path("TVlogo_Images")  # 台标根目录
+OUTPUT_FILE = "output.m3u"
+TVBOX_TXT_FILE = "tvbox_output.txt"
+OUTPUT_WITH_LOGO_FILE = "output_with_logo.m3u"
+MISSING_LOGOS_FILE = "missing_logos.txt"
+REMOTE_FILE_PATH = Path("md/httop_links.txt")  # 从 crawler 输出读取 m3u 链接
 
 PROVINCES = [
     "北京","上海","天津","重庆","辽宁","吉林","黑龙江","江苏","浙江","安徽",
@@ -22,27 +21,22 @@ PROVINCES = [
 
 SPECIAL_CHANNELS = {"CCTV17": "央视频道"}
 
-OUTPUT_FILE = "output.m3u"
-TVBOX_TXT_FILE = "tvbox_output.txt"
-OUTPUT_WITH_LOGO_FILE = "output_with_logo.m3u"
-MISSING_LOGOS_FILE = "missing_logos.txt"
-
 # -------- 函数 ---------
-# 判断文件内容是否变化
+
 def is_content_changed(file_path, new_content):
     if os.path.exists(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
             old_content = f.read()
             return old_content != new_content
-    return True  # 文件不存在时视为内容变化
+    return True
 
-# 下载 M3U 文件
+
 def download_m3u(url):
     r = requests.get(url, timeout=10)
     r.raise_for_status()
     return r.text
 
-# 解析 M3U 文件内容
+
 def parse_m3u(content):
     lines = content.splitlines()
     result = []
@@ -59,7 +53,7 @@ def parse_m3u(content):
             result.append((name, url, grp, logo))
     return result
 
-# 分类频道
+
 def classify_channel(name, original_group, tvlogo_dir):
     for key, val in SPECIAL_CHANNELS.items():
         if key in name:
@@ -85,7 +79,7 @@ def classify_channel(name, original_group, tvlogo_dir):
         return "其他频道"
     return "其他频道"
 
-# 生成 TVBox 格式文本文件
+
 def generate_tvbox_txt(channels):
     grouped = defaultdict(list)
     for name, url, grp, logo in channels:
@@ -106,7 +100,7 @@ def generate_tvbox_txt(channels):
     else:
         print(f"⚠️ 文件内容无变化，未生成 {TVBOX_TXT_FILE}")
 
-# 生成 output_with_logo.m3u
+
 def generate_output_with_logo(channels):
     out_lines = ["#EXTM3U"]
     missing_logos = []
@@ -130,10 +124,16 @@ def generate_output_with_logo(channels):
     if missing_logos:
         with open(MISSING_LOGOS_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(missing_logos))
-        print(f"⚠️ 未匹配台标的频道已保存至 {MISSING_LOGOS_FILE}，共 {len(missing_logos)} 个频道")
+        print(f"⚠️ 未匹配台标的频道已保存至 {MISSING_LOGOS_FILE}, 共 {len(missing_logos)} 个频道")
 
-# -------- 主逻辑 ---------
+
 def main():
+    if not REMOTE_FILE_PATH.exists():
+        raise FileNotFoundError(f"{REMOTE_FILE_PATH} 不存在，请先运行 httop_crawler.py 获取最新 m3u 链接")
+
+    with open(REMOTE_FILE_PATH, "r", encoding="utf-8") as f:
+        REMOTE_FILES = [line.strip() for line in f if line.strip()]
+
     all_channels = []
     for url in REMOTE_FILES:
         content = download_m3u(url)
@@ -158,6 +158,7 @@ def main():
     # 生成 output_with_logo.m3u 和 tvbox_output.txt
     generate_output_with_logo(all_channels)
     generate_tvbox_txt(all_channels)
+
 
 if __name__ == "__main__":
     main()
