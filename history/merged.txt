@@ -930,6 +930,20 @@ CCTV12,http://171.14.84.67:808/hls/12/index.m3u8
 CCTV13,http://171.14.84.67:808/hls/13/index.m3u8
 CCTV14,http://171.14.84.67:808/hls/14/index.m3u8
 CCTV15,http://171.14.84.67:808/hls/15/index.m3u8
+CCTV1,http://219.155.109.62:5566/hls/65/index.m3u8
+CCTV2,http://219.155.109.62:5566/hls/66/index.m3u8
+CCTV3,http://219.155.109.62:5566/hls/67/index.m3u8
+CCTV4,http://219.155.109.62:5566/hls/68/index.m3u8
+CCTV5,http://219.155.109.62:5566/hls/69/index.m3u8
+CCTV6,http://219.155.109.62:5566/hls/70/index.m3u8
+CCTV7,http://219.155.109.62:5566/hls/71/index.m3u8
+CCTV8,http://219.155.109.62:5566/hls/72/index.m3u8
+CCTV9,http://219.155.109.62:5566/hls/73/index.m3u8
+CCTV10,http://219.155.109.62:5566/hls/74/index.m3u8
+CCTV11,http://219.155.109.62:5566/hls/75/index.m3u8
+CCTV12,http://219.155.109.62:5566/hls/76/index.m3u8
+CCTV13,http://219.155.109.62:5566/hls/77/index.m3u8
+CCTV14,http://219.155.109.62:5566/hls/78/index.m3u8
 CCTV1,http://live1.hrtn.net/live/cctv1hd_3000.m3u8?auth_key=1761358467-4da52fbb27146ef846b2395284f7e1e0-0-f1a2c976ef41b68dabb063f204fc7d11
 CCTV2,http://live1.hrtn.net/live/cctv2hd_3000.m3u8?auth_key=1761358467-56a346a4ac7d671aa3e9d3ec4a40b9a1-0-f7377f195a80920a970349186b921d10
 CCTV3,http://live1.hrtn.net/live/cctv3hd_3000.m3u8?auth_key=1761358467-188005b8a9dcb14d32e9833c98e2ea1a-0-2554dcfd658dff0a8bc11ac15b15cc91
@@ -2935,6 +2949,7 @@ CCTV17,http://live1.hrtn.net/live/cctv14hd_3000.m3u8?auth_key=1761099728-f370e85
 新疆卫视,http://171.14.84.67:808/hls/53/index.m3u8
 西藏卫视,http://171.14.84.67:808/hls/54/index.m3u8
 湖南卫视,http://171.14.84.67:808/hls/59/index.m3u8
+河南卫视,http://219.155.109.62:5566/hls/81/index.m3u8
 湖北卫视,http://live1.hrtn.net/live/hbwshd_3000.m3u8?auth_key=1761358467-1bc9b9ac8359d43dfba78e343aeb46e4-0-b8ac5dbc24dff5e67fb850eb572e07be
 湖南卫视,http://live1.hrtn.net/live/hnwshd_3000.m3u8?auth_key=1761358467-9b4e036a30a5a5a20482ef66fd46a0bc-0-c47dccc6773348eb6ea421afca35629d
 东方卫视,http://live1.hrtn.net/live/dfwshd_3000.m3u8?auth_key=1761358467-7d81b9954150ff7551988ba5cd5675b9-0-ab138a12d2610e575854b718a28bc603
@@ -4883,6 +4898,7 @@ TVS-2广东经济科教,http://113.88.211.3:9898/hls/25/index.m3u8
 宁夏,http://171.14.84.67:808/hls/44/index.m3u8
 广西,http://171.14.84.67:808/hls/45/index.m3u8
 甘肃,http://171.14.84.67:808/hls/46/index.m3u8
+河南都市,http://219.155.109.62:5566/hls/82/index.m3u8
 湖北综合,http://live1.hrtn.net/live/hbzhhd_3000.m3u8?auth_key=1761358467-32af43da74f2f6b0b62690c2de0e0182-0-7078c198b39aa47926c2837495f286e9
 湖北经视,http://live1.hrtn.net/live/hbjsjd_3000.m3u8?auth_key=1761358467-2e5c01589714665e03ec468324b59cfc-0-c2718c955640b1fdbda2d610e0afb2f7
 湖北公共,http://live1.hrtn.net/live/hbgghd_3000.m3u8?auth_key=1761358467-fa4724e53e15d679deb9918c3f05b13a-0-ba19ab3587863b33a0fc3e0a4d513c18
