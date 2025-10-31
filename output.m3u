@@ -1,5 +1,99 @@
 #EXTM3U
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="" group-title="央视频道",CCTV1
+http://61.163.179.201:808/hls/1/index.m3u8
+#EXTINF:-1 tvg-name="CCTV2" tvg-logo="" group-title="央视频道",CCTV2
+http://61.163.179.201:808/hls/2/index.m3u8
+#EXTINF:-1 tvg-name="CCTV3" tvg-logo="" group-title="央视频道",CCTV3
+http://61.163.179.201:808/hls/3/index.m3u8
+#EXTINF:-1 tvg-name="CCTV4" tvg-logo="" group-title="央视频道",CCTV4
+http://61.163.179.201:808/hls/4/index.m3u8
+#EXTINF:-1 tvg-name="CCTV6" tvg-logo="" group-title="央视频道",CCTV6
+http://61.163.179.201:808/hls/6/index.m3u8
+#EXTINF:-1 tvg-name="CCTV7" tvg-logo="" group-title="央视频道",CCTV7
+http://61.163.179.201:808/hls/7/index.m3u8
+#EXTINF:-1 tvg-name="CCTV8" tvg-logo="" group-title="央视频道",CCTV8
+http://61.163.179.201:808/hls/8/index.m3u8
+#EXTINF:-1 tvg-name="CCTV9" tvg-logo="" group-title="央视频道",CCTV9
+http://61.163.179.201:808/hls/9/index.m3u8
+#EXTINF:-1 tvg-name="CCTV10" tvg-logo="" group-title="央视频道",CCTV10
+http://61.163.179.201:808/hls/10/index.m3u8
+#EXTINF:-1 tvg-name="CCTV12" tvg-logo="" group-title="央视频道",CCTV12
+http://61.163.179.201:808/hls/12/index.m3u8
+#EXTINF:-1 tvg-name="CCTV14" tvg-logo="" group-title="央视频道",CCTV14
+http://61.163.179.201:808/hls/14/index.m3u8
+#EXTINF:-1 tvg-name="CGTN" tvg-logo="" group-title="其他频道",CGTN
+http://61.163.179.201:808/hls/16/index.m3u8
+#EXTINF:-1 tvg-name="河南卫视" tvg-logo="" group-title="卫视频道",河南卫视
+http://61.163.179.201:808/hls/17/index.m3u8
+#EXTINF:-1 tvg-name="都市频道" tvg-logo="" group-title="台湾频道二",都市频道
+http://61.163.179.201:808/hls/18/index.m3u8
+#EXTINF:-1 tvg-name="民生频道" tvg-logo="" group-title="台湾频道二",民生频道
+http://61.163.179.201:808/hls/19/index.m3u8
+#EXTINF:-1 tvg-name="法治频道" tvg-logo="" group-title="台湾频道二",法治频道
+http://61.163.179.201:808/hls/20/index.m3u8
+#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="" group-title="台湾频道二",电视剧频道
+http://61.163.179.201:808/hls/21/index.m3u8
+#EXTINF:-1 tvg-name="湖南卫视" tvg-logo="" group-title="卫视频道",湖南卫视
+http://61.163.179.201:808/hls/22/index.m3u8
+#EXTINF:-1 tvg-name="江苏卫视" tvg-logo="" group-title="卫视频道",江苏卫视
+http://61.163.179.201:808/hls/23/index.m3u8
+#EXTINF:-1 tvg-name="浙江卫视" tvg-logo="" group-title="卫视频道",浙江卫视
+http://61.163.179.201:808/hls/24/index.m3u8
+#EXTINF:-1 tvg-name="CCTV5+" tvg-logo="" group-title="央视频道",CCTV5+
+http://61.163.179.201:808/hls/25/index.m3u8
+#EXTINF:-1 tvg-name="CCTV11" tvg-logo="" group-title="央视频道",CCTV11
+http://61.163.179.201:808/hls/26/index.m3u8
+#EXTINF:-1 tvg-name="CCTV15" tvg-logo="" group-title="央视频道",CCTV15
+http://61.163.179.201:808/hls/28/index.m3u8
+#EXTINF:-1 tvg-name="CCTV1" tvg-logo="" group-title="央视频道",CCTV1
+http://61.163.179.201:808/hls/1/index.m3u8
+#EXTINF:-1 tvg-name="CCTV2" tvg-logo="" group-title="央视频道",CCTV2
+http://61.163.179.201:808/hls/2/index.m3u8
+#EXTINF:-1 tvg-name="CCTV3" tvg-logo="" group-title="央视频道",CCTV3
+http://61.163.179.201:808/hls/3/index.m3u8
+#EXTINF:-1 tvg-name="CCTV4" tvg-logo="" group-title="央视频道",CCTV4
+http://61.163.179.201:808/hls/4/index.m3u8
+#EXTINF:-1 tvg-name="CCTV6" tvg-logo="" group-title="央视频道",CCTV6
+http://61.163.179.201:808/hls/6/index.m3u8
+#EXTINF:-1 tvg-name="CCTV7" tvg-logo="" group-title="央视频道",CCTV7
+http://61.163.179.201:808/hls/7/index.m3u8
+#EXTINF:-1 tvg-name="CCTV8" tvg-logo="" group-title="央视频道",CCTV8
+http://61.163.179.201:808/hls/8/index.m3u8
+#EXTINF:-1 tvg-name="CCTV9" tvg-logo="" group-title="央视频道",CCTV9
+http://61.163.179.201:808/hls/9/index.m3u8
+#EXTINF:-1 tvg-name="CCTV10" tvg-logo="" group-title="央视频道",CCTV10
+http://61.163.179.201:808/hls/10/index.m3u8
+#EXTINF:-1 tvg-name="CCTV12" tvg-logo="" group-title="央视频道",CCTV12
+http://61.163.179.201:808/hls/12/index.m3u8
+#EXTINF:-1 tvg-name="CCTV14" tvg-logo="" group-title="央视频道",CCTV14
+http://61.163.179.201:808/hls/14/index.m3u8
+#EXTINF:-1 tvg-name="CGTN" tvg-logo="" group-title="其他频道",CGTN
+http://61.163.179.201:808/hls/16/index.m3u8
+#EXTINF:-1 tvg-name="河南卫视" tvg-logo="" group-title="卫视频道",河南卫视
+http://61.163.179.201:808/hls/17/index.m3u8
+#EXTINF:-1 tvg-name="都市频道" tvg-logo="" group-title="台湾频道二",都市频道
+http://61.163.179.201:808/hls/18/index.m3u8
+#EXTINF:-1 tvg-name="民生频道" tvg-logo="" group-title="台湾频道二",民生频道
+http://61.163.179.201:808/hls/19/index.m3u8
+#EXTINF:-1 tvg-name="法治频道" tvg-logo="" group-title="台湾频道二",法治频道
+http://61.163.179.201:808/hls/20/index.m3u8
+#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="" group-title="台湾频道二",电视剧频道
+http://61.163.179.201:808/hls/21/index.m3u8
+#EXTINF:-1 tvg-name="湖南卫视" tvg-logo="" group-title="卫视频道",湖南卫视
+http://61.163.179.201:808/hls/22/index.m3u8
+#EXTINF:-1 tvg-name="江苏卫视" tvg-logo="" group-title="卫视频道",江苏卫视
+http://61.163.179.201:808/hls/23/index.m3u8
+#EXTINF:-1 tvg-name="浙江卫视" tvg-logo="" group-title="卫视频道",浙江卫视
+http://61.163.179.201:808/hls/24/index.m3u8
+#EXTINF:-1 tvg-name="CCTV5+" tvg-logo="" group-title="央视频道",CCTV5+
+http://61.163.179.201:808/hls/25/index.m3u8
+#EXTINF:-1 tvg-name="CCTV11" tvg-logo="" group-title="央视频道",CCTV11
+http://61.163.179.201:808/hls/26/index.m3u8
+#EXTINF:-1 tvg-name="CCTV15" tvg-logo="" group-title="央视频道",CCTV15
+http://61.163.179.201:808/hls/28/index.m3u8
+#EXTINF:-1 tvg-name="CCTV5" tvg-logo="" group-title="央视频道",CCTV5
+http://61.163.179.201:808/hls/5/index.m3u8
+#EXTINF:-1 tvg-name="CCTV1" tvg-logo="" group-title="央视频道",CCTV1
 http://122.114.131.154:4018/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="CCTV2" tvg-logo="" group-title="央视频道",CCTV2
 http://122.114.131.154:4018/hls/2/index.m3u8
