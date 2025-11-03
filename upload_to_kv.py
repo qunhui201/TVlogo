@@ -7,6 +7,8 @@ from concurrent.futures import ThreadPoolExecutor
 LOCAL_DIR = "./"  # 当前仓库路径
 MAX_THREADS = 4           # 并发上传线程数
 OVERWRITE_EXISTING = False  # True = 覆盖已存在 KV，False = 跳过
+EXCLUDE_FOLDERS = ['img', 'TVlogo_Images']  # 需要排除的文件夹
+VALID_EXTENSIONS = ['.txt', '.md', '.json']  # 允许上传的文件扩展名
 
 # ---------------- 函数 ----------------
 def kv_key_exists(key):
@@ -36,13 +38,23 @@ def upload_to_kv(key, value):
     print(f"✅ 上传成功: {key}")
 
 def process_file(local_file, key):
+    # 排除指定文件夹
+    if any(exclude in local_file for exclude in EXCLUDE_FOLDERS):
+        print(f"⏭ 跳过文件夹: {local_file}")
+        return
+
+    # 只上传允许的文件类型
+    if not any(local_file.endswith(ext) for ext in VALID_EXTENSIONS):
+        print(f"⏭ 跳过非允许文件: {local_file}")
+        return
+
     if not OVERWRITE_EXISTING and kv_key_exists(key):
         print(f"⏭ 跳过已存在: {key}")
         return
 
     with open(local_file, "rb") as f:
         content = f.read()
-        if len(content) > 24*1024*1024:
+        if len(content) > 24 * 1024 * 1024:
             print(f"⚠️ 文件过大无法上传 KV: {key}")
             return
         timestamp = time.time()
