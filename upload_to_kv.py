@@ -7,8 +7,8 @@ from concurrent.futures import ThreadPoolExecutor
 LOCAL_DIR = "./"  # 当前仓库路径
 MAX_THREADS = 4           # 并发上传线程数
 OVERWRITE_EXISTING = False  # True = 覆盖已存在 KV，False = 跳过
-EXCLUDE_FOLDERS = ['img', 'TVlogo_Images']  # 需要排除的文件夹
-VALID_EXTENSIONS = ['.txt', '.md', '.json']  # 允许上传的文件扩展名
+EXCLUDE_FOLDERS = ['img', 'TVlogo_Images', 'md']  # 需要排除的文件夹
+VALID_EXTENSIONS = ['.txt', '.md', '.json', '.m3u']  # 允许上传的文件扩展名，包括 .m3u 文件
 
 # ---------------- 函数 ----------------
 def kv_key_exists(key):
