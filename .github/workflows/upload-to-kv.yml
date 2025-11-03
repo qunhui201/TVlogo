@@ -2,7 +2,7 @@ name: Upload to Cloudflare KV
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # 每天凌晨 1 点自动运行
+    - cron: '0 */4 * * *'  # 每4小时自动运行
   workflow_dispatch:  # 允许手动触发
 
 jobs:
@@ -28,4 +28,4 @@ jobs:
           KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
-        run: python upload_to_kv.py  # 运行你创建的 upload_to_kv.py 脚本
+        run: python md/upload_to_kv.py  # 运行位于 md/ 目录下的 upload_to_kv.py 脚本
