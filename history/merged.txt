@@ -1236,6 +1236,13 @@ CCTV6,http://111.36.102.239:8089/hls/20/index.m3u8
 CCTV7,http://111.36.102.239:8089/hls/21/index.m3u8
 CCTV8,http://111.36.102.239:8089/hls/22/index.m3u8
 CCTV9,http://111.36.102.239:8089/hls/23/index.m3u8
+CCTV1,http://14.106.98.72:888/hls/1/index.m3u8
+CCTV2,http://14.106.98.72:888/hls/2/index.m3u8
+CCTV4,http://14.106.98.72:888/hls/3/index.m3u8
+CCTV7,http://14.106.98.72:888/hls/4/index.m3u8
+CCTV10,http://14.106.98.72:888/hls/6/index.m3u8
+CCTV11,http://14.106.98.72:888/hls/7/index.m3u8
+CCTV12,http://14.106.98.72:888/hls/8/index.m3u8
 CCTV1,http://14.155.136.87:8088/hls/1/index.m3u8
 CCTV2,http://14.155.136.87:8088/hls/3/index.m3u8
 CCTV3,http://14.155.136.87:8088/hls/4/index.m3u8
@@ -3908,6 +3915,21 @@ CCTV17,http://live1.hrtn.net/live/cctv14hd_3000.m3u8?auth_key=1761099728-f370e85
 广东卫视,http://111.36.102.239:8089/hls/43/index.m3u8
 黑龙江卫视,http://111.36.102.239:8089/hls/44/index.m3u8
 重庆卫视,http://111.36.102.239:8089/hls/45/index.m3u8
+天津卫视,http://14.106.98.72:888/hls/27/index.m3u8
+吉林卫视,http://14.106.98.72:888/hls/28/index.m3u8
+黑龙江卫视,http://14.106.98.72:888/hls/29/index.m3u8
+山西卫视,http://14.106.98.72:888/hls/30/index.m3u8
+陕西卫视,http://14.106.98.72:888/hls/33/index.m3u8
+河北卫视,http://14.106.98.72:888/hls/34/index.m3u8
+云南卫视,http://14.106.98.72:888/hls/35/index.m3u8
+深圳卫视,http://14.106.98.72:888/hls/36/index.m3u8
+青海卫视,http://14.106.98.72:888/hls/37/index.m3u8
+西藏卫视,http://14.106.98.72:888/hls/38/index.m3u8
+内蒙古卫视,http://14.106.98.72:888/hls/39/index.m3u8
+新疆卫视,http://14.106.98.72:888/hls/40/index.m3u8
+兵团卫视,http://14.106.98.72:888/hls/41/index.m3u8
+甘肃卫视,http://14.106.98.72:888/hls/42/index.m3u8
+宁夏卫视,http://14.106.98.72:888/hls/43/index.m3u8
 深圳卫视,http://14.155.136.87:8088/hls/2/index.m3u8
 嘉佳卡通卫视,http://14.155.136.87:8088/hls/27/index.m3u8
 广东卫视,http://14.155.136.87:8088/hls/28/index.m3u8
@@ -5457,18 +5479,18 @@ CGTN纪录片,http://42.48.106.247:808/hls/18/index.m3u8
 聊城综合,http://119.189.16.34:10252/hls/3/index.m3u8
 沧州综合,http://122.114.131.154:4021/hls/26/index.m3u8
 新闻综合,http://101.95.21.250:10081/hls/45/index.m3u8
+汕头综合,http://27.41.245.25:808/hls/1/index.m3u8
+汕头综合,http://27.41.244.203:808/hls/1/index.m3u8
 新闻综合,http://171.14.84.67:808/hls/55/index.m3u8
 汕头新闻综合,http://27.41.245.32:801/hls/901/index.m3u8
 潮州综合,http://27.41.245.32:801/hls/200/index.m3u8
 揭阳综合,http://27.41.245.32:801/hls/301/index.m3u8
-汕头综合,http://27.41.244.203:808/hls/1/index.m3u8
 杭州综合,http://183.129.255.66:8480/hls/19/index.m3u8
 汕头新闻综合,http://27.41.244.148:801/hls/901/index.m3u8
 潮州综合,http://27.41.244.148:801/hls/200/index.m3u8
 揭阳综合,http://27.41.244.148:801/hls/301/index.m3u8
 南京新闻综合,http://180.119.42.180:8200/hls/31/index.m3u8
 苏州新闻综合,http://180.119.42.180:8200/hls/52/index.m3u8
-汕头综合,http://27.41.245.25:808/hls/1/index.m3u8
 📺DOX系列,#genre#
 QTV-1高清,http://112.255.253.1:9001/hls/35/index.m3u8
 QTV-2高清,http://112.255.253.1:9001/hls/36/index.m3u8
@@ -6038,6 +6060,18 @@ BRTV,http://live1.hrtn.net/live/dajs_1000.m3u8?auth_key=1761159114-6666f59438230
 WHTV,http://live1.hrtn.net/live/jyjs_1000.m3u8?auth_key=1761159114-e9272b55066b572ecabb9b43b068e228-0-f3c891925479499c42c75f6181c71a3d
 CGTN,http://live1.hrtn.net/live/cctvnews_1000.m3u8?auth_key=1761159114-9bbcda1e782831c23540b955a069b0c2-0-8f5fc4e43376f39e3dff313cf8804b52
 BRTV少儿,http://live1.hrtn.net/live/kkse_1000.m3u8?auth_key=1761159114-228078590d281029030d08912c5ddf53-0-07d91cf9399f4bbea95366b6f357a98b
+凤凰中文,http://27.41.245.25:808/hls/63/index.m3u8
+凤凰中文,http://27.41.244.203:808/hls/63/index.m3u8
+CCTV-NEWS,http://14.106.98.72:888/hls/5/index.m3u8
+CCTV-新闻,http://14.106.98.72:888/hls/9/index.m3u8
+CCTV-少儿,http://14.106.98.72:888/hls/10/index.m3u8
+CCTV-音乐,http://14.106.98.72:888/hls/11/index.m3u8
+中国教育-1,http://14.106.98.72:888/hls/12/index.m3u8
+CQTV影视,http://14.106.98.72:888/hls/14/index.m3u8
+CQTV都市,http://14.106.98.72:888/hls/15/index.m3u8
+CQTV时尚,http://14.106.98.72:888/hls/16/index.m3u8
+中国气象,http://14.106.98.72:888/hls/44/index.m3u8
+炫动卡通,http://14.106.98.72:888/hls/48/index.m3u8
 CGTN,http://14.155.136.87:8088/hls/18/index.m3u8
 深圳都市,http://14.155.136.87:8088/hls/20/index.m3u8
 深圳电视剧,http://14.155.136.87:8088/hls/21/index.m3u8
@@ -6154,7 +6188,6 @@ CCTV高尔夫·网球,http://113.227.250.189:81/hls/60/index.m3u8
 14,http://39.89.11.150:8083/hls/14/index.m3u8
 15,http://39.89.11.150:8083/hls/15/index.m3u8
 16,http://39.89.11.150:8083/hls/16/index.m3u8
-凤凰中文,http://27.41.244.203:808/hls/63/index.m3u8
 CETV1,http://live1.hrtn.net/live/zgjy1hd_3000.m3u8?auth_key=1761272311-926b700fedc9a720880e053d958a4a8e-0-035c30f0a35b6ea3658ab21934e11e4f
 CETV4,http://live1.hrtn.net/live/zgjy4_1000.m3u8?auth_key=1761272311-fa76a1e7c724fe28989df257d14acf55-0-9bf3d1c83076d49cb9a96364523b81cc
 BRTV,http://live1.hrtn.net/live/dajs_1000.m3u8?auth_key=1761272311-89b15276d84a7afa445a3bec92f384dd-0-390d2a89d8f8973774fbaa68ad98ce63
@@ -6198,7 +6231,6 @@ WHTV,http://live1.hrtn.net/live/jyjs_1000.m3u8?auth_key=1761311409-d45ee321a348f
 CGTN,http://live1.hrtn.net/live/cctvnews_1000.m3u8?auth_key=1761311409-8aac9e9879536da161509bf52aa5afe5-0-0d07297819131752da4dec70469f6613
 BRTV少儿,http://live1.hrtn.net/live/kkse_1000.m3u8?auth_key=1761311409-2b2f37efa92b92f3db97d5558c8bd448-0-0703787b687bb0eac4c3bd600501f099
 CGTN,http://123.14.80.227:8888/hls/16/index.m3u8
-凤凰中文,http://27.41.245.25:808/hls/63/index.m3u8
 CETV1,http://live1.hrtn.net/live/zgjy1hd_3000.m3u8?auth_key=1761375076-abb61a8416976966cfd2280326004afb-0-5f50b7e9a2e1cbdbc73981c4b2b1e44c
 CETV4,http://live1.hrtn.net/live/zgjy4_1000.m3u8?auth_key=1761375076-caafb5306fd14a1596e8bb63c39a0e5b-0-87352499dff4c62218c6234a8fee5791
 BRTV,http://live1.hrtn.net/live/dajs_1000.m3u8?auth_key=1761375076-ec8a5b8606902ef58322a524068f1025-0-5fa08f98913fa3f5caa173689f9ae36b
@@ -6353,6 +6385,7 @@ BTV国际频道,http://114.252.245.56:10443/hls/38/index.m3u8
 公共频道,http://123.14.180.161:8899/hls/26/index.m3u8
 梨园频道,http://123.14.180.161:8899/hls/30/index.m3u8
 国学频道,http://123.14.180.161:8899/hls/32/index.m3u8
+纪实频道,http://14.106.98.72:888/hls/46/index.m3u8
 公共频道,http://171.14.84.67:808/hls/56/index.m3u8
 梨园频道,http://113.227.250.189:81/hls/66/index.m3u8
 都市频道,http://123.14.181.31:9003/hls/20/index.m3u8
@@ -6968,6 +7001,8 @@ BTV生活,http://114.252.112.253:8899/hls/20/index.m3u8
 中国天气,http://live1.hrtn.net/live/zgqx_1000.m3u8?auth_key=1761159114-bea66c0af83598d97876c0b2d2d2deb3-0-98059c61f4e8a2f091db441e9fa18e06
 卡酷少儿,http://61.52.71.139:9003/hls/57/index.m3u8
 金鹰卡通,http://61.52.71.139:9003/hls/58/index.m3u8
+汕头经济生活,http://27.41.245.25:808/hls/2/index.m3u8
+汕头经济生活,http://27.41.244.203:808/hls/2/index.m3u8
 深圳财经生活,http://14.155.136.87:8088/hls/22/index.m3u8
 金鹰卡通,http://live1.hrtn.net/live/jjkt_1000.m3u8?auth_key=1761058214-262d9064eb1bd921bbe671ec1db4b550-0-8d07e8fd1c1892d9abbaca18916c395d
 家庭理财,http://live1.hrtn.net/live/jtlc_1000.m3u8?auth_key=1761058214-d9df4569c212df24e98aed3444c7ec9f-0-b698d3512b627856a58b45e5212b26b1
@@ -7019,7 +7054,6 @@ CHC家庭影院,http://183.21.70.172:3388/hls/88/index.m3u8
 金鹰卡通,http://42.227.88.162:8888/hls/58/index.m3u8
 CHC家庭影院,http://42.227.88.162:8888/hls/65/index.m3u8
 CHC动作电影,http://42.227.88.162:8888/hls/66/index.m3u8
-汕头经济生活,http://27.41.244.203:808/hls/2/index.m3u8
 金鹰卡通,http://live1.hrtn.net/live/jjkt_1000.m3u8?auth_key=1761272311-b68792b330e3f089130239f7e96ce795-0-e9a36519bfbfc3c56e4f992d726e7402
 嘉佳卡通,http://live1.hrtn.net/live/jiajkt_1000.m3u8?auth_key=1761272311-2f82d89abe89d3011ae282356dff0b0d-0-444e597f6c04d2c2f72236fc0795845b
 家庭理财,http://live1.hrtn.net/live/jtlc_1000.m3u8?auth_key=1761272311-ff9126beebc3025a534751648fa9c64f-0-4bf4994bf7ae579136084dccb511dd4d
@@ -7046,7 +7080,6 @@ CHC家庭影院,http://183.21.70.117:3388/hls/88/index.m3u8
 嘉佳卡通,http://live1.hrtn.net/live/jiajkt_1000.m3u8?auth_key=1761311409-339b9a2b7d08a78f98a671c55a9f56a8-0-2e61c3f2998b4514cb8e5de90c7b4dc0
 家庭理财,http://live1.hrtn.net/live/jtlc_1000.m3u8?auth_key=1761311409-e95bf2b2579acc08486d886c48913f6d-0-cb9f054a0c664f4d26704a50e53c3522
 中国天气,http://live1.hrtn.net/live/zgqx_1000.m3u8?auth_key=1761311409-2cccacc55231c99b275e4060980e514a-0-89ff183bbc4c14d3b92e6fd3d67f123d
-汕头经济生活,http://27.41.245.25:808/hls/2/index.m3u8
 金鹰卡通,http://live1.hrtn.net/live/jjkt_1000.m3u8?auth_key=1761375076-36a5eccf93d67465db263969e5e65c43-0-b0609e51448197a1ecbcec05dd2c8a4f
 嘉佳卡通,http://live1.hrtn.net/live/jiajkt_1000.m3u8?auth_key=1761375076-6319d339f5f60707fe31490e9a18f9c1-0-6c38bea246e89ef14356b5263e0f422f
 家庭理财,http://live1.hrtn.net/live/jtlc_1000.m3u8?auth_key=1761375076-210d1ac3e309e317f0e3d1736e487dca-0-b905c5a0d64324320c7b23128abaf755
@@ -7157,5 +7190,5 @@ CHC动作电影HD,http://220.176.60.118:20000/hls/fa779d96af87baa6.m3u8
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761185747-9a3134a2eddc13d89c5bec453b6eef96-0-42c6e4e465add2a58298fef4274e8200
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761245466-842eebd504744becb80fc0f8c94b5e36-0-1c64936450fc61a1c4ad19738ac0850c
 📺港澳地区,#genre#
-翡翠台,http://27.41.244.203:808/hls/64/index.m3u8
 翡翠台,http://27.41.245.25:808/hls/64/index.m3u8
+翡翠台,http://27.41.244.203:808/hls/64/index.m3u8

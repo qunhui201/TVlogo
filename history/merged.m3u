@@ -4341,6 +4341,20 @@ http://123.14.84.17:8888/hls/18/index.m3u8
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV1
 http://123.14.84.17:8888/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV1
+http://14.106.98.72:888/hls/1/index.m3u8
+#EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
+http://14.106.98.72:888/hls/2/index.m3u8
+#EXTINF:-1 tvg-name="CCTV4" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV4.png" group-title="央视频道",CCTV4
+http://14.106.98.72:888/hls/3/index.m3u8
+#EXTINF:-1 tvg-name="CCTV7" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV7.png" group-title="央视频道",CCTV7
+http://14.106.98.72:888/hls/4/index.m3u8
+#EXTINF:-1 tvg-name="CCTV10" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV10.png" group-title="央视频道",CCTV10
+http://14.106.98.72:888/hls/6/index.m3u8
+#EXTINF:-1 tvg-name="CCTV11" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV11.png" group-title="央视频道",CCTV11
+http://14.106.98.72:888/hls/7/index.m3u8
+#EXTINF:-1 tvg-name="CCTV12" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV12.png" group-title="央视频道",CCTV12
+http://14.106.98.72:888/hls/8/index.m3u8
+#EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV1
 http://114.252.245.56:10443/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
 http://114.252.245.56:10443/hls/2/index.m3u8
@@ -10582,6 +10596,36 @@ http://123.14.84.17:8888/hls/38/index.m3u8
 http://123.14.84.17:8888/hls/39/index.m3u8
 #EXTINF:-1 tvg-name="河北卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/河北卫视.png" group-title="卫视频道",河北卫视
 http://123.14.84.17:8888/hls/40/index.m3u8
+#EXTINF:-1 tvg-name="天津卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/天津卫视.png" group-title="卫视频道",天津卫视
+http://14.106.98.72:888/hls/27/index.m3u8
+#EXTINF:-1 tvg-name="吉林卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/吉林卫视.png" group-title="卫视频道",吉林卫视
+http://14.106.98.72:888/hls/28/index.m3u8
+#EXTINF:-1 tvg-name="黑龙江卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/黑龙江卫视.png" group-title="卫视频道",黑龙江卫视
+http://14.106.98.72:888/hls/29/index.m3u8
+#EXTINF:-1 tvg-name="山西卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/山西卫视.png" group-title="卫视频道",山西卫视
+http://14.106.98.72:888/hls/30/index.m3u8
+#EXTINF:-1 tvg-name="陕西卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/陕西卫视.png" group-title="卫视频道",陕西卫视
+http://14.106.98.72:888/hls/33/index.m3u8
+#EXTINF:-1 tvg-name="河北卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/河北卫视.png" group-title="卫视频道",河北卫视
+http://14.106.98.72:888/hls/34/index.m3u8
+#EXTINF:-1 tvg-name="云南卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/云南卫视.png" group-title="卫视频道",云南卫视
+http://14.106.98.72:888/hls/35/index.m3u8
+#EXTINF:-1 tvg-name="深圳卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/深圳卫视.png" group-title="卫视频道",深圳卫视
+http://14.106.98.72:888/hls/36/index.m3u8
+#EXTINF:-1 tvg-name="青海卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/青海卫视.png" group-title="卫视频道",青海卫视
+http://14.106.98.72:888/hls/37/index.m3u8
+#EXTINF:-1 tvg-name="西藏卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/西藏卫视.png" group-title="卫视频道",西藏卫视
+http://14.106.98.72:888/hls/38/index.m3u8
+#EXTINF:-1 tvg-name="内蒙古卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/内蒙古卫视.png" group-title="卫视频道",内蒙古卫视
+http://14.106.98.72:888/hls/39/index.m3u8
+#EXTINF:-1 tvg-name="新疆卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/新疆卫视.png" group-title="卫视频道",新疆卫视
+http://14.106.98.72:888/hls/40/index.m3u8
+#EXTINF:-1 tvg-name="兵团卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/兵团卫视.png" group-title="卫视频道",兵团卫视
+http://14.106.98.72:888/hls/41/index.m3u8
+#EXTINF:-1 tvg-name="甘肃卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/甘肃卫视.png" group-title="卫视频道",甘肃卫视
+http://14.106.98.72:888/hls/42/index.m3u8
+#EXTINF:-1 tvg-name="宁夏卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/宁夏卫视.png" group-title="卫视频道",宁夏卫视
+http://14.106.98.72:888/hls/43/index.m3u8
 #EXTINF:-1 tvg-name="北京卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/北京卫视.png" group-title="卫视频道",北京卫视
 http://114.252.245.56:10443/hls/16/index.m3u8
 #EXTINF:-1 tvg-name="湖南卫视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/全国卫视/湖南卫视.png" group-title="卫视频道",湖南卫视
@@ -14134,6 +14178,36 @@ http://live1.hrtn.net/live/zgqx_1000.m3u8?auth_key=1761397735-9abfb8fdef5a20b60e
 http://live1.hrtn.net/live/sdjyws_1000.m3u8?auth_key=1761397735-9b161f4247990d5e8d9b2eadb4747d18-0-8d4e82d298504cbe886c38a1ae4ffe36
 #EXTINF:-1 tvg-name="CGTN" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/CGTN、中国教育电视台、新华社、中央新影/CGTN.png" group-title="其他频道",CGTN
 http://123.14.84.17:8888/hls/16/index.m3u8
+#EXTINF:-1 tvg-name="汕头综合" tvg-logo="" group-title="CIBN系列",汕头综合
+http://27.41.245.25:808/hls/1/index.m3u8
+#EXTINF:-1 tvg-name="汕头经济生活" tvg-logo="" group-title="数字频道",汕头经济生活
+http://27.41.245.25:808/hls/2/index.m3u8
+#EXTINF:-1 tvg-name="凤凰中文" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/港澳地区/凤凰中文台.png" group-title="其他频道",凤凰中文
+http://27.41.245.25:808/hls/63/index.m3u8
+#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/港澳地区/翡翠台.png" group-title="港澳地区",翡翠台
+http://27.41.245.25:808/hls/64/index.m3u8
+#EXTINF:-1 tvg-name="CCTV-NEWS" tvg-logo="" group-title="其他频道",CCTV-NEWS
+http://14.106.98.72:888/hls/5/index.m3u8
+#EXTINF:-1 tvg-name="CCTV-新闻" tvg-logo="" group-title="其他频道",CCTV-新闻
+http://14.106.98.72:888/hls/9/index.m3u8
+#EXTINF:-1 tvg-name="CCTV-少儿" tvg-logo="" group-title="其他频道",CCTV-少儿
+http://14.106.98.72:888/hls/10/index.m3u8
+#EXTINF:-1 tvg-name="CCTV-音乐" tvg-logo="" group-title="其他频道",CCTV-音乐
+http://14.106.98.72:888/hls/11/index.m3u8
+#EXTINF:-1 tvg-name="中国教育-1" tvg-logo="" group-title="其他频道",中国教育-1
+http://14.106.98.72:888/hls/12/index.m3u8
+#EXTINF:-1 tvg-name="CQTV影视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/台湾频道一/台视.png" group-title="其他频道",CQTV影视
+http://14.106.98.72:888/hls/14/index.m3u8
+#EXTINF:-1 tvg-name="CQTV都市" tvg-logo="" group-title="其他频道",CQTV都市
+http://14.106.98.72:888/hls/15/index.m3u8
+#EXTINF:-1 tvg-name="CQTV时尚" tvg-logo="" group-title="其他频道",CQTV时尚
+http://14.106.98.72:888/hls/16/index.m3u8
+#EXTINF:-1 tvg-name="中国气象" tvg-logo="" group-title="其他频道",中国气象
+http://14.106.98.72:888/hls/44/index.m3u8
+#EXTINF:-1 tvg-name="纪实频道" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/台湾频道二/影迷纪实台.png" group-title="台湾频道二",纪实频道
+http://14.106.98.72:888/hls/46/index.m3u8
+#EXTINF:-1 tvg-name="炫动卡通" tvg-logo="" group-title="其他频道",炫动卡通
+http://14.106.98.72:888/hls/48/index.m3u8
 #EXTINF:-1 tvg-name="少儿动画" tvg-logo="" group-title="其他频道",少儿动画
 http://114.252.245.56:10443/hls/3/index.m3u8
 #EXTINF:-1 tvg-name="BTV文艺高清" tvg-logo="" group-title="DOX系列",BTV文艺高清
@@ -14220,14 +14294,6 @@ http://113.81.20.155:808/hls/44/index.m3u8
 http://113.81.20.155:808/hls/56/index.m3u8
 #EXTINF:-1 tvg-name="少儿动画" tvg-logo="" group-title="其他频道",少儿动画
 http://113.81.20.155:808/hls/63/index.m3u8
-#EXTINF:-1 tvg-name="汕头综合" tvg-logo="" group-title="CIBN系列",汕头综合
-http://27.41.245.25:808/hls/1/index.m3u8
-#EXTINF:-1 tvg-name="汕头经济生活" tvg-logo="" group-title="数字频道",汕头经济生活
-http://27.41.245.25:808/hls/2/index.m3u8
-#EXTINF:-1 tvg-name="凤凰中文" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/港澳地区/凤凰中文台.png" group-title="其他频道",凤凰中文
-http://27.41.245.25:808/hls/63/index.m3u8
-#EXTINF:-1 tvg-name="翡翠台" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/港澳地区/翡翠台.png" group-title="港澳地区",翡翠台
-http://27.41.245.25:808/hls/64/index.m3u8
 #EXTINF:-1 tvg-name="湖北综合" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/湖北/湖北综合频道.png" group-title="地方频道",湖北综合
 http://live1.hrtn.net/live/hbzhhd_3000.m3u8?auth_key=1761058214-cc62832387dc1e6e9a2cd043772179a0-0-efd936114e805dedc66f8969827a8dc7
 #EXTINF:-1 tvg-name="湖北经视" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/湖北/湖北经视频道.png" group-title="地方频道",湖北经视
