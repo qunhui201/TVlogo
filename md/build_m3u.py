@@ -19,7 +19,20 @@ PROVINCES = [
 ]
 SPECIAL_CHANNELS = {"CCTV17": "央视频道"}
 
-# ---------- 函数 ----------
+# 新增：频道简称映射表（用于地方频道判定）
+PREFIX_MAP = {
+    "BTV": "北京",
+    "JSTV": "江苏",
+    "GDTV": "广东",
+    "HNTV": "湖南",
+    "SDTV": "山东",
+    "LNTV": "辽宁",
+    "HLJTV": "黑龙江",
+    "ZJTV": "浙江",
+    "CQTV": "重庆",
+    "CCTV": "央视频道",
+}
+
 def is_content_changed(file_path, new_content):
     if os.path.exists(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
@@ -49,28 +62,42 @@ def parse_m3u(content):
     return result
 
 def classify_channel(name, original_group, tvlogo_dir):
+    # 特殊频道直接分类
     for key, val in SPECIAL_CHANNELS.items():
         if key in name:
             return val
-    if original_group in ["央视频道", "卫视频道", "地方频道"]:
-        return original_group
-    if "卫视" in name:
-        return "卫视频道"
+
+    # 简称前缀匹配（优先）
+    for prefix, province in PREFIX_MAP.items():
+        if name.upper().startswith(prefix):
+            if province == "央视频道":
+                return "央视频道"
+            return "地方频道"
+
+    # 省份名匹配
     for province in PROVINCES:
         if province in name and "卫视" not in name:
             return "地方频道"
+
+    # 卫视频道
+    if "卫视" in name:
+        return "卫视频道"
+
+    # 台标文件夹匹配
     for folder in tvlogo_dir.iterdir():
-        if not folder.is_dir(): continue
+        if not folder.is_dir():
+            continue
         folder_name = folder.name
-        if folder_name in ["央视频道", "卫视频道", "地方频道"]: continue
+        if folder_name in ["央视频道", "卫视频道", "地方频道"]:
+            continue
         for logo_file in folder.iterdir():
-            if not logo_file.is_file(): continue
+            if not logo_file.is_file():
+                continue
             filename = logo_file.stem
             ch_name = re.sub(r'^[A-Za-z0-9\+\-]+', '', filename)
             if ch_name and ch_name in name:
                 return folder_name
-    if name.isdigit() or not name:
-        return "其他频道"
+
     return "其他频道"
 
 def generate_tvbox_txt(channels):
