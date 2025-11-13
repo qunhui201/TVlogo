@@ -66,6 +66,18 @@ def match_logo(channel_name, group_title):
                     return logo_path
     return logo_path
 
+# ✅ 新增：自动归类函数
+def normalize_group(channel_name, group_title):
+    name = channel_name
+    if any(k in name for k in ["CCTV", "央", "中央电视台"]):
+        return "央视频道"
+    elif "卫视" in name:
+        return "卫视频道"
+    elif any(city in name for city in PROVINCES + ["BTV", "东方", "南方", "珠江", "都市", "公共", "新闻", "影视", "少儿"]):
+        return "地方频道"
+    else:
+        return group_title or "其他频道"
+
 def main():
     output_lines = []
     missing_logos = []
@@ -82,6 +94,10 @@ def main():
             group_title = re.search(r'group-title="([^"]+)"', info)
             name = tvg_name.group(1) if tvg_name else ""
             group = group_title.group(1) if group_title else ""
+            
+            # ✅ 使用自动归类修正 group
+            group = normalize_group(name, group)
+
             logo = match_logo(name, group)
             if not logo:
                 missing_logos.append(f"{group} - {name}")
