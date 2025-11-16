@@ -4066,6 +4066,38 @@ http://27.41.245.32:801/hls/14/index.m3u8
 http://27.41.245.32:801/hls/15/index.m3u8
 #EXTINF:-1 tvg-name="CCTV17" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV17.png" group-title="央视频道",CCTV17
 http://27.41.245.32:801/hls/16/index.m3u8
+#EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV17.png" group-title="央视频道",CCTV1
+http://122.114.131.154:4000/hls/1/index.m3u8
+#EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
+http://122.114.131.154:4000/hls/2/index.m3u8
+#EXTINF:-1 tvg-name="CCTV3" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV3.png" group-title="央视频道",CCTV3
+http://122.114.131.154:4000/hls/3/index.m3u8
+#EXTINF:-1 tvg-name="CCTV4" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV4美洲.png" group-title="央视频道",CCTV4
+http://122.114.131.154:4000/hls/4/index.m3u8
+#EXTINF:-1 tvg-name="CCTV5" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV5+.png" group-title="央视频道",CCTV5
+http://122.114.131.154:4000/hls/5/index.m3u8
+#EXTINF:-1 tvg-name="CCTV6" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV6.png" group-title="央视频道",CCTV6
+http://122.114.131.154:4000/hls/6/index.m3u8
+#EXTINF:-1 tvg-name="CCTV7" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV7.png" group-title="央视频道",CCTV7
+http://122.114.131.154:4000/hls/7/index.m3u8
+#EXTINF:-1 tvg-name="CCTV8" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV8.png" group-title="央视频道",CCTV8
+http://122.114.131.154:4000/hls/8/index.m3u8
+#EXTINF:-1 tvg-name="CCTV9" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV9.png" group-title="央视频道",CCTV9
+http://122.114.131.154:4000/hls/9/index.m3u8
+#EXTINF:-1 tvg-name="CCTV10" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV10
+http://122.114.131.154:4000/hls/10/index.m3u8
+#EXTINF:-1 tvg-name="CCTV11" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV11
+http://122.114.131.154:4000/hls/11/index.m3u8
+#EXTINF:-1 tvg-name="CCTV12" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV12
+http://122.114.131.154:4000/hls/12/index.m3u8
+#EXTINF:-1 tvg-name="CCTV13" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV13
+http://122.114.131.154:4000/hls/13/index.m3u8
+#EXTINF:-1 tvg-name="CCTV14" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV14
+http://122.114.131.154:4000/hls/14/index.m3u8
+#EXTINF:-1 tvg-name="CCTV15" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV15
+http://122.114.131.154:4000/hls/15/index.m3u8
+#EXTINF:-1 tvg-name="CCTV5+" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV5+.png" group-title="央视频道",CCTV5+
+http://122.114.131.154:4000/hls/16/index.m3u8
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV1
 http://220.176.60.118:20000/hls/ab4d37a6f19d7e80.m3u8
 #EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
@@ -4168,38 +4200,6 @@ http://221.13.232.250:1999/hls/13/index.m3u8
 http://221.13.232.250:1999/hls/14/index.m3u8
 #EXTINF:-1 tvg-name="CCTV15" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV15.png" group-title="央视频道",CCTV15
 http://221.13.232.250:1999/hls/15/index.m3u8
-#EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV1.png" group-title="央视频道",CCTV1
-http://122.114.131.154:4000/hls/1/index.m3u8
-#EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
-http://122.114.131.154:4000/hls/2/index.m3u8
-#EXTINF:-1 tvg-name="CCTV3" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV3.png" group-title="央视频道",CCTV3
-http://122.114.131.154:4000/hls/3/index.m3u8
-#EXTINF:-1 tvg-name="CCTV4" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV4.png" group-title="央视频道",CCTV4
-http://122.114.131.154:4000/hls/4/index.m3u8
-#EXTINF:-1 tvg-name="CCTV5" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV5.png" group-title="央视频道",CCTV5
-http://122.114.131.154:4000/hls/5/index.m3u8
-#EXTINF:-1 tvg-name="CCTV6" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV6.png" group-title="央视频道",CCTV6
-http://122.114.131.154:4000/hls/6/index.m3u8
-#EXTINF:-1 tvg-name="CCTV7" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV7.png" group-title="央视频道",CCTV7
-http://122.114.131.154:4000/hls/7/index.m3u8
-#EXTINF:-1 tvg-name="CCTV8" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV8.png" group-title="央视频道",CCTV8
-http://122.114.131.154:4000/hls/8/index.m3u8
-#EXTINF:-1 tvg-name="CCTV9" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV9.png" group-title="央视频道",CCTV9
-http://122.114.131.154:4000/hls/9/index.m3u8
-#EXTINF:-1 tvg-name="CCTV10" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV10.png" group-title="央视频道",CCTV10
-http://122.114.131.154:4000/hls/10/index.m3u8
-#EXTINF:-1 tvg-name="CCTV11" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV11.png" group-title="央视频道",CCTV11
-http://122.114.131.154:4000/hls/11/index.m3u8
-#EXTINF:-1 tvg-name="CCTV12" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV12.png" group-title="央视频道",CCTV12
-http://122.114.131.154:4000/hls/12/index.m3u8
-#EXTINF:-1 tvg-name="CCTV13" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV13.png" group-title="央视频道",CCTV13
-http://122.114.131.154:4000/hls/13/index.m3u8
-#EXTINF:-1 tvg-name="CCTV14" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV14.png" group-title="央视频道",CCTV14
-http://122.114.131.154:4000/hls/14/index.m3u8
-#EXTINF:-1 tvg-name="CCTV15" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV15.png" group-title="央视频道",CCTV15
-http://122.114.131.154:4000/hls/15/index.m3u8
-#EXTINF:-1 tvg-name="CCTV5+" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV5+.png" group-title="央视频道",CCTV5+
-http://122.114.131.154:4000/hls/16/index.m3u8
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV17.png" group-title="央视频道",CCTV1
 http://171.15.150.93:9999/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://raw.githubusercontent.com/qunhui201/TVlogo/main/TVlogo_Images/中央电视台/CCTV2.png" group-title="央视频道",CCTV2
