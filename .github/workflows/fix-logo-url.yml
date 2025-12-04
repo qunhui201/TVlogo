@@ -1,30 +1,37 @@
-name: 批量修复台标链接
+name: 批量修复台标链接（私库专用）
 
 on:
-  workflow_dispatch:    # 手动触发
-  push:
-    branches: [ main ]
+  workflow_dispatch:    # 手动触发即可
 
 jobs:
-  fix-logo:
+  fix-logo-url:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}   # 自动有权限
+    # 关键：给 Actions 写权限
+    permissions:
+      contents: write     # 允许修改仓库内容
+      pull-requests: write
 
-      - name: 批量替换旧台标路径为新公开库
+    steps:
+      - name: Checkout 仓库（使用有写权限的 token）
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUSH_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: 批量替换旧台标路径 → 新公开图床
         run: |
           find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
-            echo "正在处理: $file"
+            echo "正在修复: $file"
+            # 替换为你的公开台标库（推荐 jsDelivr 加速版）
             sed -i 's|https://raw\.githubusercontent\.com/qunhui201/TVlogo/main/TVlogo_Images|https://cdn.jsdelivr.net/gh/qunhui201/logo@TVlogo_Images|g' "$file"
           done
 
-      - name: 提交修改
+      - name: 提交并推送到 main 分支
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.PUSH_TOKEN }}@github.com/${{ github.repository }}.git
+          
           git add .
-          git commit -m "自动修复台标链接 → 指向公开图床 qunhui201/logo" || echo "无改动"
-          git push
+          git commit -m "自动修复台标链接 → 指向公开图床 qunhui201/logo" || echo "没有需要提交的更改"
+          
+          # 自动使用有写权限的 token 推送
+          git push origin main
