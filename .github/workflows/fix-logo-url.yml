@@ -1,4 +1,4 @@
-name: 终极清洗台标链接套娃（一次搞定）
+name: 只砍斜杠套娃（一次彻底解决）
 
 on: workflow_dispatch
 
@@ -7,39 +7,28 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}   # 确保你已经添加了这个 Secret
+          token: ${{ secrets.PAT_TOKEN }}
 
-      - name: 彻底清洗套娃 + 统一为 kenyu.ggff.net 加速链接
+      - name: 一次性砍掉所有多余斜杠和套娃
         run: |
           find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
-            echo "正在清洗: $file"
-
-            # 第一步：把所有连续出现的 kenyu.ggff.net/https:// 合并成一个
-            # 只要还有两个 kenyu 就一直替换，直到只剩一个（最多循环 10 次，防止意外）
-            for i in {1..10}; do
-              if ! grep -q "kenyu\.ggff\.net.*kenyu\.ggff\.net" "$file"; then
-                break
-              fi
-              sed -i 's|kenyu\.ggff\.net/https:/|kenyu.ggff.net/https://|g' "$file"
-              sed -i 's|kenyu\.ggff\.net//|kenyu.ggff.net/|g' "$file"
-            done
-
-            # 第二步：把原始 raw 链接统一换成正确的一层 kenyu 加速链接
-            sed -i 's|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
-
-            # 第三步：把 jsDelivr 的也换掉（防止漏的）
-            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+            echo "正在砍: $file"
+            
+            # 只干这一件事：反复把 kenyu.ggff.net 后面所有 ////// 砍到只剩一个 /
+            sed -i 's|kenyu\.ggff\.net/\+|kenyu.ggff.net/|g' "$file"
+            
+            # 再把 raw 前面的 ////// 也砍干净
+            sed -i 's|https:/\+|https://|g' "$file"
           done
 
-      - name: 提交清洗结果
+      - name: 提交
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions@github.com"
+          git config user.name "clean-bot"
+          git config user.email "clean@github.com"
           git add .
-          git commit -m "终极清洗：台标链接套娃已清除，只保留一层 kenyu.ggff.net" || echo "没有改动"
-          git push origin main
+          git commit -m "砍掉所有多余斜杠，链接恢复正常" || echo "无改动"
+          git push
