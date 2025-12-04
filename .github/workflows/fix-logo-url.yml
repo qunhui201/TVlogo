@@ -25,9 +25,9 @@ jobs:
             # 1. 干掉所有双斜杠
             sed -i "s|kenyu\.ggff\.net//|kenyu.ggff.net/|g" "{}"
             # 2. 替换所有旧路径为 kenyu 加速版
-            sed -i "s|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g" "{}"
+            sed -i "s|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g" "{}"
             # 3. 把 jsDelivr 的也一起干掉
-            sed -i "s|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g" "{}"
+            sed -i "s|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g" "{}"
           '
 
       - name: 提交并推送到 main
