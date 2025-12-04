@@ -1,8 +1,8 @@
-name: Upload to Cloudflare KV（终极 Bulk 版）
+name: 智能增量上传到 KV（只传改动的文件）
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */6 * * *'   # 每6小时一次
   workflow_dispatch:
 
 jobs:
@@ -10,32 +10,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # 拿最近两次提交，用于对比改动
 
-      - name: 一键上传所有文件到 KV（无需 Python、无需 requests）
+      - name: 只上传有改动的 .m3u/.txt/.yaml 文件
         env:
           KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 生成 bulk json（只上传 .m3u .txt .yaml .yml）
-          jq -n \
-            --arg account "$KV_ACCOUNT_ID" \
-            --arg namespace "$KV_NAMESPACE_ID" \
-            --arg token "$KV_API_TOKEN" \
-            '[inputs | {key: .path, value: .content}]' \
-            <(find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) ! -path "*/\.git/*" -exec sh -c '
-              path="${0#./}"; content=$(cat "$0" | base64 -w0); echo "{\"path\":\"'"$path"'\",\"content\":\"'"$content"'\"}"
-            ' {} \; ) \
-            > bulk.json
-
-          # 一次性上传（免费账号支持最多 10,000 个键）
-          curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/bulk" \
-            -H "Authorization: Bearer $KV_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data @bulk.json
-
-          echo "全部上传完成！"
-
-      - name: 清理临时文件
-        if: always()
-        run: rm -f bulk.json
+          # 获取本次有改动的文件（包括新增、修改）
+          git diff --name-only HEAD~1 HEAD > changed.txt || echo "首次运行，上传全部"
+          
+          if [ ! -s changed.txt ]; then
+            echo "没有文件改动，跳过上传"
+            exit 0
+          fi
+          
+          echo "本次改动文件："
+          cat changed.txt
+          
+          while IFS= read -r file; do
+            [[ -f "$file" ]] || continue
+            [[ "$file" == *".m3u"* || "$file" == *".txt"* || "$file" == *".yaml"* || "$file" == *".yml"* ]] || continue
+            
+            key="${file#./}"
+            echo "上传 $key"
+            curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$key" \
+              -H "Authorization: Bearer $KV_API_TOKEN" \
+              -H "Content-Type: text/plain" \
+              --data-binary @"$file"
+            echo ""
+            sleep 1   # 稳一点，每秒最多1个
+          done < changed.txt
+          
+          echo "增量上传完成！"
