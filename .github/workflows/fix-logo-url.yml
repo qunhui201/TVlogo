@@ -30,10 +30,10 @@ jobs:
             done
 
             # 第二步：把原始 raw 链接统一换成正确的一层 kenyu 加速链接
-            sed -i 's|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+            sed -i 's|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
 
             # 第三步：把 jsDelivr 的也换掉（防止漏的）
-            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
           done
 
       - name: 提交清洗结果
