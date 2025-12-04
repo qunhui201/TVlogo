@@ -1,39 +1,41 @@
-name: 修复台标链接 → kenyu.ggff.net 加速版
+name: 终极修复台标链接（去重+防套娃）
 
-on: workflow_dispatch   # 手动触发
+on: workflow_dispatch
 
 jobs:
   fix:
     runs-on: ubuntu-latest
-    
-    # 关键：给完整写权限（新语法，旧的 workflows: write 已经不被所有仓库接受）
     permissions:
       contents: write
-      actions: write          # 替代 workflows: write
-      checks: write
+      actions: write
 
     steps:
-      - name: Checkout 仓库（使用有写权限的 PAT）
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}   # 必须是你刚才新建的 repo 权限 PAT
+          token: ${{ secrets.PAT_TOKEN }}
 
-      - name: 修复双斜杠 + 替换为 kenyu.ggff.net 加速链接
+      - name: 终极清洗台标链接（去掉所有多余套娃）
         run: |
-          find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | xargs -0 -I {} sh -c '
-            echo "处理: {}"
-            # 1. 干掉所有双斜杠
-            sed -i "s|kenyu\.ggff\.net//|kenyu.ggff.net/|g" "{}"
-            # 2. 替换所有旧路径为 kenyu 加速版
-            sed -i "s|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g" "{}"
-            # 3. 把 jsDelivr 的也一起干掉
-            sed -i "s|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g" "{}"
-          '
+          find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
+            echo "清洗: $file"
 
-      - name: 提交并推送到 main
+            # 核心：反复去掉多余的 kenyu.ggff.net 前缀，直到只剩一个
+            while grep -q "kenyu\.ggff\.net.*kenyu\.ggff\.net" "$file"; do
+              sed -i 's|kenyu\.ggff\.net/https:/|kenyu.ggff.net/https://|g' "$file"
+              sed -i 's|kenyu\.ggff\.net//|kenyu.ggff.net/|g' "$file"
+            done
+
+            # 最终统一成你想要的正确格式（只保留一个 kenyu 前缀）
+            sed -i 's|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+
+            # 顺便把 jsDelivr 的也干掉
+            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+          done
+
+      - name: 提交清洗结果
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m "修复台标链接 → kenyu.ggff.net 加速版（已修正双斜杠）" || echo "没有改动"
+          git commit -m "终极清洗：去掉台标链接套娃，只保留一个 kenyu.ggff.net" || echo "无改动"
           git push origin main
