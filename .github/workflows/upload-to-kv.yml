@@ -1,31 +1,26 @@
 name: Upload to Cloudflare KV
-
 on:
   schedule:
-    - cron: '0 */4 * * *'  # 每4小时自动运行
-  workflow_dispatch:  # 允许手动触发
+    - cron: '0 */6 * * *'     # 每6小时一次，稳一点
+  workflow_dispatch:
 
 jobs:
   upload:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
+      - name: Install requests
+        run: pip install requests
 
-      - name: Upload to Cloudflare KV
+      - name: Run upload script
         env:
           KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
-        run: python md/upload_to_kv.py  # 运行位于 md/ 目录下的 upload_to_kv.py 脚本
+        run: python md/upload_to_kv.py
