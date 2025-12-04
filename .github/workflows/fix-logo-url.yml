@@ -1,37 +1,32 @@
-name: 批量修复台标链接（私库专用）
+name: 修复台标链接 → 官方加速版（Gcore）
 
 on:
   workflow_dispatch:    # 手动触发即可
 
 jobs:
-  fix-logo-url:
+  fix-logo:
     runs-on: ubuntu-latest
-    # 关键：给 Actions 写权限
     permissions:
-      contents: write     # 允许修改仓库内容
-      pull-requests: write
+      contents: write     # 必须有写权限
 
     steps:
-      - name: Checkout 仓库（使用有写权限的 token）
+      - name: Checkout 仓库
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PUSH_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 批量替换旧台标路径 → 新公开图床
+      - name: 替换为官方加速链接（Gcore）
         run: |
           find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
-            echo "正在修复: $file"
-            # 替换为你的公开台标库（推荐 jsDelivr 加速版）
-            sed -i 's|https://raw\.githubusercontent\.com/qunhui201/TVlogo/main/TVlogo_Images|https://cdn.jsdelivr.net/gh/qunhui201/logo@TVlogo_Images|g' "$file"
+            echo "正在处理: $file"
+            # 把 jsDelivr 版全部换成 Gcore 官方加速版
+            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://ghproxy.com/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
           done
 
-      - name: 提交并推送到 main 分支
+      - name: 提交并推送
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
+          git config user.email "github-actions@github.com"
           git add .
-          git commit -m "自动修复台标链接 → 指向公开图床 qunhui201/logo" || echo "没有需要提交的更改"
-          
-          # 自动使用有写权限的 token 推送
+          git commit -m "修复台标链接 → 官方加速版（ghproxy.com）" || echo "没有需要提交的更改"
           git push origin main
