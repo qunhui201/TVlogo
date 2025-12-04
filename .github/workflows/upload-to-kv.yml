@@ -1,4 +1,4 @@
-name: Upload to Cloudflare KV (Bulk版)
+name: Upload to Cloudflare KV（终极 Bulk 版）
 
 on:
   schedule:
@@ -11,14 +11,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Bulk Upload to KV（一次全传完）
+      - name: 一键上传所有文件到 KV（无需 Python、无需 requests）
         env:
           KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
-        run: python md/bulk_upload_kv.py
+        run: |
+          # 生成 bulk json（只上传 .m3u .txt .yaml .yml）
+          jq -n \
+            --arg account "$KV_ACCOUNT_ID" \
+            --arg namespace "$KV_NAMESPACE_ID" \
+            --arg token "$KV_API_TOKEN" \
+            '[inputs | {key: .path, value: .content}]' \
+            <(find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) ! -path "*/\.git/*" -exec sh -c '
+              path="${0#./}"; content=$(cat "$0" | base64 -w0); echo "{\"path\":\"'"$path"'\",\"content\":\"'"$content"'\"}"
+            ' {} \; ) \
+            > bulk.json
+
+          # 一次性上传（免费账号支持最多 10,000 个键）
+          curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/bulk" \
+            -H "Authorization: Bearer $KV_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data @bulk.json
+
+          echo "全部上传完成！"
+
+      - name: 清理临时文件
+        if: always()
+        run: rm -f bulk.json
