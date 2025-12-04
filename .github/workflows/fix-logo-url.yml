@@ -20,7 +20,7 @@ jobs:
           find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
             echo "正在处理: $file"
             # 把 jsDelivr 版全部换成 Gcore 官方加速版
-            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://ghproxy.com/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net//https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
           done
 
       - name: 提交并推送
