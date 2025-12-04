@@ -1,4 +1,4 @@
-name: 砍掉多余的 kenyu.ggff.net 前缀（只留一个）
+name: 终极砍套娃（一次彻底干净）
 
 on: workflow_dispatch
 
@@ -13,22 +13,14 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: 砍掉所有多余的 kenyu.ggff.net 前缀
+      - name: 一次砍干净所有多余 kenyu.ggff.net（不管多少层）
         run: |
-          find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
-            echo "正在砍前缀: $file"
-            
-            # 只要还有两个 kenyu.ggff.net，就一直砍，直到只剩一个
-            while grep -q "kenyu\.ggff\.net.*kenyu\.ggff\.net" "$file"; do
-              sed -i 's|kenyu\.ggff\.net/https:/|kenyu.ggff.net/https://|g' "$file"
-              sed -i 's|kenyu\.ggff\.net/https://raw|https://raw|g' "$file"
-            done
-          done
+          find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | xargs -0 sed -i 's|kenyu\.ggff\.net/https://kenyu\.ggff\.net|kenyu.ggff.net|g'
 
       - name: 提交
         run: |
-          git config user.name "clean-bot"
+          git config user.name "final-clean"
           git config user.email "clean@github.com"
           git add .
-          git commit -m "砍掉多余 kenyu.ggff.net 前缀，只保留一个" || echo "无改动"
+          git commit -m "终极砍套娃：所有链接只剩一个 kenyu.ggff.net" || echo "无改动"
           git push
