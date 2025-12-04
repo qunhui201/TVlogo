@@ -1,4 +1,4 @@
-name: 只砍斜杠套娃（一次彻底解决）
+name: 砍掉多余的 kenyu.ggff.net 前缀（只留一个）
 
 on: workflow_dispatch
 
@@ -13,16 +13,16 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: 一次性砍掉所有多余斜杠和套娃
+      - name: 砍掉所有多余的 kenyu.ggff.net 前缀
         run: |
           find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
-            echo "正在砍: $file"
+            echo "正在砍前缀: $file"
             
-            # 只干这一件事：反复把 kenyu.ggff.net 后面所有 ////// 砍到只剩一个 /
-            sed -i 's|kenyu\.ggff\.net/\+|kenyu.ggff.net/|g' "$file"
-            
-            # 再把 raw 前面的 ////// 也砍干净
-            sed -i 's|https://\+|https://|g' "$file"
+            # 只要还有两个 kenyu.ggff.net，就一直砍，直到只剩一个
+            while grep -q "kenyu\.ggff\.net.*kenyu\.ggff\.net" "$file"; do
+              sed -i 's|kenyu\.ggff\.net/https:/|kenyu.ggff.net/https://|g' "$file"
+              sed -i 's|kenyu\.ggff\.net/https://raw|https://raw|g' "$file"
+            done
           done
 
       - name: 提交
@@ -30,5 +30,5 @@ jobs:
           git config user.name "clean-bot"
           git config user.email "clean@github.com"
           git add .
-          git commit -m "砍掉所有多余斜杠，链接恢复正常" || echo "无改动"
+          git commit -m "砍掉多余 kenyu.ggff.net 前缀，只保留一个" || echo "无改动"
           git push
