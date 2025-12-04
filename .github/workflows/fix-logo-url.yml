@@ -22,7 +22,7 @@ jobs:
             sed -i 's|kenyu\.ggff\.net/\+|kenyu.ggff.net/|g' "$file"
             
             # 再把 raw 前面的 ////// 也砍干净
-            sed -i 's|https:/\+|https://|g' "$file"
+            sed -i 's|https://\+|https://|g' "$file"
           done
 
       - name: 提交
