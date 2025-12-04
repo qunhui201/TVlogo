@@ -1,0 +1,28 @@
+
+# md/bulk_upload_kv.py  （直接替换原来的 upload_to_kv.py）
+import os
+import json
+import requests
+
+# 环境变量从 GitHub Secrets 自动获取
+url = f"https://api.cloudflare.com/client/v4/accounts/{os.getenv('KV_ACCOUNT_ID')}/storage/kv/namespaces/{os.getenv('KV_NAMESPACE_ID')}/bulk"
+
+# 构建 bulk 数据（只上传 .m3u/.txt/.yaml）
+data = []
+for root, _, files in os.walk("."):
+    for f in files:
+        if f.endswith((".m3u", ".txt", ".yaml", ".yml")):
+            path = os.path.join(root, f).lstrip("./")
+            if path.startswith(".git"): 
+                continue
+            with open(os.path.join(root, f), "rb") as fp:
+                data.append({"key": path, "value": fp.read().decode("utf-8")})
+
+# 一次性上传（免费账号支持最多 10,000 个）
+requests.put(
+    url,
+    headers={"Authorization": f"Bearer {os.getenv('KV_API_TOKEN')}"},
+    json=data
+).raise_for_status()
+
+print(f"全部上传完成！共 {len(data)} 个文件")
