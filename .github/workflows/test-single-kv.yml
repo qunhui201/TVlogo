@@ -1,0 +1,37 @@
+name: 测试上传单个文件到 KV（验证 token）
+
+on: workflow_dispatch   # 只手动触发
+
+jobs:
+  test-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 只上传 TVlogo/history/merged.m3u 测试 token 是否正确
+        env:
+          KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
+          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
+        run: |
+          FILE="TVlogo/history/merged.m3u"
+          KEY="TVlogo/history/merged.m3u"
+          
+          echo "正在上传 $FILE → KV key: $KEY"
+          
+          curl -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$KEY" \
+            -H "Authorization: Bearer $KV_API_TOKEN" \
+            -H "Content-Type: text/plain" \
+            --data-binary @"$FILE" \
+            -w "\nHTTP_STATUS: %{http_code}\n" -s -o response.json
+          
+          cat response.json
+          
+          # 判断是否成功
+          if grep -q '"success":true' response.json; then
+            echo "上传成功！3 个 token 完全正确！"
+          else
+            echo "上传失败，请检查 3 个 secret 是否填写正确"
+            cat response.json
+          fi
