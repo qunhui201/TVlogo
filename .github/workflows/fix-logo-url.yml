@@ -1,13 +1,14 @@
-name: 修复台标链接 → 官方加速版（Gcore）
+name: 修复台标链接 → kenyu.ggff.net 加速版
 
 on:
-  workflow_dispatch:    # 手动触发即可
+  workflow_dispatch:   # 手动触发
 
 jobs:
   fix-logo:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # 必须有写权限
+      contents: write      # 允许修改文件
+      workflows: write     # 关键！允许修改 .github/workflows 目录
 
     steps:
       - name: Checkout 仓库
@@ -15,12 +16,20 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 替换为官方加速链接（Gcore）
+      - name: 修复双斜杠 + 替换为 kenyu.ggff.net 加速链接
         run: |
+          # 修复所有可能的错误写法（包含双斜杠、单斜杠、jsDelivr 等）
           find . -type f \( -name "*.m3u" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' file; do
             echo "正在处理: $file"
-            # 把 jsDelivr 版全部换成 Gcore 官方加速版
-            sed -i 's|https://kenyu.ggff.net//https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+            
+            # 步骤1：干掉双斜杠（不管前面是什么域名）
+            sed -i 's|kenyu\.ggff\.net//|kenyu.ggff.net/|g' "$file"
+            
+            # 步骤2：替换所有旧路径为正确的 kenyu 加速版
+            sed -i 's|https://raw\.githubusercontent\.com/qunhui201/logo/main/TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
+            
+            # 步骤3：如果还有 jsDelivr 的也一起干掉（防止漏网）
+            sed -i 's|https://cdn\.jsdelivr\.net/gh/qunhui201/logo@TVlogo_Images|https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images|g' "$file"
           done
 
       - name: 提交并推送
@@ -28,5 +37,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions@github.com"
           git add .
-          git commit -m "修复台标链接 → 官方加速版（ghproxy.com）" || echo "没有需要提交的更改"
+          git commit -m "修复台标链接 → kenyu.ggff.net 加速版（已修正双斜杠）" || echo "无改动"
           git push origin main
