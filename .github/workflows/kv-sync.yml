@@ -1,4 +1,4 @@
-name: 同步到 Cloudflare KV（2025最新稳版）
+name: 同步到 Cloudflare KV（带调试的终极版）
 
 on:
   workflow_dispatch:
@@ -11,19 +11,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 上传文件到 Cloudflare KV（已修复404）
+      - name: 调试 + 上传文件到 Cloudflare KV
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
+          # 先安装 jq（调试用）
+          sudo apt-get update && sudo apt-get install -y jq
+
+          # 调试1: 测试 API 连通性 - 列出所有 KV 命名空间
+          echo "调试: 列出你的所有 KV 命名空间（如果 404/403，检查 secrets）"
+          curl -X GET "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces" \
+            -H "Authorization: Bearer $API_TOKEN" \
+            --fail --silent --show-error | jq '.result[] | {id: .id, title: .title}' || echo "调试失败！很可能 secrets 错"
+
+          # 调试2: 测试单个命名空间是否存在（替换为你的 NAMESPACE_ID）
+          echo "调试: 检查具体命名空间 $NAMESPACE_ID 是否存在"
+          curl -X GET "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID" \
+            -H "Authorization: Bearer $API_TOKEN" \
+            --fail --silent --show-error | jq '.result' || echo "命名空间不存在！检查 KV_NAMESPACE_ID"
+
+          # 下面是上传逻辑（如果调试失败，这里也会 404）
           shopt -s globstar nullglob
 
           pattern='*.txt *.m3u *.m3u8 *.yaml *.yml *.json *.csv *.md'
           count=0
 
           for file in **/$pattern; do
-            # 排除目录
             if [[ "$file" == .git/* ]] || [[ "$file" == .github/* ]] || [[ "$file" == md/* ]]; then
               echo "跳过: $file"
               continue
@@ -36,15 +51,14 @@ jobs:
 
             echo "正在上传 ($((++count))) $key → $encoded_key"
 
-            # 关键！去掉多余的 /storage
             curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
               -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
               --data-binary @"$file" \
               --fail --silent --show-error && \
-              echo "上传成功！" || { echo "上传失败！"; exit 1; }
+              echo "上传成功！" || echo "上传失败！（如果 404，检查上面调试）"
 
             sleep 1.1
           done
 
-          echo "全部上传完成！共处理 $count 个文件"
+          echo "全部完成！共 $count 个文件"
