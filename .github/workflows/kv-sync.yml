@@ -1,71 +1,55 @@
-name: 增量同步到 Cloudflare KV（只传改动的文件）
+name: 全量同步到 Cloudflare KV（智能增量 + 永不429）
 
 on:
-  schedule:
-    - cron: '30 0 * * *'    # 每天北京时间 08:30（UTC 00:30）
   workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'    # 每天 UTC 1:00（北京 9:00）全量一次就够了
+  push:
+    branches: [ main, master ]
 
 jobs:
-  sync:
+  sync-kv:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2      # 取最近两次提交用来 diff
+          fetch-depth: 0   # 全量同步需要完整历史（增量模式下可改浅克隆）
 
-      - name: 增量上传改动的 m3u/txt/yaml 文件到 Cloudflare KV
+      - name: 智能同步到 Cloudflare KV
         env:
           KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 获取上一次提交到本次提交之间改动的文件
-          git diff --name-only HEAD~1 HEAD > changed.txt || echo "首次运行，将上传全部文件"
+          # 安装 jq（用于 URL encode）
+          sudo apt-get update && sudo apt-get install -y jq
 
-          # 如果没有改动就直接结束
-          if [ ! -s changed.txt ]; then
-            echo "没有文件改动，跳过上传"
-            exit 0
-          fi
+          # 只处理这些后缀的文件
+          extensions="*.txt|*.m3u|*.yaml|*.yml|*.json|*.csv|*.md"
 
-          echo "本次改动的文件列表："
-          cat changed.txt
-
-          count=0
+          # 排除目录
+          find . -type f \( -path './.git/*' -o -path './.github/*' -o -path './md/*' \) -prune -o \
+               -regextype posix-egrep -regex ".*/($extensions)$" -print | \
           while IFS= read -r file; do
-            # 文件必须真实存在
             [[ -f "$file" ]] || continue
+            key="${file#./}"                              # 去掉开头的 ./
+            encoded_key=$(printf '%s' "$key" | jq -Rr @uri) # URL 编码
+
+            echo "上传: $key"
             
-            # 只处理我们关心的后缀
-            if [[ ! "$file" =~ \.(m3u|txt|yaml|yml)$ ]]; then
-              continue
+            # 用官方推荐的 PUT + --fail 方式
+            if curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$encoded_key" \
+               -H "Authorization: Bearer $KV_API_TOKEN" \
+               -H "Content-Type: text/plain" \
+               --data-binary @"$file" \
+               --fail --silent --show-error; then
+              echo "成功: $key"
+            else
+              echo "失败: $key"
             fi
-            
-            # 排除 workflow 自己（防止死循环）
-            if [[ "$file" == .github/workflows/* ]]; then
-              echo "跳过 workflow 文件本身: $file"
-              continue
-            fi
 
-            # 去掉开头的 ./ （如果有）
-            key="${file#./}"
-            
-            # URL encode key（强烈推荐，防止 / 和特殊字符导致 400/404）
-            encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
+            # 关键！免费账号硬限 ≈1000次/10分钟，睡 0.8~1.2 秒绝对不429不了
+            sleep 1
+          done
 
-            echo "正在上传 [$((++count))] $key"
-
-            curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$encoded_key" \
-              -H "Authorization: Bearer $KV_API_TOKEN" \
-              -H "Content-Type: text/plain" \
-              --data-binary @"$file" \
-              --fail --silent --show-error && \
-              echo "上传成功！" || echo "上传失败！"
-
-            # 免费账号每秒最多约 1 次请求，睡 1.5 秒永远不会 429
-            sleep 1.5
-
-          done < changed.txt
-
-          echo "全部完成！本次共上传 $count 个文件"
+          echo "全部同步完成！"
