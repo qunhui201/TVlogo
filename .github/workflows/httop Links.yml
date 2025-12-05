@@ -2,8 +2,11 @@ name: Update httop Links
 
 on:
   schedule:
-    - cron: "0 * * * *"  # 每小时运行一次
+    - cron: "0 * * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write  # 允许 GitHub Actions 修改当前仓库
 
 jobs:
   update:
@@ -11,10 +14,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-      # 关闭 GITHUB_TOKEN 权限，确保使用你的 PAT 推送
         uses: actions/checkout@v3
-        with:
-          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,15 +29,10 @@ jobs:
         run: |
           python md/httop_crawler.py
 
-      - name: Commit and push changes to TVlogo
-        env:
-          TVLOG_TOKEN: ${{ secrets.TVLOG_TOKEN }}
+      - name: Commit and push changes
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
           git add md/httop_links.txt
           git commit -m "Update httop links" || echo "No changes to commit"
-
-          # 使用你的 Fine-grained Token 推送到 TVlogo 仓库
-          git push https://${TVLOG_TOKEN}@github.com/qunhui201/TVlogo.git HEAD:main
+          git push
