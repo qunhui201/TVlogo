@@ -1,10 +1,10 @@
-name: 智能增量同步 KV（根目录+history强制刷新，其余真正增量）
+name: 终极智能同步 KV（根目录强制刷新，history归档文件只传一次）
 
 on:
   push:
     branches: [ main, master ]
   schedule:
-    - cron: '0 */4 * * *'    # 北京时间每4小时自动跑一次（可改成 */6 或 */3）
+    - cron: '0 */4 * * *'    # 每4小时兜底一次，可自行调整
   workflow_dispatch:
 
 jobs:
@@ -15,45 +15,41 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: 智能上传到 Cloudflare KV
+      - name: 智能上传 + 更新已上传清单
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 创建一个空文件用于存放本次要上传的列表
-          : > upload_list.txt
+          # 清单文件路径（会自动创建）
+          LIST_FILE="kv_uploaded_history.txt"
+          touch "$LIST_FILE"
 
-          # 1. 根目录所有文件 + history/merged.m3u 和 history/merged.txt → 强制每天刷新
-          echo "添加强制刷新文件（根目录全部 + history/merged.*）"
-          find . -maxdepth 1 -type f \( -name "*.txt" -o -name "*.m3u" -o -name "*.m3u8" -o -name "*.md" -o -name "*.json" \) -print >> upload_list.txt
-          find history -maxdepth 1 -name "merged.*" -print >> upload_list.txt 2>/dev/null || true
+          # 1. 强制上传的文件（根目录全部 + history/merged.*）
+          : > force_upload.txt
+          find . -maxdepth 1 -type f -regex '.*\.\(txt\|m3u\|m3u8\|md\|json\)' -print >> force_upload.txt
+          find history -maxdepth 1 -name "merged.*" -print >> force_upload.txt 2>/dev/null || true
 
-          # 2. history/ 目录下除 merged.* 外的其他文件 → 只有新增或改动才上传（真正增量）
-          echo "添加 history/ 目录下的增量文件"
-          git diff --name-only HEAD~1 HEAD 2>/dev/null | grep "^history/" | grep -v "merged\." >> upload_list.txt || true
+          # 2. history/ 目录下可能的新归档文件（排除 merged.*）
+          find history -type f ! -name "merged.*" | sort > history_all.txt
 
-          # 3. 如果是定时任务（schedule），额外把今天新增的历史文件也补上（防止漏）
-          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
-            echo "定时任务，补上 history/ 今天可能漏掉的新文件"
-            find history -type f ! -name "merged.*" -newer "$(date -d 'yesterday' +%Y-%m-%d)" -print >> upload_list.txt 2>/dev/null || true
-          fi
+          # 3. 对比历史清单，找出真正的新文件
+          comm -23 history_all.txt <(sort "$LIST_FILE" 2>/dev/null || true) > history_new.txt
 
-          # 去重排序
-          sort -u upload_list.txt -o upload_list.txt
+          # 合并要上传的列表
+          cat force_upload.txt history_new.txt | grep -v "^$" | sort -u > final_upload.txt
 
-          # 排除不需要的目录
-          grep -v -E '^(\.git|\.github|md)/' upload_list.txt > upload_list.tmp && mv upload_list.tmp upload_list.txt
-
-          if [ ! -s upload_list.txt ]; then
-            echo "没有需要上传的文件，结束"
+          if [ ! -s final_upload.txt ]; then
+            echo "没有需要上传的文件（根目录和merged都没变，也没新归档）"
             exit 0
           fi
 
-          echo "本次将上传以下文件（根目录+merged强制，其余增量）："
-          cat upload_list.txt
+          echo "本次将上传以下文件："
+          cat final_upload.txt
 
           count=0
+          uploaded_new_history=""
+
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
             key="${file#./}"
@@ -61,18 +57,41 @@ jobs:
 
             echo "正在上传 ($((++count))) $key"
 
-            curl -X PUT \
+            if curl -X PUT \
               "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
               -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
               --data-binary @"$file" \
-              --fail --silent --show-error && echo "上传成功！" || echo "上传失败！"
+              --fail --silent --show-error; then
+              echo "上传成功！"
+
+              # 如果是 history/ 下的归档文件，记录到本次新增清单
+              if [[ "$file" == history/* ]] && [[ "$file" != history/merged.* ]]; then
+                uploaded_new_history="$uploaded_new_history$file\n"
+              fi
+            else
+              echo "上传失败！"
+            fi
 
             sleep 1.2
-          done < upload_list.txt
+          done < final_upload.txt
+
+          # 4. 更新已上传历史清单（追加本次新增的归档文件）
+          if [ -n "$uploaded_new_history" ]; then
+            printf "$uploaded_new_history" >> "$LIST_FILE"
+            echo "已更新归档文件清单，本次新增："
+            printf "$uploaded_new_history"
+          fi
+
+          # 5. 把清单提交回仓库（这样下次运行能读到）
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add "$LIST_FILE"
+          git diff --staged --quiet || git commit -m "chore: 更新 KV 已上传归档文件清单 [skip ci]"
+          git push || echo "无变化或推送失败（正常）"
 
           echo "=========================================="
           echo "本次同步完成！共上传 $count 个文件"
           echo "根目录和 history/merged.* 已强制刷新"
-          echo "history/ 其他文件为真正增量上传"
+          echo "history/ 归档文件一生只传一次，永不重复"
           echo "=========================================="
