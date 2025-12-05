@@ -1,4 +1,4 @@
-# 文件名：.github/workflows/kv-sync.yml
+
 name: 增量同步到 Cloudflare KV（只传改动的文件）
 
 on:
