@@ -1,9 +1,7 @@
-name: 同步到 Cloudflare KV（全量稳如老狗版）
+name: 同步到 Cloudflare KV（2025最新稳版）
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '30 2 * * *'    # 每天北京时间 10:30 执行一次
   push:
     branches: [ main, master ]
 
@@ -13,50 +11,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 同步指定文件到 Cloudflare KV
+      - name: 上传文件到 Cloudflare KV（已修复404）
         env:
-          KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
-          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
-          KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
+          ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
+          NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 需要上传的后缀（根据你实际情况增删）
-          pattern='*.txt *.m3u *.m3u8 *.yaml *.yml *.json *.csv *.md'
-
-          echo "开始扫描要上传的文件..."
-          
-          # 直接用通配符展开 + 排除目录的方式（最稳！）
           shopt -s globstar nullglob
-          
+
+          pattern='*.txt *.m3u *.m3u8 *.yaml *.yml *.json *.csv *.md'
           count=0
+
           for file in **/$pattern; do
-            # 跳过隐藏目录和 .git、.github、md 目录
-            if [[ "$file" == .git/* ]] || \
-               [[ "$file" == .github/* ]] || \
-               [[ "$file" == md/* ]] || \
-               [[ "$file" == .* ]]; then
+            # 排除目录
+            if [[ "$file" == .git/* ]] || [[ "$file" == .github/* ]] || [[ "$file" == md/* ]]; then
               echo "跳过: $file"
               continue
             fi
 
-            # 真实文件检查
             [[ -f "$file" ]] || continue
 
             key="$file"
             encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
 
-            echo "正在上传 ($((++count))) $key"
+            echo "正在上传 ($((++count))) $key → $encoded_key"
 
-            curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$encoded_key" \
-              -H "Authorization: Bearer $KV_API_TOKEN" \
+            # 关键！去掉多余的 /storage
+            curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+              -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
               --data-binary @"$file" \
               --fail --silent --show-error && \
-              echo "上传成功！" || echo "上传失败！"
+              echo "上传成功！" || { echo "上传失败！"; exit 1; }
 
-            sleep 1.1   # 免费账号最稳的节奏
+            sleep 1.1
           done
 
-          echo "=================================="
-          echo "全部完成！本次共上传 $count 个文件"
-          echo "=================================="
+          echo "全部上传完成！共处理 $count 个文件"
