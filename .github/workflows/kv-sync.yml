@@ -1,53 +1,36 @@
-
-name: 增量同步到 Cloudflare KV（只传改动的文件）
-
-on:
-  schedule:
-    - cron: '30 0 * * *'      # 每天北京时间 08:30 运行一次（正好重置后）
-  workflow_dispatch:          # 支持手动触发
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2          # 拿最近两次提交，用于对比
-
       - name: 找出本次改动的 m3u/txt/yaml 文件并上传
         env:
           KV_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           KV_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 获取改动的文件列表
           git diff --name-only HEAD~1 HEAD > changed.txt || echo "首次运行，上传全部"
-          
+
           if [ ! -s changed.txt ]; then
             echo "没有文件改动，跳过上传"
             exit 0
           fi
-          
-          echo "本次需要上传的文件："
+
+          echo "本次需要上传的文件：
           cat changed.txt
-          
+
           count=0
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
             [[ "$file" =~ \.(m3u|txt|yaml|yml)$ ]] || continue
-            
+
             key="${file#./}"
+            encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
+            
             echo "正在上传第 $((++count)) 个：$key"
             
-            curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$KEY" \
+            curl -X PUT "https://api.cloudflare.com/client/v4/accounts/$KV_ACCOUNT_ID/storage/kv/namespaces/$KV_NAMESPACE_ID/values/$encoded_key" \
               -H "Authorization: Bearer $KV_API_TOKEN" \
               -H "Content-Type: text/plain" \
               --data-binary @"$file" \
-              --fail --silent --show-error
-            
-            echo "上传成功！"
-            sleep 1.5   # 稳一点，每秒最多 0.6 次，免费账号永不 429
+              --fail --silent --show-error && echo "上传成功！" || echo "上传失败！"
+
+            sleep 1.5
           done < changed.txt
-          
+
           echo "全部完成！本次共上传 $count 个文件"
