@@ -1,0 +1,78 @@
+name: 智能增量同步 KV（根目录+history强制刷新，其余真正增量）
+
+on:
+  push:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 */4 * * *'    # 北京时间每4小时自动跑一次（可改成 */6 或 */3）
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 智能上传到 Cloudflare KV
+        env:
+          ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
+          NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          API_TOKEN: ${{ secrets.KV_API_TOKEN }}
+        run: |
+          # 创建一个空文件用于存放本次要上传的列表
+          : > upload_list.txt
+
+          # 1. 根目录所有文件 + history/merged.m3u 和 history/merged.txt → 强制每天刷新
+          echo "添加强制刷新文件（根目录全部 + history/merged.*）"
+          find . -maxdepth 1 -type f \( -name "*.txt" -o -name "*.m3u" -o -name "*.m3u8" -o -name "*.md" -o -name "*.json" \) -print >> upload_list.txt
+          find history -maxdepth 1 -name "merged.*" -print >> upload_list.txt 2>/dev/null || true
+
+          # 2. history/ 目录下除 merged.* 外的其他文件 → 只有新增或改动才上传（真正增量）
+          echo "添加 history/ 目录下的增量文件"
+          git diff --name-only HEAD~1 HEAD 2>/dev/null | grep "^history/" | grep -v "merged\." >> upload_list.txt || true
+
+          # 3. 如果是定时任务（schedule），额外把今天新增的历史文件也补上（防止漏）
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" ]]; then
+            echo "定时任务，补上 history/ 今天可能漏掉的新文件"
+            find history -type f ! -name "merged.*" -newer "$(date -d 'yesterday' +%Y-%m-%d)" -print >> upload_list.txt 2>/dev/null || true
+          fi
+
+          # 去重排序
+          sort -u upload_list.txt -o upload_list.txt
+
+          # 排除不需要的目录
+          grep -v -E '^(\.git|\.github|md)/' upload_list.txt > upload_list.tmp && mv upload_list.tmp upload_list.txt
+
+          if [ ! -s upload_list.txt ]; then
+            echo "没有需要上传的文件，结束"
+            exit 0
+          fi
+
+          echo "本次将上传以下文件（根目录+merged强制，其余增量）："
+          cat upload_list.txt
+
+          count=0
+          while IFS= read -r file; do
+            [[ -f "$file" ]] || continue
+            key="${file#./}"
+            encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
+
+            echo "正在上传 ($((++count))) $key"
+
+            curl -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+              -H "Authorization: Bearer $API_TOKEN" \
+              -H "Content-Type: text/plain" \
+              --data-binary @"$file" \
+              --fail --silent --show-error && echo "上传成功！" || echo "上传失败！"
+
+            sleep 1.2
+          done < upload_list.txt
+
+          echo "=========================================="
+          echo "本次同步完成！共上传 $count 个文件"
+          echo "根目录和 history/merged.* 已强制刷新"
+          echo "history/ 其他文件为真正增量上传"
+          echo "=========================================="
