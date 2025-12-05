@@ -37,4 +37,4 @@ jobs:
           git commit -m "Update httop links" || echo "No changes to commit"
 
           # 使用 TVLOGO_TOKEN 推送到 qunhui201/TVlogo 仓库
-          git push https://${TVLOGO_TOKEN}@github.com/qunhui201/TVlogo.git HEAD:main
+          git push https://${TVLOG_TOKEN}@github.com/qunhui201/TVlogo.git HEAD:main
