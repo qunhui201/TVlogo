@@ -11,7 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repository
+      # 关闭 GITHUB_TOKEN 权限，确保使用你的 PAT 推送
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,9 +29,9 @@ jobs:
         run: |
           python md/httop_crawler.py
 
-      - name: Commit and push changes to TVlogo repo
+      - name: Commit and push changes to TVlogo
         env:
-          TVLOGO_TOKEN: ${{ secrets.TVLOG_TOKEN }}
+          TVLOG_TOKEN: ${{ secrets.TVLOG_TOKEN }}
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
@@ -36,5 +39,5 @@ jobs:
           git add md/httop_links.txt
           git commit -m "Update httop links" || echo "No changes to commit"
 
-          # 使用 TVLOGO_TOKEN 推送到 qunhui201/TVlogo 仓库
+          # 使用你的 Fine-grained Token 推送到 TVlogo 仓库
           git push https://${TVLOG_TOKEN}@github.com/qunhui201/TVlogo.git HEAD:main
