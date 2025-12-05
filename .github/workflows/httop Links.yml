@@ -8,6 +8,7 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -25,10 +26,15 @@ jobs:
         run: |
           python md/httop_crawler.py
 
-      - name: Commit and push changes
+      - name: Commit and push changes to TVlogo repo
+        env:
+          TVLOGO_TOKEN: ${{ secrets.TVLOGO_TOKEN }}
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+
           git add md/httop_links.txt
           git commit -m "Update httop links" || echo "No changes to commit"
-          git push
+
+          # 使用 TVLOGO_TOKEN 推送到 qunhui201/TVlogo 仓库
+          git push https://${TVLOGO_TOKEN}@github.com/qunhui201/TVlogo.git HEAD:main
