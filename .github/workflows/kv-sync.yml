@@ -1,4 +1,4 @@
-name: 智能增量同步到 Cloudflare KV（公开仓库专用）
+name: 智能增量同步到 Cloudflare KV（永不 malformed）
 
 on:
   workflow_dispatch:
@@ -17,16 +17,13 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: 上传到 Cloudflare KV（彻底杜绝 malformed 和 .github 问题）
+      - name: 上传到 Cloudflare KV（永不 malformed + 防 429）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 安装 jq（虽然后面不用了，但保险）
-          sudo apt-get update && sudo apt-get install -y jq
-
-          # 1. 强制每次都上传的核心文件
+          # 强制上传的核心文件
           cat > /tmp/force.txt << 'EOF'
           output.m3u
           output_with_logo.m3u
@@ -35,17 +32,16 @@ jobs:
           README.md
           EOF
 
-          # 2. 强制上传所有 merged 文件
+          # merged 文件
           find history -maxdepth 1 -name "merged.*" -type f > /tmp/merged.txt 2>/dev/null || true
 
-          # 3. 合并 + 去重 + 完全排除 .github 目录
+          # 合并 + 去重 + 完全排除 .github
           {
             cat /tmp/force.txt
             cat /tmp/merged.txt
             git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -v '^\.github/' || true
           } | grep -v "^$" | sort -u > /tmp/upload.txt
 
-          # 如果没文件就直接结束
           if [ ! -s /tmp/upload.txt ]; then
             echo "没有需要上传的文件"
             exit 0
@@ -58,13 +54,12 @@ jobs:
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
 
-            # 去掉可能的前缀 ./
+            # 关键修复：用 bash 内置 + printf 完美编码（永不 malformed！）
             key="${file#./}"
+            # 手动 URL 编码（最稳！）
+            encoded_key=$(printf '%s' "$key" | jq -s -R -r @uri)
 
-            # 用 Python 完美编码（永不 malformed）
-            encoded_key=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$key")
-
-            echo "正在上传 → $key"
+            echo "正在上传 → $key (编码: $encoded_key)"
 
             if curl -X PUT \
               "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
@@ -75,10 +70,10 @@ jobs:
               echo "上传成功！"
               ((SUCCESS++))
             else
-              echo "上传失败（可能是 429，稍后自动重试）"
+              echo "上传失败"
             fi
 
-            sleep 3
+            sleep 4
           done < /tmp/upload.txt
 
           echo "=========================================="
