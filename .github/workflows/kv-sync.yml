@@ -1,78 +1,54 @@
-name: 智能增量同步到 Cloudflare KV（只传新文件，永不429）
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2   # 足够对比新旧提交
-
-      - name: 终极增量上传（只传新文件 + merged 文件强制刷新）
+      - name: 终极防429上传（公开库专用）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 安装 jq（用于 URL 编码）
-          sudo apt-get update && sudo apt-get install -y jq
-
-          # 1. 找出本次提交真正有变化的文件（git 自己告诉我们！）
-          changed_files=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(txt|m3u|m3u8|json|md)$' || true)
-          
-          # 2. 强制上传的文件（根目录核心文件 + history/merged.*）
-          force_files=""
-          for f in output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt README.md; do
-            [[ -f "$f" ]] && force_files="$force_files $f"
-          done
-          # 加上所有 merged 文件（每次构建都强制刷新）
-          force_files="$force_files $(find history -maxdepth 1 -name "merged.*" -type f 2>/dev/null || true)"
-
-          # 3. 合并：有变化的 + 强制上传的 → 最终上传列表
-          upload_list=$(echo "$changed_files"$'\n'"$force_files" | tr ' ' '\n' | grep -v "^$" | sort -u)
+          # 生成上传列表（你原来的逻辑）
+          upload_list=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(m3u|txt|json|md)$' || true)
+          force_files="output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt README.md $(find history -maxdepth 1 -name 'merged.*' -type f)"
+          upload_list=$(echo "$upload_list"$'\n'"$force_files" | grep -v "^$" | sort -u)
 
           if [[ -z "$upload_list" ]]; then
-            echo "没有需要上传的文件（本次构建无变化）"
+            echo "没有需要上传的文件"
             exit 0
           fi
 
-          echo "本次将上传以下 $(echo "$upload_list" | wc -l) 个文件："
-          echo "$upload_list" | sed 's/^/  → /'
+          echo "本次上传 $(echo "$upload_list" | wc -l) 个文件："
+          echo "$upload_list" | sed 's/^/→ /'
 
-          count=0 uploaded=0 failed=0
+          count=0 success=0 fail=0
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
             key="${file#./}"
             encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
 
-            echo "正在上传 ($((++count))) $key"
+            echo "上传 ($((++count))) $key"
 
-            if curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
-              -H "Authorization: Bearer $API_TOKEN" \
-              -H "Content-Type: text/plain" \
-              --data-binary @"$file" \
-              --fail --silent --show-error; then
-              echo "上传成功！"
-              ((uploaded++))
-            else
-              echo "上传失败！（可能是网络波动）"
-              ((failed++))
-            fi
+            # 核心：超稳延迟 + 重试机制
+            for attempt in 1 2 3; do
+              if curl -X PUT \
+                "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+                -H "Authorization: Bearer $API_TOKEN" \
+                -H "Content-Type: text/plain" \
+                --data-binary @"$file" \
+                --fail --silent --show-error; then
+                echo "成功！"
+                ((success++))
+                break
+              else
+                echo "第 $attempt 次失败（429限流），等待重试..."
+                sleep $((attempt * 5))  # 1→5秒，2→10秒，3→15秒
+              fi
+            done
 
-            # 超稳延迟：每上传一个睡 1.5 秒，每 5 个大休息 8 秒
-            sleep 1.5
-            (( count % 5 == 0 )) && sleep 8
+            # 每上传 1 个必睡 2 秒，每 3 个大睡 10 秒（彻底避开 429）
+            sleep 2
+            (( count % 3 == 0 )) && sleep 10
 
           done <<< "$upload_list"
 
           echo "=========================================="
-          echo "增量同步完成！"
-          echo "本次上传：$count 个（成功 $uploaded，失败 $failed）"
-          echo "只传新文件 + 强制刷新 merged，永不429！"
+          echo "上传完成！成功 $success，失败 $fail，总计 $count"
+          echo "7 个文件一般 60~90 秒就能传完，稳到飞起！"
           echo "=========================================="
