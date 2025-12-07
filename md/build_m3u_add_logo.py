@@ -6,7 +6,7 @@ INPUT_FILE = "output.m3u"
 OUTPUT_FILE = "output_with_logo.m3u"
 MISSING_LOGO_FILE = "missing_logos.txt"
 TVLOGO_DIR = Path("TVlogo_Images")
-BASE_LOGO_URL = "https://cdn.jsdelivr.net/gh/qunhui201/logo@TVlogo_Images"
+BASE_LOGO_URL = "https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images"
 PROVINCES = [
     "北京", "上海", "天津", "重庆", "辽宁", "吉林", "黑龙江", "江苏", "浙江", "安徽",
     "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "广西", "海南", "四川",
