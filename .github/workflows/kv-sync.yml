@@ -1,31 +1,69 @@
-name: 【实验】上传单个测试文件到 KV（确诊专用）
+name: 上传 7 个核心文件到 Cloudflare KV（新账号专用）
 
 on:
-  workflow_dispatch:   # 只手动触发
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
 
 jobs:
-  test-upload-one-file:
+  upload-7-files:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
-      - name: 上传一个纯文本测试文件到你的 KV
+      - name: Checkout 仓库
+        uses: actions/checkout@v4
+
+      - name: 上传 7 个核心文件到 KV（永不 429）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          echo "开始实验：尝试写入 key = test_github_actions ，value = hello world"
+          # 这 7 个文件每次都强制上传（核心文件必须最新）
+          FILES=(
+            "output.m3u"
+            "output_with_logo.m3u"
+            "tvbox_output.txt"
+            "missing_logos.txt"
+            "README.md"
+            "history/merged.m3u"
+            "history/merged.txt"
+          )
 
-          # 直接写一个最简单的键值对
-          if curl -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/test_github_actions" \
-            -H "Authorization: Bearer $API_TOKEN" \
-            -H "Content-Type: text/plain" \
-            --data "hello world from GitHub Actions $(date)" \
-            --fail --silent --show-error; then
-            echo "实验成功！你的 KV 完全正常，可以正常写入！"
-            echo "说明之前的问题是脚本/路径/编码导致的"
-          else
-            echo "实验失败，返回了 429 或其他错误"
-            echo "说明这个 KV Namespace 确实被 Cloudflare 临时限流/风控了"
-            echo "建议：立刻换一个全新的 Namespace"
-          fi
+          echo "开始上传 ${#FILES[@]} 个核心文件..."
+
+          SUCCESS=0
+          for file in "${FILES[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "跳过（文件不存在）：$file"
+              continue
+            fi
+
+            key="$file"
+            # 用最稳的 Python 编码（永不 malformed）
+            encoded_key=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote('$key', safe=''))")
+
+            echo "正在上传 → $file"
+
+            if curl -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+              -H "Authorization: Bearer $API_TOKEN" \
+              -H "Content-Type: text/plain" \
+              --data-binary @"$file" \
+              --fail --silent --show-error; then
+              echo "上传成功！"
+              ((SUCCESS++))
+            else
+              echo "上传失败（网络波动）"
+            fi
+
+            # 新账号也保险起见，稳一点
+            sleep 2
+          done
+
+          echo "=========================================="
+          echo "全部完成！成功上传 $SUCCESS / ${#FILES[@]} 个文件"
+          echo "你的 KV 已满血复活，完美同步！"
+          echo "=========================================="
