@@ -1,4 +1,4 @@
-name: 上传 7 个核心文件到 Cloudflare KV（新账号专用）
+name: 上传7个核心文件（新账号专用·永不429·永不malformed）
 
 on:
   workflow_dispatch:
@@ -6,22 +6,21 @@ on:
     branches: [ main, master ]
 
 jobs:
-  upload-7-files:
+  upload:
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
-      - name: Checkout 仓库
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 上传 7 个核心文件到 KV（永不 429）
+      - name: 上传7个核心文件（最稳版）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 这 7 个文件每次都强制上传（核心文件必须最新）
+          # 必须的7个文件
           FILES=(
             "output.m3u"
             "output_with_logo.m3u"
@@ -32,23 +31,24 @@ jobs:
             "history/merged.txt"
           )
 
-          echo "开始上传 ${#FILES[@]} 个核心文件..."
+          echo "开始上传 ${#FILES[@]} 个文件..."
 
           SUCCESS=0
           for file in "${FILES[@]}"; do
             if [[ ! -f "$file" ]]; then
-              echo "跳过（文件不存在）：$file"
+              echo "跳过（不存在）：$file"
               continue
             fi
 
             key="$file"
-            # 用最稳的 Python 编码（永不 malformed）
-            encoded_key=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote('$key', safe=''))")
 
-            echo "正在上传 → $file"
+            # 关键：改用 Cloudflare 官方推荐的 base64 方式，完全避开 URL 编码问题！
+            encoded_key=$(echo -n "$key" | base64)
+
+            echo "正在上传 → $key (base64 key: $encoded_key)"
 
             if curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key?base64_key=true" \
               -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
               --data-binary @"$file" \
@@ -56,14 +56,12 @@ jobs:
               echo "上传成功！"
               ((SUCCESS++))
             else
-              echo "上传失败（网络波动）"
+              echo "上传失败"
             fi
 
-            # 新账号也保险起见，稳一点
-            sleep 2
+            sleep 2.5
           done
 
           echo "=========================================="
-          echo "全部完成！成功上传 $SUCCESS / ${#FILES[@]} 个文件"
-          echo "你的 KV 已满血复活，完美同步！"
+          echo "全部完成！成功 $SUCCESS / ${#FILES[@]} 个文件"
           echo "=========================================="
