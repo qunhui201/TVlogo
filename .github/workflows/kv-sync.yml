@@ -1,10 +1,3 @@
-name: 上传7个核心文件（新账号专用·永不429·永不malformed）
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
-
 jobs:
   upload:
     runs-on: ubuntu-latest
@@ -33,16 +26,17 @@ jobs:
           for file in "${FILES[@]}"; do
             [[ ! -f "$file" ]] && { echo "跳过（不存在）：$file"; continue; }
 
-            key="${file#./}"  # 去掉开头的 ./
+            # KV Key 不需要开头的 './'，这里确保去除
+            key="${file#./}"
             
-            # 关键：用最最最稳的 Python 编码（实测永不 malformed）
-            encoded_key=$(python3 - << 'PY'
-import urllib.parse
-import sys
-key = sys.argv[1]
-print(urllib.parse.quote(key, safe=''))
-PY
-            "$key")
+            # 【核心修正】: 使用 Python 脚本进行 URL 编码，并将结果赋值给变量
+            encoded_key=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${key}', safe=''))")
+
+            # 检查编码结果，如果 Python 脚本失败，encoded_key可能为空
+            if [[ -z "$encoded_key" ]]; then
+                echo "错误：Python 编码失败或结果为空，跳过 $key"
+                continue
+            fi
 
             echo "正在上传 → $key (编码后: $encoded_key)"
 
@@ -62,5 +56,5 @@ PY
           done
 
           echo "=========================================="
-          echo "全部完成！成功 $SUCCESS / ${#FILES[@]} 个文件"
+          echo "全部完成！成功 $SUCCESS / ${#FILES[@]} 个文件"        
           echo "=========================================="
