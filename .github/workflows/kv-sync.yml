@@ -1,66 +1,31 @@
-name: 验证 Cloudflare KV Token 权限（一键三连）
+name: 【实验】上传单个测试文件到 KV（确诊专用）
 
 on:
-  workflow_dispatch:   # 只支持手动触发
+  workflow_dispatch:   # 只手动触发
 
 jobs:
-  validate:
+  test-upload-one-file:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. 验证 Account ID 是否正确
-        env:
-          ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
-        run: |
-          echo "正在验证 Account ID: $ACCOUNT_ID"
-          if [[ -z "$ACCOUNT_ID" ]]; then
-            echo "Account ID 为空！请检查 Secrets"
-            exit 1
-          fi
-          echo "Account ID 格式正常"
-
-      - name: 2. 验证 API Token 是否能正常认证
-        env:
-          API_TOKEN: ${{ secrets.KV_API_TOKEN }}
-        run: |
-          echo "正在验证 API Token 是否有效..."
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer $API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/user/tokens/verify")
-          
-          if [[ "$RESPONSE" == "200" ]]; then
-            echo "API Token 认证成功！"
-          else
-            echo "API Token 无效或无权限！状态码: $RESPONSE"
-            exit 1
-          fi
-
-      - name: 3. 验证是否拥有指定 KV Namespace 的读写权限
+      - name: 上传一个纯文本测试文件到你的 KV
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          echo "正在验证对 KV Namespace ($NAMESPACE_ID) 的读写权限..."
-          
-          # 先读（GET）
-          GET=$(curl -s -X GET \
-            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID" \
-            -H "Authorization: Bearer $API_TOKEN")
-          
-          # 再尝试写一个测试键（会自动覆盖，无副作用）
-          WRITE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/__github_actions_test_key__" \
+          echo "开始实验：尝试写入 key = test_github_actions ，value = hello world"
+
+          # 直接写一个最简单的键值对
+          if curl -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/test_github_actions" \
             -H "Authorization: Bearer $API_TOKEN" \
             -H "Content-Type: text/plain" \
-            --data "test")
-
-          echo "$GET" | jq .
-
-          if [[ "$WRITE" == "200" ]]; then
-            echo "全部验证通过！你的 3 个 Secrets 完全正确且拥有 KV 读写权限！"
-            echo "可以放心使用上传脚本了！"
+            --data "hello world from GitHub Actions $(date)" \
+            --fail --silent --show-error; then
+            echo "实验成功！你的 KV 完全正常，可以正常写入！"
+            echo "说明之前的问题是脚本/路径/编码导致的"
           else
-            echo "写权限验证失败！状态码: $WRITE"
-            echo "请检查 Token 是否勾选了：Account → Workers KV Storage → Edit"
-            exit 1
+            echo "实验失败，返回了 429 或其他错误"
+            echo "说明这个 KV Namespace 确实被 Cloudflare 临时限流/风控了"
+            echo "建议：立刻换一个全新的 Namespace"
           fi
