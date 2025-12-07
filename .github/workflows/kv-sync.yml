@@ -1,66 +1,95 @@
-      - name: 终极防 malformed + 防429 上传
+name: 智能增量同步到 Cloudflare KV（公开仓库专用）
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout 仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 终极安全上传（防 malformed + 防 429）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
+          # 安装 jq
           sudo apt-get update && sudo apt-get install -y jq
 
-          # 正确做法：用数组或换行，避免空格连在一起
-          changed=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+          # 1. 找出 git 这次真正改动的文件
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
 
-          # 强制上传的文件（每行一个！）
-          printf "%s\n" \
-            "output.m3u" \
-            "output_with_logo.m3u" \
-            "tvbox_output.txt" \
-            "missing_logos.txt" \
-            "README.md" > force_files.txt
+          # 2. 强制每次都上传的核心文件（每行一个！）
+          cat > force.txt << 'EOF'
+          output.m3u
+          output_with_logo.m3u
+          tvbox_output.txt
+          missing_logos.txt
+          README.md
+          EOF
 
-          # merged 文件也每行一个
-          find history -maxdepth 1 -name "merged.*" -type f -printf "%f\n" 2>/dev/null | sed 's|^|history/|' > merged_files.txt
+          # 3. 强制上传所有 merged 文件
+          find history -maxdepth 1 -name "merged.*" -type f | sed 's|^\./||' > merged.txt 2>/dev/null || true
 
-          # 合并 + 去重 → 最终上传列表
-          upload_list=$(cat force_files.txt merged_files.txt <(echo "$changed") | grep -v "^$" | sort -u)
+          # 4. 合并 + 去重 → 最终要上传的列表
+          {
+            echo "$CHANGED"
+            cat force.txt
+            cat merged.txt
+          } | grep -v "^$" | sort -u > upload_list.txt
 
-          if [[ -z "$upload_list" ]]; then
-            echo "没有需要上传的文件"
+          # 如果没东西要传就直接结束
+          if [ ! -s upload_list.txt ]; then
+            echo "没有需要上传的文件，本次结束"
             exit 0
           fi
 
-          echo "本次将上传 $(echo "$upload_list" | wc -l) 个文件："
-          echo "$upload_list" | sed 's/^/  → /'
+          echo "本次将上传 $(wc -l < upload_list.txt) 个文件："
+          cat upload_list.txt | sed 's/^/  → /'
 
-          count=0 success=0 fail=0
+          # 5. 开始上传（每文件独立处理，永不 malformed）
+          SUCCESS=0
+          FAIL=0
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
 
-            key="${file#./}"
-            # 关键修复：先清理 key，再编码
-            key=$(echo "$key" | sed 's/^[.]\///')  # 去掉开头的 ./
-            encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
+            # 清理路径（去掉开头的 ./）
+            KEY=$(echo "$file" | sed 's|^\./||')
+            ENCODED=$(printf '%s' "$KEY" | jq -Rr @uri)
 
-            echo "正在上传 ($((++count))) $key → $encoded_key"
+            echo "正在上传 → $KEY"
 
-            for attempt in 1 2 3; do
+            for i in 1 2 3; do
               if curl -X PUT \
-                "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+                "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$ENCODED" \
                 -H "Authorization: Bearer $API_TOKEN" \
                 -H "Content-Type: text/plain" \
                 --data-binary @"$file" \
                 --fail --silent --show-error; then
                 echo "上传成功！"
-                ((success++))
+                ((SUCCESS++))
                 break
               else
-                echo "第 $attempt 次失败，等待重试..."
-                sleep $((attempt * 8))
+                echo "第 $i 次失败，等待重试..."
+                sleep $((i * 8))
               fi
             done
 
             sleep 2.5
-            (( count % 3 == 0 )) && sleep 15
+            (( $(wc -l < upload_list.txt) - SUCCESS - FAIL > 0 && (SUCCESS + FAIL) % 3 == 0 )) && sleep 15
 
-          done <<< "$upload_list"
+          done < upload_list.txt
 
-          echo "上传完成！成功 $success，失败 $fail"
+          echo "=========================================="
+          echo "全部完成！成功 $SUCCESS，失败 $FAIL"
+          echo "=========================================="
