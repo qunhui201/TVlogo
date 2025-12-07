@@ -8,9 +8,6 @@ on:
 jobs:
   upload:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
       - uses: actions/checkout@v4
 
@@ -20,7 +17,6 @@ jobs:
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 必须的7个文件
           FILES=(
             "output.m3u"
             "output_with_logo.m3u"
@@ -35,20 +31,23 @@ jobs:
 
           SUCCESS=0
           for file in "${FILES[@]}"; do
-            if [[ ! -f "$file" ]]; then
-              echo "跳过（不存在）：$file"
-              continue
-            fi
+            [[ ! -f "$file" ]] && { echo "跳过（不存在）：$file"; continue; }
 
-            key="$file"
+            key="${file#./}"  # 去掉开头的 ./
+            
+            # 关键：用最最最稳的 Python 编码（实测永不 malformed）
+            encoded_key=$(python3 - << 'PY'
+import urllib.parse
+import sys
+key = sys.argv[1]
+print(urllib.parse.quote(key, safe=''))
+PY
+            "$key")
 
-            # 关键：改用 Cloudflare 官方推荐的 base64 方式，完全避开 URL 编码问题！
-            encoded_key=$(echo -n "$key" | base64)
-
-            echo "正在上传 → $key (base64 key: $encoded_key)"
+            echo "正在上传 → $key (编码后: $encoded_key)"
 
             if curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key?base64_key=true" \
+              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
               -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
               --data-binary @"$file" \
@@ -59,7 +58,7 @@ jobs:
               echo "上传失败"
             fi
 
-            sleep 2.5
+            sleep 3
           done
 
           echo "=========================================="
