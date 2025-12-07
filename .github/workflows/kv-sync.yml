@@ -1,81 +1,66 @@
-name: 智能增量同步到 Cloudflare KV（永不 malformed）
+name: 验证 Cloudflare KV Token 权限（一键三连）
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
+  workflow_dispatch:   # 只支持手动触发
 
 jobs:
-  sync:
+  validate:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
-      - name: Checkout 仓库
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+      - name: 1. 验证 Account ID 是否正确
+        env:
+          ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
+        run: |
+          echo "正在验证 Account ID: $ACCOUNT_ID"
+          if [[ -z "$ACCOUNT_ID" ]]; then
+            echo "Account ID 为空！请检查 Secrets"
+            exit 1
+          fi
+          echo "Account ID 格式正常"
 
-      - name: 上传到 Cloudflare KV（永不 malformed + 防 429）
+      - name: 2. 验证 API Token 是否能正常认证
+        env:
+          API_TOKEN: ${{ secrets.KV_API_TOKEN }}
+        run: |
+          echo "正在验证 API Token 是否有效..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/user/tokens/verify")
+          
+          if [[ "$RESPONSE" == "200" ]]; then
+            echo "API Token 认证成功！"
+          else
+            echo "API Token 无效或无权限！状态码: $RESPONSE"
+            exit 1
+          fi
+
+      - name: 3. 验证是否拥有指定 KV Namespace 的读写权限
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 强制上传的核心文件
-          cat > /tmp/force.txt << 'EOF'
-          output.m3u
-          output_with_logo.m3u
-          tvbox_output.txt
-          missing_logos.txt
-          README.md
-          EOF
+          echo "正在验证对 KV Namespace ($NAMESPACE_ID) 的读写权限..."
+          
+          # 先读（GET）
+          GET=$(curl -s -X GET \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID" \
+            -H "Authorization: Bearer $API_TOKEN")
+          
+          # 再尝试写一个测试键（会自动覆盖，无副作用）
+          WRITE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/__github_actions_test_key__" \
+            -H "Authorization: Bearer $API_TOKEN" \
+            -H "Content-Type: text/plain" \
+            --data "test")
 
-          # merged 文件
-          find history -maxdepth 1 -name "merged.*" -type f > /tmp/merged.txt 2>/dev/null || true
+          echo "$GET" | jq .
 
-          # 合并 + 去重 + 完全排除 .github
-          {
-            cat /tmp/force.txt
-            cat /tmp/merged.txt
-            git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -v '^\.github/' || true
-          } | grep -v "^$" | sort -u > /tmp/upload.txt
-
-          if [ ! -s /tmp/upload.txt ]; then
-            echo "没有需要上传的文件"
-            exit 0
+          if [[ "$WRITE" == "200" ]]; then
+            echo "全部验证通过！你的 3 个 Secrets 完全正确且拥有 KV 读写权限！"
+            echo "可以放心使用上传脚本了！"
+          else
+            echo "写权限验证失败！状态码: $WRITE"
+            echo "请检查 Token 是否勾选了：Account → Workers KV Storage → Edit"
+            exit 1
           fi
-
-          echo "本次将上传 $(wc -l < /tmp/upload.txt) 个文件："
-          cat /tmp/upload.txt | sed 's/^/  → /'
-
-          SUCCESS=0
-          while IFS= read -r file; do
-            [[ -f "$file" ]] || continue
-
-            # 关键修复：用 bash 内置 + printf 完美编码（永不 malformed！）
-            key="${file#./}"
-            # 手动 URL 编码（最稳！）
-            encoded_key=$(printf '%s' "$key" | jq -s -R -r @uri)
-
-            echo "正在上传 → $key (编码: $encoded_key)"
-
-            if curl -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
-              -H "Authorization: Bearer $API_TOKEN" \
-              -H "Content-Type: text/plain" \
-              --data-binary @"$file" \
-              --fail --silent --show-error; then
-              echo "上传成功！"
-              ((SUCCESS++))
-            else
-              echo "上传失败"
-            fi
-
-            sleep 4
-          done < /tmp/upload.txt
-
-          echo "=========================================="
-          echo "全部完成！成功 $SUCCESS 个文件"
-          echo "=========================================="
