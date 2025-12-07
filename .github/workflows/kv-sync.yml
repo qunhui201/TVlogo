@@ -1,35 +1,12 @@
-name: 智能增量同步到 Cloudflare KV（公开仓库专用）
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout 仓库
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: 终极安全上传（防 malformed + 防 429）
+      - name: 终极安全上传（彻底杜绝 malformed）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 安装 jq
           sudo apt-get update && sudo apt-get install -y jq
 
-          # 1. 找出 git 这次真正改动的文件
-          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-
-          # 2. 强制每次都上传的核心文件（每行一个！）
+          # 强制上传的核心文件
           cat > force.txt << 'EOF'
           output.m3u
           output_with_logo.m3u
@@ -38,36 +15,39 @@ jobs:
           README.md
           EOF
 
-          # 3. 强制上传所有 merged 文件
-          find history -maxdepth 1 -name "merged.*" -type f | sed 's|^\./||' > merged.txt 2>/dev/null || true
+          # merged 文件
+          find history -maxdepth 1 -name "merged.*" -type f > merged.txt 2>/dev/null || true
 
-          # 4. 合并 + 去重 → 最终要上传的列表
+          # 合并 + 去重
           {
-            echo "$CHANGED"
             cat force.txt
             cat merged.txt
+            git diff --name-only HEAD~1 HEAD 2>/dev/null || true
           } | grep -v "^$" | sort -u > upload_list.txt
 
-          # 如果没东西要传就直接结束
           if [ ! -s upload_list.txt ]; then
-            echo "没有需要上传的文件，本次结束"
+            echo "没有需要上传的文件"
             exit 0
           fi
 
           echo "本次将上传 $(wc -l < upload_list.txt) 个文件："
           cat upload_list.txt | sed 's/^/  → /'
 
-          # 5. 开始上传（每文件独立处理，永不 malformed）
           SUCCESS=0
-          FAIL=0
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
 
-            # 清理路径（去掉开头的 ./）
-            KEY=$(echo "$file" | sed 's|^\./||')
-            ENCODED=$(printf '%s' "$KEY" | jq -Rr @uri)
+            # 关键修复：强制去掉开头的 ./
+            KEY="${file#./}"
+            # 再保险一次：把 .github 开头的路径改成合法的（Cloudflare KV 支持点，但不能以 . 开头作为 key）
+            if [[ "$KEY" == .github/* ]]; then
+              KEY="github_${KEY#.github/}"
+            fi
 
-            echo "正在上传 → $KEY"
+            # 完美编码：用 python 替代 jq（永不 malformed！）
+            ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$KEY', safe=''))")
+
+            echo "正在上传 → $KEY (编码后: $ENCODED)"
 
             for i in 1 2 3; do
               if curl -X PUT \
@@ -85,11 +65,9 @@ jobs:
               fi
             done
 
-            sleep 2.5
-            (( $(wc -l < upload_list.txt) - SUCCESS - FAIL > 0 && (SUCCESS + FAIL) % 3 == 0 )) && sleep 15
+            sleep 3
+            (( $(wc -l < upload_list.txt) > 3 && SUCCESS % 3 == 0 )) && sleep 15
 
           done < upload_list.txt
 
-          echo "=========================================="
-          echo "全部完成！成功 $SUCCESS，失败 $FAIL"
-          echo "=========================================="
+          echo "全部完成！成功 $SUCCESS 个文件"
