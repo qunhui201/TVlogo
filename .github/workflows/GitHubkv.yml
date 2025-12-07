@@ -11,4 +11,4 @@ jobs:
     steps:
       - name: 触发同步请求
         run: |
-          curl -X GET "https://2222.yuye.qzz.io/sync"
+          curl -X GET "https://live.yuye.qzz.io/sync"
