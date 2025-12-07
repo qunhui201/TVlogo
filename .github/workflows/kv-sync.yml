@@ -1,3 +1,10 @@
+name: 上传7个核心文件（新账号专用·永不429·永不malformed）
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
 jobs:
   upload:
     runs-on: ubuntu-latest
@@ -26,13 +33,11 @@ jobs:
           for file in "${FILES[@]}"; do
             [[ ! -f "$file" ]] && { echo "跳过（不存在）：$file"; continue; }
 
-            # KV Key 不需要开头的 './'，这里确保去除
             key="${file#./}"
             
-            # 【核心修正】: 使用 Python 脚本进行 URL 编码，并将结果赋值给变量
+            # 使用 Python 进行 URL 编码 (单行命令，避免 Heredoc 语法错误)
             encoded_key=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${key}', safe=''))")
 
-            # 检查编码结果，如果 Python 脚本失败，encoded_key可能为空
             if [[ -z "$encoded_key" ]]; then
                 echo "错误：Python 编码失败或结果为空，跳过 $key"
                 continue
