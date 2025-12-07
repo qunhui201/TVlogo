@@ -7,9 +7,6 @@ on:
         description: '本次同步备注（可选）'
         required: false
         default: '手动触发同步'
-  schedule:
-    - cron: "30 */6 * * *" # 每隔 6 小时自动运行一次
-
 jobs:
   build_and_sync:
     runs-on: ubuntu-latest
