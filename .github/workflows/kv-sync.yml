@@ -1,4 +1,4 @@
-name: 上传7个核心文件（新账号专用·永不429·永不malformed）
+name: 上传7个核心文件（修复空字符版）
 
 on:
   workflow_dispatch:
@@ -11,12 +11,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 上传7个核心文件（最稳版）
+      - name: 上传7个核心文件
         env:
-          ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
-          NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
-          API_TOKEN: ${{ secrets.KV_API_TOKEN }}
+          # 直接读取 Secrets
+          RAW_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
+          RAW_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          RAW_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
+          # =======================================================
+          # 1. 清洗 Secrets (去除所有空格、换行符) - 关键修复步骤
+          # =======================================================
+          ACCOUNT_ID=$(echo "$RAW_ACCOUNT_ID" | tr -d '[:space:]')
+          NAMESPACE_ID=$(echo "$RAW_NAMESPACE_ID" | tr -d '[:space:]')
+          API_TOKEN=$(echo "$RAW_API_TOKEN" | tr -d '[:space:]')
+
+          # 2. 检查是否为空 (调试信息)
+          echo "正在检查配置..."
+          if [[ -z "$ACCOUNT_ID" ]]; then echo "❌ 错误: KV_ACCOUNT_ID 为空！"; exit 1; fi
+          if [[ -z "$NAMESPACE_ID" ]]; then echo "❌ 错误: KV_NAMESPACE_ID 为空！"; exit 1; fi
+          if [[ -z "$API_TOKEN" ]]; then echo "❌ 错误: KV_API_TOKEN 为空！"; exit 1; fi
+          
+          # 打印部分 ID 以确认无空格 (例如只显示前3位)
+          echo "Account ID (前3位): ${ACCOUNT_ID:0:3}..."
+          echo "Namespace ID (前3位): ${NAMESPACE_ID:0:3}..."
+
           FILES=(
             "output.m3u"
             "output_with_logo.m3u"
@@ -27,6 +45,7 @@ jobs:
             "history/merged.txt"
           )
 
+          echo "------------------------------------------"
           echo "开始上传 ${#FILES[@]} 个文件..."
 
           SUCCESS=0
@@ -35,29 +54,34 @@ jobs:
 
             key="${file#./}"
             
-            # 使用 Python 进行 URL 编码 (单行命令，避免 Heredoc 语法错误)
-            encoded_key=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${key}', safe=''))")
+            # 使用 Python 进行 URL 编码 (使用 sys.stdout.write 避免末尾产生新换行)
+            encoded_key=$(python3 -c "import urllib.parse, sys; sys.stdout.write(urllib.parse.quote('${key}', safe=''))")
 
-            if [[ -z "$encoded_key" ]]; then
-                echo "错误：Python 编码失败或结果为空，跳过 $key"
-                continue
-            fi
+            echo "正在上传 → $key"
 
-            echo "正在上传 → $key (编码后: $encoded_key)"
-
-            if curl -X PUT \
+            # 3. 执行上传
+            # 注意：这里的 URL 变量已经使用了清洗过的 ACCOUNT_ID 和 NAMESPACE_ID
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
               "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
               -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
-              --data-binary @"$file" \
-              --fail --silent --show-error; then
-              echo "上传成功！"
+              --data-binary @"$file")
+
+            if [[ "$HTTP_CODE" == "200" ]]; then
+              echo "✅ 上传成功"
               ((SUCCESS++))
             else
-              echo "上传失败"
+              echo "❌ 上传失败 (HTTP $HTTP_CODE)"
+              # 如果失败，尝试打印一次完整的响应内容以便调试
+              curl -s -X PUT \
+                "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+                -H "Authorization: Bearer $API_TOKEN" \
+                -H "Content-Type: text/plain" \
+                --data-binary @"$file"
+              echo "" 
             fi
 
-            sleep 3
+            sleep 2
           done
 
           echo "=========================================="
