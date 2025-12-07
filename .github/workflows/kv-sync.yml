@@ -1,31 +1,59 @@
-      - name: 终极防429上传（公开库专用）
+name: 智能增量同步到 Cloudflare KV（公开仓库专用，永不429）
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout 仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 终极防429上传到 Cloudflare KV（只传新文件 + merged 强制刷新）
         env:
           ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
           NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
           API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
-          # 生成上传列表（你原来的逻辑）
-          upload_list=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(m3u|txt|json|md)$' || true)
-          force_files="output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt README.md $(find history -maxdepth 1 -name 'merged.*' -type f)"
-          upload_list=$(echo "$upload_list"$'\n'"$force_files" | grep -v "^$" | sort -u)
+          # 安装 jq（用于 URL 编码）
+          sudo apt-get update && sudo apt-get install -y jq
+
+          # 1. git 告诉我们哪些文件变了
+          changed=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+
+          # 2. 强制每次都刷新的核心文件 + merged 文件
+          force="output.m3u output_with_logo.m3u tvbox_output.txt missing_logos.txt README.md"
+          merged=$(find history -maxdepth 1 -name "merged.*" -type f 2>/dev/null || echo "")
+
+          # 3. 合并去重 → 最终上传列表
+          upload_list=$(printf "%s\n%s\n%s" "$changed" "$force" "$merged" | grep -v "^$" | sort -u)
 
           if [[ -z "$upload_list" ]]; then
-            echo "没有需要上传的文件"
+            echo "本次构建没有需要上传的文件"
             exit 0
           fi
 
-          echo "本次上传 $(echo "$upload_list" | wc -l) 个文件："
-          echo "$upload_list" | sed 's/^/→ /'
+          echo "本次将上传 $(echo "$upload_list" | wc -l) 个文件："
+          echo "$upload_list" | sed 's/^/  → /'
 
           count=0 success=0 fail=0
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
+
             key="${file#./}"
             encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
 
-            echo "上传 ($((++count))) $key"
+            echo "正在上传 ($((++count))) $key"
 
-            # 核心：超稳延迟 + 重试机制
+            # 重试3次 + 指数退避
             for attempt in 1 2 3; do
               if curl -X PUT \
                 "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
@@ -33,22 +61,22 @@
                 -H "Content-Type: text/plain" \
                 --data-binary @"$file" \
                 --fail --silent --show-error; then
-                echo "成功！"
+                echo "上传成功！"
                 ((success++))
                 break
               else
-                echo "第 $attempt 次失败（429限流），等待重试..."
-                sleep $((attempt * 5))  # 1→5秒，2→10秒，3→15秒
+                echo "第 $attempt 次失败，等待重试..."
+                sleep $((attempt * 6))
               fi
             done
 
-            # 每上传 1 个必睡 2 秒，每 3 个大睡 10 秒（彻底避开 429）
+            # 超级稳的延迟策略
             sleep 2
-            (( count % 3 == 0 )) && sleep 10
+            (( count % 3 == 0 )) && sleep 12
 
           done <<< "$upload_list"
 
           echo "=========================================="
-          echo "上传完成！成功 $success，失败 $fail，总计 $count"
-          echo "7 个文件一般 60~90 秒就能传完，稳到飞起！"
+          echo "同步完成！成功 $success，失败 $fail，总计 $count"
+          echo "公开仓库 + 防429延迟，永不被限流！"
           echo "=========================================="
