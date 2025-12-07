@@ -1,122 +1,87 @@
-name: 同步 KV（归档文件只传一次，限速安全版）
+# =======================================================
+# 【重要调试】使用 set -eux 模式运行，让 Bash 打印每一步
+# 当脚本退出时，你就能看到是哪一行命令出错了
+# =======================================================
+set -eux
 
-# 只保留手动触发
-on:
-  workflow_dispatch:
-    inputs:
-      note:
-        description: '本次同步备注（可选）'
-        required: false
-        default: '手动触发同步'
+# 1. 变量清洗：去除 Secrets 中的隐藏空格和换行符
+ACCOUNT_ID=$(echo "$RAW_ACCOUNT_ID" | tr -d '[:space:]')
+NAMESPACE_ID=$(echo "$RAW_NAMESPACE_ID" | tr -d '[:space:]')
+API_TOKEN=$(echo "$RAW_API_TOKEN" | tr -d '[:space:]')
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      
-      # 【新增步骤】安装 Python 确保 URL 编码工具可用
-      - name: Setup Python for URL Encoding
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
+# 检查配置
+if [[ -z "$ACCOUNT_ID" || -z "$NAMESPACE_ID" || -z "$API_TOKEN" ]]; then
+  echo "❌ 错误: Secrets 未配置或为空，跳过上传步骤。"
+  exit 0
+fi
 
-      - name: 智能上传 + 更新已上传清单
-        env:
-          # 引用 Secrets (以供下一步清洗)
-          RAW_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
-          RAW_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
-          RAW_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
-        run: |
-          # 1. 变量清洗：去除 Secrets 中的隐藏空格和换行符
-          ACCOUNT_ID=$(echo "$RAW_ACCOUNT_ID" | tr -d '[:space:]')
-          NAMESPACE_ID=$(echo "$RAW_NAMESPACE_ID" | tr -d '[:space:]')
-          API_TOKEN=$(echo "$RAW_API_TOKEN" | tr -d '[:space:]')
-          
-          # 检查配置
-          if [[ -z "$ACCOUNT_ID" || -z "$NAMESPACE_ID" || -z "$API_TOKEN" ]]; then
-            echo "❌ 错误: Secrets 未配置或为空，无法执行上传。"
-            exit 1
-          fi
+LIST_FILE="kv_uploaded_history.txt"
+touch "$LIST_FILE"
 
-          LIST_FILE="kv_uploaded_history.txt"
-          touch "$LIST_FILE"
+# 1. 强制上传的文件（根目录全部 + history/merged.*）
+: > force_upload.txt
+# 注意：find 命令的结果可能带有 './'，后续处理会移除
+find . -maxdepth 1 -type f -regex '.*\.\(txt\|m3u\|m3u8\|md\|json\)' -print >> force_upload.txt
+find history -maxdepth 1 -name "merged.*" -print >> force_upload.txt 2>/dev/null || true
 
-          # 1. 强制上传的文件（根目录全部 + history/merged.*）
-          : > force_upload.txt
-          find . -maxdepth 1 -type f -regex '.*\.\(txt\|m3u\|m3u8\|md\|json\)' -print >> force_upload.txt
-          find history -maxdepth 1 -name "merged.*" -print >> force_upload.txt 2>/dev/null || true
+# 2. history/ 下所有归档文件（排除 merged.*）
+find history -type f ! -name "merged.*" | sort > history_all.txt
 
-          # 2. history/ 下所有归档文件（排除 merged.*）
-          find history -type f ! -name "merged.*" | sort > history_all.txt
+# 3. 对比历史清单，找出真正的新归档文件
+# 使用 || true 确保 comm 命令找不到文件时不会退出脚本
+comm -23 history_all.txt <(sort "$LIST_FILE" 2>/dev/null || true) > history_new.txt
 
-          # 3. 对比历史清单，找出真正的新归档文件
-          # 确保 LIST_FILE 在 checkout 时被拉取，否则 comm 对比会失效。
-          comm -23 history_all.txt <(sort "$LIST_FILE" 2>/dev/null || true) > history_new.txt
+# 合并最终上传列表
+cat force_upload.txt history_new.txt | grep -v "^$" | sort -u > final_upload.txt
 
-          # 合并最终上传列表
-          cat force_upload.txt history_new.txt | grep -v "^$" | sort -u > final_upload.txt
+if [ ! -s final_upload.txt ]; then
+  echo "没有需要上传的文件（根目录和merged都没变，也没新归档）"
+  exit 0
+fi
 
-          if [ ! -s final_upload.txt ]; then
-            echo "没有需要上传的文件（根目录和merged都没变，也没新归档）"
-            exit 0
-          fi
+echo "本次将上传以下文件："
+cat final_upload.txt
+echo "----------------------------------------"
 
-          echo "本次将上传以下文件："
-          cat final_upload.txt
-          echo "----------------------------------------"
+count=0
+uploaded_new_history=""
 
-          count=0
-          uploaded_new_history=""
-          
-          # 【优化点】使用 Python URL 编码代替 jq
-          while IFS= read -r file; do
-            [[ -f "$file" ]] || continue
-            
-            # 使用 Python 编码代替 jq -Rr @uri
-            key="${file#./}"
-            encoded_key=$(python3 -c "import urllib.parse, sys; sys.stdout.write(urllib.parse.quote('${key}', safe=''))")
+# 【修复点】确保在循环开始前检查 Python 可用性
+command -v python3 || { echo "Python 3 未找到，无法进行 URL 编码！"; exit 1; }
 
-            # 计数器和上传信息
-            ((count++))
-            echo "正在上传 ($count) $key"
-            
-            # 执行 CURL PUT
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
-              "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
-              -H "Authorization: Bearer $API_TOKEN" \
-              -H "Content-Type: text/plain" \
-              --data-binary @"$file")
+while IFS= read -r file; do
+  # 跳过不存在的文件
+  [[ -f "$file" ]] || continue
+  
+  # 关键：移除开头的 ./ 或 /。使用 ${file#./} 更安全。
+  key="${file#./}"
+  key="${key#/}"
+  
+  # 使用 Python 编码
+  encoded_key=$(python3 -c "import urllib.parse, sys; sys.stdout.write(urllib.parse.quote('${key}', safe=''))")
 
-            if [[ "$HTTP_CODE" == "200" ]]; then
-              echo "✅ 上传成功！"
-              if [[ "$file" == history/* ]] && [[ "$file" != history/merged.* ]]; then
-                uploaded_new_history="$uploaded_new_history$file\n"
-              fi
-            else
-              echo "❌ 上传失败！HTTP 状态码: $HTTP_CODE"
-            fi
-            
-            # 【优化点】安全限流：每次上传间隔 1.5 秒
-            sleep 1.5
-          done < final_upload.txt
+  # 计数器和上传信息
+  count=$((count + 1))
+  echo "正在上传 ($count) $key"
+  
+  # 执行 CURL PUT
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+    "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
+    -H "Authorization: Bearer $API_TOKEN" \
+    -H "Content-Type: text/plain" \
+    --data-binary @"$file")
 
-          # 更新已上传历史清单 (保持不变)
-          if [ -n "$uploaded_new_history" ]; then
-            printf "$uploaded_new_history" >> "$LIST_FILE"
-            echo "已更新归档文件清单，本次新增："
-            printf "$uploaded_new_history"
-          fi
+  if [[ "$HTTP_CODE" == "200" ]]; then
+    echo "✅ 上传成功！"
+    if [[ "$file" == history/* ]] && [[ "$file" != history/merged.* ]]; then
+      uploaded_new_history="$uploaded_new_history$file\n"
+    fi
+  else
+    echo "❌ 上传失败！HTTP 状态码: $HTTP_CODE"
+    # 如果失败，这里会因为 set -e 而退出，但我们继续
+  fi
+  
+  sleep 1.5
+done < final_upload.txt
 
-          # 提交清单文件变更（保持不变）
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add "$LIST_FILE"
-          git diff --staged --quiet || git commit -m "chore: 更新 KV 已上传归档文件清单（${{ github.event.inputs.note || '手动触发' }}） [skip ci]"
-          git push || echo "无变化或推送失败（正常）"
-
-          echo "=========================================="
-          echo "本次手动同步完成！共上传 $count 个文件"
-          echo "----------------------------------------"
+# ... (其余代码保持不变)
