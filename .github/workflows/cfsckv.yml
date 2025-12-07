@@ -1,9 +1,8 @@
-name: 同步 KV（归档文件只传一次）
+name: 同步 KV（归档文件只传一次，限速安全版）
 
 # 只保留手动触发
 on:
   workflow_dispatch:
-    # 可选：加个输入框，让手动触发时可以写点备注（不写也行）
     inputs:
       note:
         description: '本次同步备注（可选）'
@@ -17,13 +16,31 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
+      
+      # 【新增步骤】安装 Python 确保 URL 编码工具可用
+      - name: Setup Python for URL Encoding
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
 
       - name: 智能上传 + 更新已上传清单
         env:
-          ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
-          NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
-          API_TOKEN: ${{ secrets.KV_API_TOKEN }}
+          # 引用 Secrets (以供下一步清洗)
+          RAW_ACCOUNT_ID: ${{ secrets.KV_ACCOUNT_ID }}
+          RAW_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
+          RAW_API_TOKEN: ${{ secrets.KV_API_TOKEN }}
         run: |
+          # 1. 变量清洗：去除 Secrets 中的隐藏空格和换行符
+          ACCOUNT_ID=$(echo "$RAW_ACCOUNT_ID" | tr -d '[:space:]')
+          NAMESPACE_ID=$(echo "$RAW_NAMESPACE_ID" | tr -d '[:space:]')
+          API_TOKEN=$(echo "$RAW_API_TOKEN" | tr -d '[:space:]')
+          
+          # 检查配置
+          if [[ -z "$ACCOUNT_ID" || -z "$NAMESPACE_ID" || -z "$API_TOKEN" ]]; then
+            echo "❌ 错误: Secrets 未配置或为空，无法执行上传。"
+            exit 1
+          fi
+
           LIST_FILE="kv_uploaded_history.txt"
           touch "$LIST_FILE"
 
@@ -36,6 +53,7 @@ jobs:
           find history -type f ! -name "merged.*" | sort > history_all.txt
 
           # 3. 对比历史清单，找出真正的新归档文件
+          # 确保 LIST_FILE 在 checkout 时被拉取，否则 comm 对比会失效。
           comm -23 history_all.txt <(sort "$LIST_FILE" 2>/dev/null || true) > history_new.txt
 
           # 合并最终上传列表
@@ -48,38 +66,51 @@ jobs:
 
           echo "本次将上传以下文件："
           cat final_upload.txt
+          echo "----------------------------------------"
 
           count=0
           uploaded_new_history=""
+          
+          # 【优化点】使用 Python URL 编码代替 jq
           while IFS= read -r file; do
             [[ -f "$file" ]] || continue
+            
+            # 使用 Python 编码代替 jq -Rr @uri
             key="${file#./}"
-            encoded_key=$(printf '%s' "$key" | jq -Rr @uri)
-            echo "正在上传 ($((++count))) $key → KV key: $encoded_key"
-            if curl -X PUT \
+            encoded_key=$(python3 -c "import urllib.parse, sys; sys.stdout.write(urllib.parse.quote('${key}', safe=''))")
+
+            # 计数器和上传信息
+            ((count++))
+            echo "正在上传 ($count) $key"
+            
+            # 执行 CURL PUT
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
               "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/storage/kv/namespaces/$NAMESPACE_ID/values/$encoded_key" \
               -H "Authorization: Bearer $API_TOKEN" \
               -H "Content-Type: text/plain" \
-              --data-binary @"$file" \
-              --fail --silent --show-error; then
-              echo "上传成功！"
+              --data-binary @"$file")
+
+            if [[ "$HTTP_CODE" == "200" ]]; then
+              echo "✅ 上传成功！"
               if [[ "$file" == history/* ]] && [[ "$file" != history/merged.* ]]; then
                 uploaded_new_history="$uploaded_new_history$file\n"
               fi
             else
-              echo "上传失败！"
+              echo "❌ 上传失败！HTTP 状态码: $HTTP_CODE"
             fi
-            sleep 1.2
+            
+            # 【优化点】安全限流：每次上传间隔 1.5 秒
+            sleep 1.5
           done < final_upload.txt
 
-          # 更新已上传历史清单
+          # 更新已上传历史清单 (保持不变)
           if [ -n "$uploaded_new_history" ]; then
             printf "$uploaded_new_history" >> "$LIST_FILE"
             echo "已更新归档文件清单，本次新增："
             printf "$uploaded_new_history"
           fi
 
-          # 提交清单文件变更（让下次还能读到）
+          # 提交清单文件变更（保持不变）
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add "$LIST_FILE"
@@ -88,6 +119,4 @@ jobs:
 
           echo "=========================================="
           echo "本次手动同步完成！共上传 $count 个文件"
-          echo "根目录和 history/merged.* 已强制刷新"
-          echo "history/ 归档文件一生只传一次，永不重复"
-          echo "=========================================="
+          echo "----------------------------------------"
