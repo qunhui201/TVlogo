@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "30 */6 * * *"
-  push:
-    branches: [ main, master ]
-
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
