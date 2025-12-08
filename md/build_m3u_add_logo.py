@@ -70,7 +70,7 @@ def match_logo(channel_name, group_title):
     return logo_path
 
 def main():
-    output_lines = ['#EXTM3U x-tvg-url="http://httop.top/e.xml"']
+    output_lines = ['#EXTM3U x-tvg-url="https://raw.githubusercontent.com/qunhui201/iptv-api/refs/heads/master/output/epg/epg.gz"']
     missing_logos = []
 
     with open(INPUT_FILE, "r", encoding="utf-8") as f:
