@@ -296,3 +296,8 @@ history/tvbox_12070959.txt
 history/tvbox_12071000.txt
 history/tvbox_12071008.txt
 history/tvbox_12071014.txt
+history/logo12080656.m3u
+history/logo12091850.m3u
+history/logo12100152.m3u
+history/tvbox_12091850.txt
+history/tvbox_12100152.txt
