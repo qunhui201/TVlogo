@@ -2227,6 +2227,33 @@ CCTV14,http://42.48.106.195:808/hls/15/index.m3u8
 CCTV15,http://42.48.106.195:808/hls/16/index.m3u8
 CCTV17,http://42.48.106.195:808/hls/17/index.m3u8
 CCTV4,http://42.48.106.195:808/hls/125/index.m3u8
+CCTV1,http://222.160.247.75:81/hls/1/index.m3u8
+CCTV2,http://222.160.247.75:81/hls/2/index.m3u8
+CCTV3,http://222.160.247.75:81/hls/3/index.m3u8
+CCTV4,http://222.160.247.75:81/hls/4/index.m3u8
+CCTV5,http://222.160.247.75:81/hls/5/index.m3u8
+CCTV6,http://222.160.247.75:81/hls/6/index.m3u8
+CCTV7,http://222.160.247.75:81/hls/7/index.m3u8
+CCTV8,http://222.160.247.75:81/hls/8/index.m3u8
+CCTV9,http://222.160.247.75:81/hls/9/index.m3u8
+CCTV10,http://222.160.247.75:81/hls/10/index.m3u8
+CCTV11,http://222.160.247.75:81/hls/11/index.m3u8
+CCTV12,http://222.160.247.75:81/hls/12/index.m3u8
+CCTV13,http://222.160.247.75:81/hls/13/index.m3u8
+CCTV14,http://222.160.247.75:81/hls/14/index.m3u8
+CCTV15,http://222.160.247.75:81/hls/15/index.m3u8
+CCTV16,http://222.160.247.75:81/hls/16/index.m3u8
+CCTV17,http://222.160.247.75:81/hls/17/index.m3u8
+CCTV5+,http://222.160.247.75:81/hls/18/index.m3u8
+CCTV第一剧场,http://222.160.247.75:81/hls/19/index.m3u8
+CCTV风云足球,http://222.160.247.75:81/hls/20/index.m3u8
+CCTV风云音乐,http://222.160.247.75:81/hls/21/index.m3u8
+CCTV怀旧剧场,http://222.160.247.75:81/hls/22/index.m3u8
+CCTV文化精品,http://222.160.247.75:81/hls/23/index.m3u8
+CCTV兵器科技,http://222.160.247.75:81/hls/24/index.m3u8
+CCTV风云剧场,http://222.160.247.75:81/hls/25/index.m3u8
+CCTV4,http://222.160.247.75:81/hls/26/index.m3u8
+CCTV央视台球,http://222.160.247.75:81/hls/27/index.m3u8
 CCTV1,http://113.205.189.34:8082/hls/1/index.m3u8
 CCTV2,http://113.205.189.34:8082/hls/2/index.m3u8
 CCTV3,http://113.205.189.34:8082/hls/3/index.m3u8
@@ -7694,6 +7721,29 @@ CCTV15,http://171.15.151.99:9999/hls/15/index.m3u8
 三沙卫视,http://42.48.106.195:808/hls/126/index.m3u8
 康巴卫视,http://42.48.106.195:808/hls/127/index.m3u8
 延边卫视,http://42.48.106.195:808/hls/128/index.m3u8
+辽宁卫视,http://222.160.247.75:81/hls/28/index.m3u8
+黑龙江卫视,http://222.160.247.75:81/hls/29/index.m3u8
+北京卫视,http://222.160.247.75:81/hls/30/index.m3u8
+东方卫视,http://222.160.247.75:81/hls/31/index.m3u8
+浙江卫视,http://222.160.247.75:81/hls/32/index.m3u8
+江苏卫视,http://222.160.247.75:81/hls/33/index.m3u8
+安徽卫视,http://222.160.247.75:81/hls/34/index.m3u8
+东南卫视,http://222.160.247.75:81/hls/35/index.m3u8
+天津卫视,http://222.160.247.75:81/hls/36/index.m3u8
+山东卫视,http://222.160.247.75:81/hls/37/index.m3u8
+河南卫视,http://222.160.247.75:81/hls/38/index.m3u8
+河北卫视,http://222.160.247.75:81/hls/39/index.m3u8
+湖北卫视,http://222.160.247.75:81/hls/40/index.m3u8
+湖南卫视,http://222.160.247.75:81/hls/41/index.m3u8
+广东卫视,http://222.160.247.75:81/hls/42/index.m3u8
+广西卫视,http://222.160.247.75:81/hls/43/index.m3u8
+深圳卫视,http://222.160.247.75:81/hls/44/index.m3u8
+重庆卫视,http://222.160.247.75:81/hls/45/index.m3u8
+四川卫视,http://222.160.247.75:81/hls/46/index.m3u8
+江西卫视,http://222.160.247.75:81/hls/47/index.m3u8
+陕西卫视,http://222.160.247.75:81/hls/48/index.m3u8
+海南卫视,http://222.160.247.75:81/hls/49/index.m3u8
+吉林卫视,http://222.160.247.75:81/hls/50/index.m3u8
 重庆卫视,http://113.205.189.34:8082/hls/17/index.m3u8
 浙江卫视,http://113.205.189.34:8082/hls/18/index.m3u8
 江苏卫视,http://113.205.189.34:8082/hls/19/index.m3u8
@@ -11136,6 +11186,7 @@ CGTN纪录,https://httop.top/ysp-cgtnjilu
 汕头综合,http://27.41.244.232:808/hls/1/index.m3u8
 聊城综合,http://119.189.16.34:10252/hls/3/index.m3u8
 新闻综合,http://101.95.21.250:10081/hls/45/index.m3u8
+CRT 长春综合,http://222.160.247.75:81/hls/62/index.m3u8
 汕头新闻综合,http://27.41.244.148:801/hls/901/index.m3u8
 潮州综合,http://27.41.244.148:801/hls/200/index.m3u8
 揭阳综合,http://27.41.244.148:801/hls/301/index.m3u8
@@ -12263,6 +12314,11 @@ CETV-2,http://42.48.106.195:808/hls/74/index.m3u8
 四海垂钓,http://42.48.106.195:808/hls/79/index.m3u8
 天下收藏,http://42.48.106.195:808/hls/81/index.m3u8
 LDetv,http://42.48.106.195:808/hls/132/index.m3u8
+前郭TV1,http://222.160.247.75:81/hls/51/index.m3u8
+松原,http://222.160.247.75:81/hls/57/index.m3u8
+松原公共,http://222.160.247.75:81/hls/58/index.m3u8
+CETV1,http://222.160.247.75:81/hls/66/index.m3u8
+扶余,http://222.160.247.75:81/hls/67/index.m3u8
 卡酷动画,http://113.205.189.34:8082/hls/49/index.m3u8
 CGTN,http://14.154.206.175:8088/hls/18/index.m3u8
 深圳都市,http://14.154.206.175:8088/hls/20/index.m3u8
@@ -13487,6 +13543,11 @@ BTV少儿,http://114.252.112.253:8899/hls/21/index.m3u8
 湖南国际高清,http://42.48.106.195:808/hls/97/index.m3u8
 湖南公共,http://42.48.106.195:808/hls/98/index.m3u8
 山东教育,http://42.48.106.195:808/hls/131/index.m3u8
+吉林都市,http://222.160.247.75:81/hls/52/index.m3u8
+吉林综艺,http://222.160.247.75:81/hls/53/index.m3u8
+吉林影视,http://222.160.247.75:81/hls/54/index.m3u8
+吉林生活,http://222.160.247.75:81/hls/55/index.m3u8
+吉林乡村,http://222.160.247.75:81/hls/56/index.m3u8
 广东珠江,http://14.154.206.175:8088/hls/29/index.m3u8
 广东综艺,http://14.154.206.175:8088/hls/30/index.m3u8
 广东影视,http://14.154.206.175:8088/hls/32/index.m3u8
@@ -14327,6 +14388,9 @@ CHC动作电影,http://111.43.126.240:7777/hls/75/index.m3u8
 武术世界,http://42.48.106.195:808/hls/119/index.m3u8
 文物宝库,http://42.48.106.195:808/hls/120/index.m3u8
 证券服务,http://42.48.106.195:808/hls/124/index.m3u8
+都市剧场,http://222.160.247.75:81/hls/64/index.m3u8
+金鹰纪实,http://222.160.247.75:81/hls/65/index.m3u8
+环球奇观,http://222.160.247.75:81/hls/68/index.m3u8
 金鹰卡通,http://113.205.189.34:8082/hls/50/index.m3u8
 深圳财经生活,http://14.154.206.175:8088/hls/22/index.m3u8
 武术世界,http://39.164.138.145:8899/hls/31/index.m3u8
@@ -14656,6 +14720,9 @@ CHC-影迷电影,http://183.21.70.73:3388/hls/19/index.m3u8
 CHC家庭影院,http://42.48.106.195:808/hls/63/index.m3u8
 CHC高清电影,http://42.48.106.195:808/hls/64/index.m3u8
 CHC动作电影,http://42.48.106.195:808/hls/65/index.m3u8
+CHC 动作电影,http://222.160.247.75:81/hls/59/index.m3u8
+CHC 高清电影,http://222.160.247.75:81/hls/60/index.m3u8
+CHC 家庭影院,http://222.160.247.75:81/hls/61/index.m3u8
 深圳体育,http://14.154.206.175:8088/hls/24/index.m3u8
 CHC家庭影院,http://42.48.106.93:808/hls/63/index.m3u8
 CHC高清电影,http://42.48.106.93:808/hls/64/index.m3u8
@@ -14790,6 +14857,7 @@ CGTN俄罗斯语国际频道,http://42.48.106.138:808/hls/69/index.m3u8
 国学频道,http://123.14.182.189:8899/hls/32/index.m3u8
 公共频道,http://171.14.84.247:808/hls/56/index.m3u8
 翡翠台,http://27.41.244.232:808/hls/64/index.m3u8
+长影频道,http://222.160.247.75:81/hls/63/index.m3u8
 都市频道,http://39.164.138.145:8899/hls/20/index.m3u8
 文宝频道,http://39.164.138.145:8899/hls/21/index.m3u8
 法制频道,http://39.164.138.145:8899/hls/22/index.m3u8
