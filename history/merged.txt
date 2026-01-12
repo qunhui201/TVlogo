@@ -4615,6 +4615,11 @@ CCTV14,http://live1.hrtn.net/live/cctv17hd_3000.m3u8?auth_key=1761185747-0ce0eaf
 CCTV15,http://live1.hrtn.net/live/cctv14_1000.m3u8?auth_key=1761185747-25dab0d5aaa58b373739c782e3e3a1d2-0-a18cbdc23aaa23db16d754d74fde4b2a
 CCTV16,http://live1.hrtn.net/live/cctv16hd_3000.m3u8?auth_key=1761185747-7a855e6d4815d55fbb28aa174c199c62-0-1a19783e5ad7c9b0bd0d4fa04dac7ff1
 CCTV17,http://live1.hrtn.net/live/cctv14hd_3000.m3u8?auth_key=1761185747-95f4f93cae97709b6bc2bf0e39ab13a5-0-1b4786a4a619edd194e5c6d81751e50a
+CCTV2,http://218.19.108.27:808/hls/2/index.m3u8
+CCTV1,http://218.19.108.27:808/hls/1/index.m3u8
+CCTV4,http://218.19.108.27:808/hls/3/index.m3u8
+CCTV9,http://218.19.108.27:808/hls/5/index.m3u8
+CCTV5+,http://218.19.108.27:808/hls/31/index.m3u8
 CCTV1,http://222.142.186.129:8888/hls/1/index.m3u8
 CCTV2,http://222.142.186.129:8888/hls/2/index.m3u8
 CCTV3,http://222.142.186.129:8888/hls/21/index.m3u8
@@ -11019,6 +11024,10 @@ CCTV15,http://171.15.151.99:9999/hls/15/index.m3u8
 新疆卫视,http://live1.hrtn.net/live/xjws_1000.m3u8?auth_key=1761185747-45fcc166a22c0f8fb8b0a14306d630ee-0-2592bd896d3d24659705b6351ab32bf9
 西藏卫视,http://live1.hrtn.net/live/xzws_1000.m3u8?auth_key=1761185747-a857d470f93f9edaa28b9ae1513b48ca-0-522bb8bb0bb5e5aeb362bcd1401d3a02
 兵团卫视,http://live1.hrtn.net/live/btws_1000.m3u8?auth_key=1761185747-a79934fa30f1c02b38409fdda1b5a0ee-0-5b993ef5918340d9057cdf71e2077b8c
+北京卫视,http://218.19.108.27:808/hls/11/index.m3u8
+湖北卫视,http://218.19.108.27:808/hls/14/index.m3u8
+山东卫视,http://218.19.108.27:808/hls/15/index.m3u8
+黑龙江卫视,http://218.19.108.27:808/hls/16/index.m3u8
 安徽卫视,http://222.142.186.129:8888/hls/13/index.m3u8
 山东卫视,http://222.142.186.129:8888/hls/14/index.m3u8
 湖北卫视,http://222.142.186.129:8888/hls/15/index.m3u8
