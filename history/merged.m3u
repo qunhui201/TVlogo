@@ -26282,6 +26282,10 @@ http://42.180.65.141:81/hls/62/index.m3u8
 http://42.180.65.141:81/hls/63/index.m3u8
 #EXTINF:-1 tvg-name="高清电影" tvg-logo="https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/海外频道/FOX动作电影.png" group-title="海外频道",高清电影
 http://42.180.65.141:81/hls/64/index.m3u8
+#EXTINF:-1 tvg-name="Q亳州农村" tvg-logo="" group-title="其他频道",Q亳州农村
+http://120.209.208.163:5080/hls/3/index.m3u8
+#EXTINF:-1 tvg-name="Q 亳州新闻" tvg-logo="" group-title="其他频道",Q 亳州新闻
+http://120.209.208.163:5080/hls/2/index.m3u8
 #EXTINF:-1 tvg-name="湖北综合" tvg-logo="https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/湖北/湖北综合频道.png" group-title="地方频道",湖北综合
 http://live1.hrtn.net/live/hbzhhd_3000.m3u8?auth_key=1761245466-7ca1b52471eb409388a9f78af374c71f-0-f443f02a5e6a315aa0c79f584e0188e0
 #EXTINF:-1 tvg-name="湖北经视" tvg-logo="https://kenyu.ggff.net/https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/湖北/湖北经视频道.png" group-title="地方频道",湖北经视
@@ -27086,10 +27090,6 @@ http://121.33.234.76:808/hls/27/index.m3u8
 http://121.33.234.76:808/hls/22/index.m3u8
 #EXTINF:-1 tvg-name="广东新闻" tvg-logo="https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/广东/广东新闻.png" group-title="地方频道",广东新闻
 http://121.33.234.76:808/hls/23/index.m3u8
-#EXTINF:-1 tvg-name="Q亳州农村" tvg-logo="" group-title="其他频道",Q亳州农村
-http://120.209.208.163:5080/hls/3/index.m3u8
-#EXTINF:-1 tvg-name="Q 亳州新闻" tvg-logo="" group-title="其他频道",Q 亳州新闻
-http://120.209.208.163:5080/hls/2/index.m3u8
 #EXTINF:-1 tvg-name="中央一台" tvg-logo="" group-title="其他频道",中央一台
 http://119.39.224.19:808/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="中央二台" tvg-logo="" group-title="其他频道",中央二台
