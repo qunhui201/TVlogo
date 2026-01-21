@@ -27086,6 +27086,10 @@ http://121.33.234.76:808/hls/27/index.m3u8
 http://121.33.234.76:808/hls/22/index.m3u8
 #EXTINF:-1 tvg-name="广东新闻" tvg-logo="https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/广东/广东新闻.png" group-title="地方频道",广东新闻
 http://121.33.234.76:808/hls/23/index.m3u8
+#EXTINF:-1 tvg-name="Q亳州农村" tvg-logo="" group-title="其他频道",Q亳州农村
+http://120.209.208.163:5080/hls/3/index.m3u8
+#EXTINF:-1 tvg-name="Q 亳州新闻" tvg-logo="" group-title="其他频道",Q 亳州新闻
+http://120.209.208.163:5080/hls/2/index.m3u8
 #EXTINF:-1 tvg-name="中央一台" tvg-logo="" group-title="其他频道",中央一台
 http://119.39.224.19:808/hls/1/index.m3u8
 #EXTINF:-1 tvg-name="中央二台" tvg-logo="" group-title="其他频道",中央二台
@@ -28686,10 +28690,6 @@ http://39.164.138.145:9003/hls/64/index.m3u8
 http://39.164.138.145:9003/hls/66/index.m3u8
 #EXTINF:-1 tvg-name="哈哈炫动" tvg-logo="https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/数字频道/哈哈炫动.png" group-title="数字频道",哈哈炫动
 http://39.164.138.145:9003/hls/67/index.m3u8
-#EXTINF:-1 tvg-name="Q亳州农村" tvg-logo="" group-title="其他频道",Q亳州农村
-http://120.209.208.163:5080/hls/3/index.m3u8
-#EXTINF:-1 tvg-name="Q 亳州新闻" tvg-logo="" group-title="其他频道",Q 亳州新闻
-http://120.209.208.163:5080/hls/2/index.m3u8
 #EXTINF:-1 tvg-name="中国教育-1" tvg-logo="https://raw.githubusercontent.com/qunhui201/logo/main/TVlogo_Images/CGTN/1" group-title="其他频道",中国教育-1
 http://14.106.99.67:888/hls/12/index.m3u8
 #EXTINF:-1 tvg-name="CQTV影视" tvg-logo="" group-title="地方频道",CQTV影视
