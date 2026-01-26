@@ -3914,6 +3914,24 @@ CCTV12,http://123.14.46.0:9003/hls/12/index.m3u8
 CCTV13,http://123.14.46.0:9003/hls/13/index.m3u8
 CCTV14,http://123.14.46.0:9003/hls/14/index.m3u8
 CCTV15,http://123.14.46.0:9003/hls/15/index.m3u8
+CCTV1,http://hmfs.f3322.net:3388/hls/1/index.m3u8
+CCTV -2财经高清,http://hmfs.f3322.net:3388/hls/2/index.m3u8
+CCTV3,http://hmfs.f3322.net:3388/hls/3/index.m3u8
+CCTV5,http://hmfs.f3322.net:3388/hls/4/index.m3u8
+CCTV5,http://hmfs.f3322.net:3388/hls/5/index.m3u8
+CCTV13,http://hmfs.f3322.net:3388/hls/8/index.m3u8
+CCTV6,http://hmfs.f3322.net:3388/hls/16/index.m3u8
+CCTV7,http://hmfs.f3322.net:3388/hls/17/index.m3u8
+CCTV8,http://hmfs.f3322.net:3388/hls/18/index.m3u8
+CCTV4,http://hmfs.f3322.net:3388/hls/30/index.m3u8
+CCTV9,http://hmfs.f3322.net:3388/hls/31/index.m3u8
+CCTV10,http://hmfs.f3322.net:3388/hls/32/index.m3u8
+CCTV11,http://hmfs.f3322.net:3388/hls/38/index.m3u8
+CCTV12,http://hmfs.f3322.net:3388/hls/33/index.m3u8
+CCTV14,http://hmfs.f3322.net:3388/hls/34/index.m3u8
+CCTV15,http://hmfs.f3322.net:3388/hls/35/index.m3u8
+CCTV16,http://hmfs.f3322.net:3388/hls/36/index.m3u8
+CCTV17,http://hmfs.f3322.net:3388/hls/37/index.m3u8
 CCTV1,http://114.252.241.96:10443/hls/1/index.m3u8
 CCTV2,http://114.252.241.96:10443/hls/2/index.m3u8
 CCTV5,http://114.252.241.96:10443/hls/5/index.m3u8
@@ -5596,24 +5614,6 @@ CCTV-新闻,http://113.206.75.157:8082/hls/13/index.m3u8
 CCTV-少儿,http://113.206.75.157:8082/hls/14/index.m3u8
 CCTV-音乐,http://113.206.75.157:8082/hls/15/index.m3u8
 CCTV-NEWS,http://113.206.75.157:8082/hls/16/index.m3u8
-CCTV1,http://hmfs.f3322.net:3388/hls/1/index.m3u8
-CCTV -2财经高清,http://hmfs.f3322.net:3388/hls/2/index.m3u8
-CCTV3,http://hmfs.f3322.net:3388/hls/3/index.m3u8
-CCTV5,http://hmfs.f3322.net:3388/hls/4/index.m3u8
-CCTV5,http://hmfs.f3322.net:3388/hls/5/index.m3u8
-CCTV13,http://hmfs.f3322.net:3388/hls/8/index.m3u8
-CCTV6,http://hmfs.f3322.net:3388/hls/16/index.m3u8
-CCTV7,http://hmfs.f3322.net:3388/hls/17/index.m3u8
-CCTV8,http://hmfs.f3322.net:3388/hls/18/index.m3u8
-CCTV4,http://hmfs.f3322.net:3388/hls/30/index.m3u8
-CCTV9,http://hmfs.f3322.net:3388/hls/31/index.m3u8
-CCTV10,http://hmfs.f3322.net:3388/hls/32/index.m3u8
-CCTV11,http://hmfs.f3322.net:3388/hls/38/index.m3u8
-CCTV12,http://hmfs.f3322.net:3388/hls/33/index.m3u8
-CCTV14,http://hmfs.f3322.net:3388/hls/34/index.m3u8
-CCTV15,http://hmfs.f3322.net:3388/hls/35/index.m3u8
-CCTV16,http://hmfs.f3322.net:3388/hls/36/index.m3u8
-CCTV17,http://hmfs.f3322.net:3388/hls/37/index.m3u8
 CCTV1,http://119.39.198.26:808/hls/1/index.m3u8
 CCTV2,http://119.39.198.26:808/hls/2/index.m3u8
 CCTV3,http://119.39.198.26:808/hls/3/index.m3u8
@@ -10888,6 +10888,14 @@ CCTV15,http://171.15.151.99:9999/hls/15/index.m3u8
 甘肃卫视,http://123.14.46.0:9003/hls/53/index.m3u8
 青海卫视,http://123.14.46.0:9003/hls/54/index.m3u8
 新疆卫视,http://123.14.46.0:9003/hls/56/index.m3u8
+广东卫视,http://hmfs.f3322.net:3388/hls/11/index.m3u8
+大湾区卫视高清,http://hmfs.f3322.net:3388/hls/13/index.m3u8
+湖南卫视,http://hmfs.f3322.net:3388/hls/22/index.m3u8
+浙江卫视,http://hmfs.f3322.net:3388/hls/23/index.m3u8
+东方卫视,http://hmfs.f3322.net:3388/hls/24/index.m3u8
+深圳卫视,http://hmfs.f3322.net:3388/hls/25/index.m3u8
+东南卫视,http://hmfs.f3322.net:3388/hls/26/index.m3u8
+广西卫视,http://hmfs.f3322.net:3388/hls/27/index.m3u8
 北京卫视,http://114.252.241.96:10443/hls/16/index.m3u8
 湖南卫视,http://114.252.241.96:10443/hls/19/index.m3u8
 黑龙江卫视,http://114.252.241.96:10443/hls/20/index.m3u8
@@ -13245,14 +13253,6 @@ CCTV15,http://171.15.151.99:9999/hls/15/index.m3u8
 江西卫视,http://113.206.75.157:8082/hls/46/index.m3u8
 深圳卫视,http://113.206.75.157:8082/hls/47/index.m3u8
 海南卫视,http://113.206.75.157:8082/hls/48/index.m3u8
-广东卫视,http://hmfs.f3322.net:3388/hls/11/index.m3u8
-大湾区卫视高清,http://hmfs.f3322.net:3388/hls/13/index.m3u8
-湖南卫视,http://hmfs.f3322.net:3388/hls/22/index.m3u8
-浙江卫视,http://hmfs.f3322.net:3388/hls/23/index.m3u8
-东方卫视,http://hmfs.f3322.net:3388/hls/24/index.m3u8
-深圳卫视,http://hmfs.f3322.net:3388/hls/25/index.m3u8
-东南卫视,http://hmfs.f3322.net:3388/hls/26/index.m3u8
-广西卫视,http://hmfs.f3322.net:3388/hls/27/index.m3u8
 湖南卫视,http://119.39.198.26:808/hls/27/index.m3u8
 北京卫视,http://119.39.198.26:808/hls/28/index.m3u8
 深圳卫视,http://119.39.198.26:808/hls/29/index.m3u8
@@ -13506,6 +13506,7 @@ CCTV -2财经高清,http://183.21.70.172:3388/hls/2/index.m3u8
 世界地理高清,http://183.21.70.172:3388/hls/28/index.m3u8
 风云音乐高清,http://183.21.70.172:3388/hls/29/index.m3u8
 金鹰纪实高清,http://183.21.70.172:3388/hls/39/index.m3u8
+经济科教高清,http://hmfs.f3322.net:3388/hls/12/index.m3u8
 经济科教高清,http://58.255.201.97:808/hls/19/index.m3u8
 中国教育-1高清,http://58.255.201.97:808/hls/44/index.m3u8
 中央一套高清,http://183.159.127.19:808/hls/1/index.m3u8
@@ -13548,7 +13549,6 @@ CCTV -2高清,http://113.81.20.155:808/hls/2/index.m3u8
 经济科教高清,http://113.81.20.155:808/hls/19/index.m3u8
 中国教育-1高清,http://113.81.20.155:808/hls/44/index.m3u8
 武侠剧场,http://220.176.60.118:20000/hls/bf20e7f850504d97.m3u8
-经济科教高清,http://hmfs.f3322.net:3388/hls/12/index.m3u8
 📺NewTV系列,#genre#
 爱情喜剧,http://111.43.126.240:7777/hls/76/index.m3u8
 东北热剧,http://111.43.126.240:7777/hls/78/index.m3u8
@@ -13660,6 +13660,11 @@ CCTV风云足球,http://42.48.106.151:808/hls/113/index.m3u8
 CCTV风云音乐,http://42.48.106.151:808/hls/114/index.m3u8
 CCTV电视指南,http://42.48.106.151:808/hls/116/index.m3u8
 CCTV兵器科技,http://42.48.106.151:808/hls/118/index.m3u8
+风云足球高清,http://hmfs.f3322.net:3388/hls/9/index.m3u8
+风云剧场高清,http://hmfs.f3322.net:3388/hls/20/index.m3u8
+第一剧场高清,http://hmfs.f3322.net:3388/hls/21/index.m3u8
+世界地理高清,http://hmfs.f3322.net:3388/hls/28/index.m3u8
+风云音乐高清,http://hmfs.f3322.net:3388/hls/29/index.m3u8
 CCTV央视台球,http://113.227.250.189:81/hls/64/index.m3u8
 世界地理,http://171.118.206.230:9003/hls/59/index.m3u8
 央视台球,http://220.176.60.118:20000/hls/8.30E+17.m3u8
@@ -13671,11 +13676,6 @@ CCTV央视台球,http://113.227.250.189:81/hls/64/index.m3u8
 高尔夫网球,http://220.176.60.118:20000/hls/2a28bc774800bd80.m3u8
 风云足球,http://220.176.60.118:20000/hls/d77cb1896132b881.m3u8
 兵器科技,http://220.176.60.118:20000/hls/71f04be01931b768.m3u8
-风云足球高清,http://hmfs.f3322.net:3388/hls/9/index.m3u8
-风云剧场高清,http://hmfs.f3322.net:3388/hls/20/index.m3u8
-第一剧场高清,http://hmfs.f3322.net:3388/hls/21/index.m3u8
-世界地理高清,http://hmfs.f3322.net:3388/hls/28/index.m3u8
-风云音乐高清,http://hmfs.f3322.net:3388/hls/29/index.m3u8
 📺其他频道,#genre#
 bj,http://114.241.213.82:81/hls/4/index.m3u8
 ln,http://114.241.213.82:81/hls/5/index.m3u8
@@ -16421,6 +16421,10 @@ BTV少儿,http://114.252.121.120:8899/hls/21/index.m3u8
 河南国际,http://125.44.166.154:8888/hls/30/index.m3u8
 广东珠江,http://14.155.134.35:8088/hls/29/index.m3u8
 广东影视,http://14.155.134.35:8088/hls/32/index.m3u8
+广东体育高清,http://hmfs.f3322.net:3388/hls/6/index.m3u8
+广东珠江高清,http://hmfs.f3322.net:3388/hls/7/index.m3u8
+广东影视高清,http://hmfs.f3322.net:3388/hls/14/index.m3u8
+广东新闻高清,http://hmfs.f3322.net:3388/hls/15/index.m3u8
 BTV文艺高清,http://114.252.241.96:10443/hls/17/index.m3u8
 BTV体育高清,http://114.252.241.96:10443/hls/18/index.m3u8
 BTV文艺,http://114.252.241.96:10443/hls/32/index.m3u8
@@ -16846,10 +16850,6 @@ CQTV时尚,http://14.106.98.82:888/hls/16/index.m3u8
 河南新闻,http://222.142.186.129:8888/hls/28/index.m3u8
 河南公共,http://222.142.186.129:8888/hls/29/index.m3u8
 河南国际,http://222.142.186.129:8888/hls/30/index.m3u8
-广东体育高清,http://hmfs.f3322.net:3388/hls/6/index.m3u8
-广东珠江高清,http://hmfs.f3322.net:3388/hls/7/index.m3u8
-广东影视高清,http://hmfs.f3322.net:3388/hls/14/index.m3u8
-广东新闻高清,http://hmfs.f3322.net:3388/hls/15/index.m3u8
 湖南娱乐,http://119.39.198.26:808/hls/18/index.m3u8
 湖南教育,http://119.39.198.26:808/hls/21/index.m3u8
 湖南经视,http://119.39.198.26:808/hls/22/index.m3u8
@@ -17275,6 +17275,7 @@ CHC家庭影院,http://183.21.70.172:3388/hls/88/index.m3u8
 嘉佳卡通,http://123.14.46.0:9003/hls/55/index.m3u8
 文物宝库,http://123.14.46.0:9003/hls/59/index.m3u8
 金鹰卡通,http://123.14.46.0:9003/hls/60/index.m3u8
+金鹰纪实高清,http://hmfs.f3322.net:3388/hls/39/index.m3u8
 深圳财经生活,http://14.155.131.138:8088/hls/22/index.m3u8
 金鹰卡通,http://live1.hrtn.net/live/jjkt_1000.m3u8?auth_key=1761115902-bb8b95eee3a43d934485a0dfcf517a00-0-49cab92a820a00920f7328a452e8aef3
 家庭理财,http://live1.hrtn.net/live/jtlc_1000.m3u8?auth_key=1761115902-e4217f7316f71a1f76745709d902ad5b-0-026e9b6f3513f7a7f086cf2709b29500
@@ -17428,7 +17429,6 @@ BTV卡酷少儿,http://114.252.245.56:10443/hls/40/index.m3u8
 中国天气,http://live1.hrtn.net/live/zgqx_1000.m3u8?auth_key=1761185747-bb1a32dc11c4790be73362a55123b89b-0-8d255cf3703e1ea8aa01c92df7b9188b
 金鹰卡通,http://125.40.139.55:9002/hls/54/index.m3u8
 金鹰卡通,http://113.206.75.157:8082/hls/50/index.m3u8
-金鹰纪实高清,http://hmfs.f3322.net:3388/hls/39/index.m3u8
 金鹰卡通,http://119.39.198.26:808/hls/17/index.m3u8
 金鹰纪实,http://119.39.198.26:808/hls/19/index.m3u8
 金鹰卡通,http://live1.hrtn.net/live/jjkt_1000.m3u8?auth_key=1761245466-06b6fea7cfe58996da11380924a8752f-0-9f4747acc75f006d4e65fa277a5d077e
@@ -17556,6 +17556,10 @@ CHC家庭影院,http://42.237.159.180:8888/hls/65/index.m3u8
 CHC动作电影,http://42.237.159.180:8888/hls/66/index.m3u8
 CHC影迷电影,http://42.237.159.180:8888/hls/67/index.m3u8
 深圳体育,http://14.155.134.35:8088/hls/24/index.m3u8
+爱体育高清,http://hmfs.f3322.net:3388/hls/10/index.m3u8
+CHC-影迷电影,http://hmfs.f3322.net:3388/hls/19/index.m3u8
+经典电影,http://hmfs.f3322.net:3388/hls/40/index.m3u8
+4K家庭影院,http://hmfs.f3322.net:3388/hls/88/index.m3u8
 深圳体育,http://14.155.131.138:8088/hls/24/index.m3u8
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761358467-851718513e0341c8481ececc83cc4a58-0-9fd6089cbcc3822fec63fb2497159437
 家庭影院,http://175.151.205.153:81/hls/62/index.m3u8
@@ -17586,10 +17590,6 @@ CHC影迷电影,http://220.176.60.118:20000/hls/e3d37e636ec92557.m3u8
 CHC家庭影院,http://220.176.60.118:20000/hls/7b61c7bcefc21c99.m3u8
 CHC动作电影HD,http://220.176.60.118:20000/hls/fa779d96af87baa6.m3u8
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761185747-9a3134a2eddc13d89c5bec453b6eef96-0-42c6e4e465add2a58298fef4274e8200
-爱体育高清,http://hmfs.f3322.net:3388/hls/10/index.m3u8
-CHC-影迷电影,http://hmfs.f3322.net:3388/hls/19/index.m3u8
-经典电影,http://hmfs.f3322.net:3388/hls/40/index.m3u8
-4K家庭影院,http://hmfs.f3322.net:3388/hls/88/index.m3u8
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761245466-842eebd504744becb80fc0f8c94b5e36-0-1c64936450fc61a1c4ad19738ac0850c
 📺港澳地区,#genre#
 梨园频道,http://61.240.150.5:81/hls/70/index.m3u8
