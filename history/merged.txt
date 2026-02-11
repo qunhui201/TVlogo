@@ -5531,6 +5531,11 @@ CCTV14,http://live1.hrtn.net/live/cctv17hd_3000.m3u8?auth_key=1761138425-ffa52d5
 CCTV15,http://live1.hrtn.net/live/cctv14_1000.m3u8?auth_key=1761138425-83d9cb29773d2cce1cd3248ada115718-0-961e2db591fb3d9218e358404ce1b98c
 CCTV16,http://live1.hrtn.net/live/cctv16hd_3000.m3u8?auth_key=1761138425-e4c3c9308a48c616659b43817f39a903-0-05ff2a1128774d3bb0b931797de2dcd1
 CCTV17,http://live1.hrtn.net/live/cctv14hd_3000.m3u8?auth_key=1761138425-150cdf921dd07af3c7a716403635609a-0-7785145a71cb2caa08aa98c165745d3c
+CCTV2,http://218.19.108.138:808/hls/2/index.m3u8
+CCTV1,http://218.19.108.138:808/hls/1/index.m3u8
+CCTV4,http://218.19.108.138:808/hls/3/index.m3u8
+CCTV9,http://218.19.108.138:808/hls/5/index.m3u8
+CCTV5+,http://218.19.108.138:808/hls/31/index.m3u8
 CCTV1,http://live1.hrtn.net/live/cctv1hd_3000.m3u8?auth_key=1761311409-921ff11b6cfe217dc1e14ec629dba1fd-0-1d66242023a46925ddba5c758cb12cee
 CCTV2,http://live1.hrtn.net/live/cctv2hd_3000.m3u8?auth_key=1761311409-ccb476713c6f599af89c2b589f03b20e-0-f62b592d4e82b20801d89b3a47fd31f6
 CCTV3,http://live1.hrtn.net/live/cctv3hd_3000.m3u8?auth_key=1761311409-904031e9cc7d98e237a97e3fecb10846-0-2fe0cec11b94fcf20c2ae25200b67a1a
@@ -13767,6 +13772,10 @@ CCTV17,http://58.249.145.113:808/hls/16/index.m3u8
 新疆卫视,http://live1.hrtn.net/live/xjws_1000.m3u8?auth_key=1761138425-2f0b28df1a6b42109fd68b0e3e9abdc6-0-2b00382aa9b608309e71e22850eb51c4
 西藏卫视,http://live1.hrtn.net/live/xzws_1000.m3u8?auth_key=1761138425-d7bfca303a4920b0bb655b9999c968f9-0-e6f4356e0aa38e079459773eeff4aac0
 兵团卫视,http://live1.hrtn.net/live/btws_1000.m3u8?auth_key=1761138425-61e3efd7ec1ea9260729ecbe1feebefe-0-10f843e8bc2ed492532c7f725c9c2616
+北京卫视,http://218.19.108.138:808/hls/11/index.m3u8
+湖北卫视,http://218.19.108.138:808/hls/14/index.m3u8
+山东卫视,http://218.19.108.138:808/hls/15/index.m3u8
+黑龙江卫视,http://218.19.108.138:808/hls/16/index.m3u8
 湖北卫视,http://live1.hrtn.net/live/hbwshd_3000.m3u8?auth_key=1761311409-4bc3c51f3f8eb28516f3679b24ac3027-0-c341e5da8c9b197f429f5bf9190e4a61
 湖南卫视,http://live1.hrtn.net/live/hnwshd_3000.m3u8?auth_key=1761311409-d4bb18c75e5c4354a4be96c516d09caa-0-76a4b49fd5ee51dca073357ebcee7d2b
 东方卫视,http://live1.hrtn.net/live/dfwshd_3000.m3u8?auth_key=1761311409-8295aa9653d8dd546fc532883e12db50-0-6e3cbd301a40d258fb6105501e1d0548
