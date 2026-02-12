@@ -223,9 +223,9 @@ http://61.240.150.5:81/hls/63/index.m3u8
 http://61.240.150.5:81/hls/68/index.m3u8
 #EXTINF:-1 tvg-name="兵团卫视" group-title="卫视频道",兵团卫视
 http://61.240.150.5:81/hls/65/index.m3u8
-#EXTINF:-1 tvg-name="CHC动作电影" group-title="海外频道",CHC动作电影
+#EXTINF:-1 tvg-name="CHC动作电影" group-title="数字频道",CHC动作电影
 http://61.240.150.5:81/hls/110/index.m3u8
-#EXTINF:-1 tvg-name="梨园频道" group-title="港澳地区",梨园频道
+#EXTINF:-1 tvg-name="梨园频道" group-title="数字频道",梨园频道
 http://61.240.150.5:81/hls/70/index.m3u8
 #EXTINF:-1 tvg-name="CCTV1" group-title="央视频道",CCTV1
 http://175.171.37.126:81/hls/1/index.m3u8
@@ -779,7 +779,7 @@ http://42.48.106.30:808/hls/16/index.m3u8
 http://42.48.106.30:808/hls/17/index.m3u8
 #EXTINF:-1 tvg-name="CGTN英语国际频道" group-title="港澳地区",CGTN英语国际频道
 http://42.48.106.30:808/hls/19/index.m3u8
-#EXTINF:-1 tvg-name="CGTN纪录片" group-title="CGTN",CGTN纪录片
+#EXTINF:-1 tvg-name="CGTN纪录片" group-title="CIBN系列",CGTN纪录片
 http://42.48.106.30:808/hls/18/index.m3u8
 #EXTINF:-1 tvg-name="CGTN俄罗斯语国际频道" group-title="港澳地区",CGTN俄罗斯语国际频道
 http://42.48.106.30:808/hls/69/index.m3u8
@@ -897,13 +897,13 @@ http://42.48.106.30:808/hls/56/index.m3u8
 http://42.48.106.30:808/hls/57/index.m3u8
 #EXTINF:-1 tvg-name="天元围棋" group-title="数字频道",天元围棋
 http://42.48.106.30:808/hls/75/index.m3u8
-#EXTINF:-1 tvg-name="茶频道" group-title="港澳地区",茶频道
+#EXTINF:-1 tvg-name="茶频道" group-title="数字频道",茶频道
 http://42.48.106.30:808/hls/76/index.m3u8
-#EXTINF:-1 tvg-name="CHC家庭影院" group-title="海外频道",CHC家庭影院
+#EXTINF:-1 tvg-name="CHC家庭影院" group-title="数字频道",CHC家庭影院
 http://42.48.106.30:808/hls/63/index.m3u8
-#EXTINF:-1 tvg-name="CHC高清电影" group-title="海外频道",CHC高清电影
+#EXTINF:-1 tvg-name="CHC高清电影" group-title="数字频道",CHC高清电影
 http://42.48.106.30:808/hls/64/index.m3u8
-#EXTINF:-1 tvg-name="CHC动作电影" group-title="海外频道",CHC动作电影
+#EXTINF:-1 tvg-name="CHC动作电影" group-title="数字频道",CHC动作电影
 http://42.48.106.30:808/hls/65/index.m3u8
 #EXTINF:-1 tvg-name="优漫卡通" group-title="数字频道",优漫卡通
 http://42.48.106.30:808/hls/66/index.m3u8
@@ -959,7 +959,7 @@ http://42.48.106.30:808/hls/126/index.m3u8
 http://42.48.106.30:808/hls/127/index.m3u8
 #EXTINF:-1 tvg-name="延边卫视" group-title="卫视频道",延边卫视
 http://42.48.106.30:808/hls/128/index.m3u8
-#EXTINF:-1 tvg-name="环球旅游" group-title="港澳地区",环球旅游
+#EXTINF:-1 tvg-name="环球旅游" group-title="数字频道",环球旅游
 http://42.48.106.30:808/hls/130/index.m3u8
 #EXTINF:-1 tvg-name="山东教育" group-title="地方频道",山东教育
 http://42.48.106.30:808/hls/131/index.m3u8
