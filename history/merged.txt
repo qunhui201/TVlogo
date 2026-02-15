@@ -15403,6 +15403,9 @@ CCTV5+,http://222.140.17.41:8888/hls/16/index.m3u8
 新疆卫视,http://live1.hrtn.net/live/xjws_1000.m3u8?auth_key=1761311409-1ee3337ba9849b1514863b75e6fcf048-0-a03aabae7d97eb1c1e55d818e9abc0d3
 西藏卫视,http://live1.hrtn.net/live/xzws_1000.m3u8?auth_key=1761311409-9d497640cffeaae56bdd83ebf0edd359-0-080b94851bde16d3d9b2cdb7fc3689f1
 兵团卫视,http://live1.hrtn.net/live/btws_1000.m3u8?auth_key=1761311409-cdf600c8d5e4d462b2a2b51c96610046-0-8efdfb483a03b3db98c75e73b5499862
+东方卫视,http://122.114.131.154:4007/hls/16/index.m3u8
+江苏卫视,http://122.114.131.154:4007/hls/17/index.m3u8
+北京卫视,http://122.114.131.154:4007/hls/18/index.m3u8
 河南卫视,http://171.15.151.99:9999/hls/16/index.m3u8
 河南卫视,http://115.60.252.84:8082/hls/18/index.m3u8
 北京卫视,http://115.60.252.84:8082/hls/27/index.m3u8
@@ -18243,6 +18246,7 @@ BRTV,http://live1.hrtn.net/live/dajs_1000.m3u8?auth_key=1761311409-d89306440ec0d
 WHTV,http://live1.hrtn.net/live/jyjs_1000.m3u8?auth_key=1761311409-d45ee321a348f23803e5959d7fbb7818-0-f6be5488a67f404dd4209d77823e0963
 CGTN,http://live1.hrtn.net/live/cctvnews_1000.m3u8?auth_key=1761311409-8aac9e9879536da161509bf52aa5afe5-0-0d07297819131752da4dec70469f6613
 BRTV少儿,http://live1.hrtn.net/live/kkse_1000.m3u8?auth_key=1761311409-2b2f37efa92b92f3db97d5558c8bd448-0-0703787b687bb0eac4c3bd600501f099
+电视剧轮播,http://122.114.131.154:4007/hls/51/index.m3u8
 河北经济,http://122.114.131.154:4103/hls/9/index.m3u8
 河北都市,http://122.114.131.154:4103/hls/10/index.m3u8
 河北影视,http://122.114.131.154:4103/hls/11/index.m3u8
@@ -20956,6 +20960,7 @@ CHC家庭影院,http://42.48.106.172:808/hls/63/index.m3u8
 CHC高清电影,http://42.48.106.172:808/hls/64/index.m3u8
 CHC动作电影,http://42.48.106.172:808/hls/65/index.m3u8
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761311409-7626251f181e58845fa1736eb97e8ab2-0-034cb39a150a189f9f36a60decdd7eb0
+经典电影,http://122.114.131.154:4007/hls/50/index.m3u8
 深圳体育,http://14.155.136.155:8088/hls/24/index.m3u8
 深圳体育,http://14.155.145.161:8088/hls/24/index.m3u8
 劲爆体育,http://live1.hrtn.net/live/shjs_1000.m3u8?auth_key=1761272311-95dd0e32a89b2397192602ba680e3e36-0-1f846638008b7a69a49c1c22609a1b35
