@@ -4323,6 +4323,20 @@ CCTV13,http://61.52.68.202:8899/hls/13/index.m3u8
 CCTV14,http://61.52.68.202:8899/hls/14/index.m3u8
 CCTV15,http://61.52.68.202:8899/hls/15/index.m3u8
 CCTV5+,http://61.52.68.202:8899/hls/68/index.m3u8
+CCTV1,http://113.88.210.224:9898/hls/1/index.m3u8
+CCTV2,http://113.88.210.224:9898/hls/2/index.m3u8
+CCTV3,http://113.88.210.224:9898/hls/3/index.m3u8
+CCTV4,http://113.88.210.224:9898/hls/4/index.m3u8
+CCTV6,http://113.88.210.224:9898/hls/6/index.m3u8
+CCTV7,http://113.88.210.224:9898/hls/7/index.m3u8
+CCTV8,http://113.88.210.224:9898/hls/8/index.m3u8
+CCTV9,http://113.88.210.224:9898/hls/9/index.m3u8
+CCTV10,http://113.88.210.224:9898/hls/10/index.m3u8
+CCTV11,http://113.88.210.224:9898/hls/11/index.m3u8
+CCTV12,http://113.88.210.224:9898/hls/12/index.m3u8
+CCTV13,http://113.88.210.224:9898/hls/13/index.m3u8
+CCTV15,http://113.88.210.224:9898/hls/15/index.m3u8
+CCTV5+,http://113.88.210.224:9898/hls/16/index.m3u8
 CCTV1,http://175.18.215.204:81/hls/1/index.m3u8
 CCTV2,http://175.18.215.204:81/hls/2/index.m3u8
 CCTV3,http://175.18.215.204:81/hls/3/index.m3u8
@@ -13091,6 +13105,40 @@ CCTV17,http://58.249.145.113:808/hls/16/index.m3u8
 新疆卫视,http://61.52.68.202:8899/hls/56/index.m3u8
 厦门卫视,http://61.52.68.202:8899/hls/62/index.m3u8
 兵团卫视,http://61.52.68.202:8899/hls/63/index.m3u8
+广东卫视,http://113.88.210.224:9898/hls/19/index.m3u8
+湖南卫视,http://113.88.210.224:9898/hls/30/index.m3u8
+浙江卫视,http://113.88.210.224:9898/hls/31/index.m3u8
+江苏卫视,http://113.88.210.224:9898/hls/32/index.m3u8
+深圳卫视,http://113.88.210.224:9898/hls/33/index.m3u8
+东方卫视,http://113.88.210.224:9898/hls/34/index.m3u8
+安徽卫视,http://113.88.210.224:9898/hls/35/index.m3u8
+北京卫视,http://113.88.210.224:9898/hls/36/index.m3u8
+天津卫视,http://113.88.210.224:9898/hls/37/index.m3u8
+山东卫视,http://113.88.210.224:9898/hls/38/index.m3u8
+江西卫视,http://113.88.210.224:9898/hls/39/index.m3u8
+湖北卫视,http://113.88.210.224:9898/hls/40/index.m3u8
+辽宁卫视,http://113.88.210.224:9898/hls/41/index.m3u8
+黑龙江卫视,http://113.88.210.224:9898/hls/42/index.m3u8
+贵州卫视,http://113.88.210.224:9898/hls/43/index.m3u8
+四川卫视,http://113.88.210.224:9898/hls/44/index.m3u8
+河南卫视,http://113.88.210.224:9898/hls/45/index.m3u8
+云南卫视,http://113.88.210.224:9898/hls/46/index.m3u8
+重庆卫视,http://113.88.210.224:9898/hls/47/index.m3u8
+河北卫视,http://113.88.210.224:9898/hls/48/index.m3u8
+东南卫视,http://113.88.210.224:9898/hls/49/index.m3u8
+广西卫视,http://113.88.210.224:9898/hls/50/index.m3u8
+吉林卫视,http://113.88.210.224:9898/hls/51/index.m3u8
+陕西卫视,http://113.88.210.224:9898/hls/52/index.m3u8
+山西卫视,http://113.88.210.224:9898/hls/53/index.m3u8
+厦门卫视,http://113.88.210.224:9898/hls/54/index.m3u8
+内蒙古卫视,http://113.88.210.224:9898/hls/55/index.m3u8
+青海卫视,http://113.88.210.224:9898/hls/56/index.m3u8
+海南卫视,http://113.88.210.224:9898/hls/57/index.m3u8
+宁夏卫视,http://113.88.210.224:9898/hls/58/index.m3u8
+西藏卫视,http://113.88.210.224:9898/hls/59/index.m3u8
+新疆卫视,http://113.88.210.224:9898/hls/60/index.m3u8
+甘肃卫视,http://113.88.210.224:9898/hls/61/index.m3u8
+兵团卫视,http://113.88.210.224:9898/hls/62/index.m3u8
 辽宁卫视,http://175.18.215.204:81/hls/28/index.m3u8
 黑龙江卫视,http://175.18.215.204:81/hls/29/index.m3u8
 北京卫视,http://175.18.215.204:81/hls/30/index.m3u8
@@ -17506,6 +17554,7 @@ QTV-4高清,http://221.215.214.14:9005/hls/38/index.m3u8
 郑州文体高清,http://61.52.102.44:5566/hls/50/index.m3u8
 郑州商都高清,http://125.42.122.72:5566/hls/49/index.m3u8
 郑州文体高清,http://125.42.122.72:5566/hls/50/index.m3u8
+IPTV谍战剧场,http://113.88.210.224:9898/hls/70/index.m3u8
 CETV-1高清,http://182.91.38.0:1194/hls/58/index.m3u8
 CETV-4高清,http://182.91.38.0:1194/hls/60/index.m3u8
 中央一套高清,http://115.204.178.234:808/hls/1/index.m3u8
@@ -19382,6 +19431,14 @@ CGTN,http://123.14.83.52:8888/hls/16/index.m3u8
 30,http://27.219.156.183:8081/hls/30/index.m3u8
 31,http://27.219.156.183:8081/hls/31/index.m3u8
 32,http://27.219.156.183:8081/hls/32/index.m3u8
+CCVT5,http://113.88.210.224:9898/hls/5/index.m3u8
+IPTV6+,http://113.88.210.224:9898/hls/17/index.m3u8
+IPTV8+,http://113.88.210.224:9898/hls/18/index.m3u8
+炫动卡通,http://113.88.210.224:9898/hls/65/index.m3u8
+CETV1,http://113.88.210.224:9898/hls/67/index.m3u8
+SDETV,http://113.88.210.224:9898/hls/68/index.m3u8
+CGTN,http://113.88.210.224:9898/hls/69/index.m3u8
+IPTV少儿动画,http://113.88.210.224:9898/hls/72/index.m3u8
 前郭TV1,http://175.18.215.204:81/hls/51/index.m3u8
 松原,http://175.18.215.204:81/hls/57/index.m3u8
 松原公共,http://175.18.215.204:81/hls/58/index.m3u8
@@ -21257,6 +21314,15 @@ CQTV时尚,http://14.106.99.194:888/hls/16/index.m3u8
 河南梨园,http://61.52.68.202:8899/hls/25/index.m3u8
 河南文物宝库,http://61.52.68.202:8899/hls/26/index.m3u8
 河南武术世界,http://61.52.68.202:8899/hls/27/index.m3u8
+广东珠江,http://113.88.210.224:9898/hls/20/index.m3u8
+广东新闻,http://113.88.210.224:9898/hls/21/index.m3u8
+广东公共,http://113.88.210.224:9898/hls/22/index.m3u8
+TVS-1广东经济科教,http://113.88.210.224:9898/hls/24/index.m3u8
+TVS-2广东经济科教,http://113.88.210.224:9898/hls/25/index.m3u8
+广东影视,http://113.88.210.224:9898/hls/26/index.m3u8
+广东少儿,http://113.88.210.224:9898/hls/27/index.m3u8
+广东体育,http://113.88.210.224:9898/hls/28/index.m3u8
+北京卡酷,http://113.88.210.224:9898/hls/63/index.m3u8
 吉林都市,http://175.18.215.204:81/hls/52/index.m3u8
 吉林综艺,http://175.18.215.204:81/hls/53/index.m3u8
 吉林影视,http://175.18.215.204:81/hls/54/index.m3u8
@@ -22477,6 +22543,8 @@ CHC动作电影,http://42.48.106.30:808/hls/65/index.m3u8
 卡酷少儿,http://61.52.68.202:8899/hls/57/index.m3u8
 金鹰卡通,http://61.52.68.202:8899/hls/58/index.m3u8
 嘉佳卡通,http://61.52.68.202:8899/hls/59/index.m3u8
+金鹰卡通,http://113.88.210.224:9898/hls/64/index.m3u8
+嘉佳卡通,http://113.88.210.224:9898/hls/66/index.m3u8
 CHC 动作电影,http://175.18.215.204:81/hls/59/index.m3u8
 CHC 高清电影,http://175.18.215.204:81/hls/60/index.m3u8
 CHC 家庭影院,http://175.18.215.204:81/hls/61/index.m3u8
@@ -22937,6 +23005,7 @@ CHC家庭电影,http://27.41.244.148:801/hls/905/index.m3u8
 CHC 动作电影,http://175.18.215.48:81/hls/59/index.m3u8
 CHC 高清电影,http://175.18.215.48:81/hls/60/index.m3u8
 CHC 家庭影院,http://175.18.215.48:81/hls/61/index.m3u8
+IPTV经典电影,http://113.88.210.224:9898/hls/71/index.m3u8
 深圳体育,http://14.155.192.23:8088/hls/24/index.m3u8
 CHC家庭影院HD,http://119.36.6.89:1111/hls/38/index.m3u8
 CHC动作电影HD,http://119.36.6.89:1111/hls/39/index.m3u8
